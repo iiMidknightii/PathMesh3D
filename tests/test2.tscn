@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8gswamttwis8"]
+
+[sub_resource type="Curve3D" id="Curve3D_vx06t"]
+_data = {
+"points": PackedVector3Array(-1.8314, -0.130915, 2.09006, 1.8314, 0.130915, -2.09006, -5.11597, 0.190727, 0.34203, -0.810341, 0.396686, 3.29977, 0.810341, -0.396686, -3.29977, 2.60477, 0.701425, -0.999865),
+"tilts": PackedFloat32Array(3.01723, -1.805)
+}
+point_count = 2
+
+[node name="PathExtrude3D" type="PathExtrude3D" node_paths=PackedStringArray("path_3d")]
+path_3d = NodePath("Path3D")
+cross_section = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1, 0, 0)
+smooth = true
+tessellation_max_stages = 12
+tessellation_tolerance_degrees = 0.5
+sample_cubic = true
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_vx06t")
