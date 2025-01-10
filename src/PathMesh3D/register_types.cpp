@@ -6,6 +6,7 @@
 
 #include "path_mesh_3d.hpp"
 #include "path_extrude_3d.hpp"
+#include "path_multimesh_3d.hpp"
 
 void initialize_path_mesh_3d(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
@@ -14,6 +15,7 @@ void initialize_path_mesh_3d(ModuleInitializationLevel p_level) {
 
     GDREGISTER_CLASS(PathMesh3D);
     GDREGISTER_CLASS(PathExtrude3D);
+    GDREGISTER_CLASS(PathMultiMesh3D);
 }
 
 void uninitialize_path_mesh_3d(ModuleInitializationLevel p_level) {

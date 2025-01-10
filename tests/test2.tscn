@@ -11,8 +11,8 @@ point_count = 2
 path_3d = NodePath("Path3D")
 cross_section = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1, 0, 0)
 smooth = true
-tessellation_max_stages = 12
-tessellation_tolerance_degrees = 0.5
+tessellation_max_stages = 8
+tessellation_tolerance_degrees = 0.1
 sample_cubic = true
 
 [node name="Path3D" type="Path3D" parent="."]

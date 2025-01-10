@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="PathMultiMesh3D" inherits="GeometryInstance3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A helper node to allow [MultiMesh] resources to instance their input [Mesh] along a [Path3D] node.
+	</brief_description>
+	<description>
+		This node takes the MultiMesh resource and creates instances along the Path3D.  The PathMultiMesh3D node can control the alignment, distribution, offset, and other properties of each instance along the path.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="queue_rebuild">
+			<return type="void" />
+			<description>
+				Rebuilds the instances along the path. This method is called automatically when the path, but it can be called manually to force an update.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="alignment" type="int" setter="set_alignment" getter="get_alignment" enum="PathMultiMesh3D.Alignment" default="0">
+			When [member distribution] is set to [constant DISTRIBUTE_BY_DISTANCE], this property controls the alignment of the instances along the path.
+		</member>
+		<member name="count" type="int" setter="set_count" getter="get_count" default="1">
+			The number of instances to create along the path.  Only used when [member distribution] is set to [constant DISTRIBUTE_BY_COUNT].
+		</member>
+		<member name="distance" type="float" setter="set_distance" getter="get_distance" default="1.0">
+			The distance between instances along the path.  Only used when [member distribution] is set to [constant DISTRIBUTE_BY_DISTANCE].
+		</member>
+		<member name="distribution" type="int" setter="set_distribution" getter="get_distribution" enum="PathMultiMesh3D.Distribution" default="0">
+			Sets the method in which instances are spaced along the path.
+		</member>
+		<member name="multi_mesh" type="MultiMesh" setter="set_multi_mesh" getter="get_multi_mesh">
+			The MultiMesh resource to instance along the path.
+		</member>
+		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
+			The Path3D node used to instance the MultiMesh.
+		</member>
+		<member name="rotation" type="Vector3" setter="set_rotation" getter="get_rotation" default="Vector3(0, 0, 0)">	
+			The rotation applied to each instance along the path.  If [member rotation_mode] is set to [constant ROTATE_FIXED], this property is the Euler angle of all the instances relative to the PathMesh3D transform.  If [member rotation_mode] is set to [constant ROTATE_PATH], this property is the Euler angle of each instance relative to the path.  If [member rotation_mode] is set to [constant ROTATE_RANDOM], this property is ignored.
+		</member>
+		<member name="rotation_mode" type="int" setter="set_rotation_mode" getter="get_rotation_mode" enum="PathMultiMesh3D.Rotation" default="1">
+			Sets the method in which instances are rotated along the path.
+		</member>
+		<member name="sample_cubic" type="bool" setter="set_sample_cubic" getter="get_sample_cubic" default="false">
+			If [code]true[/code], the instances are sampled using cubic interpolation. If [code]false[/code], the instances are sampled using linear interpolation.
+		</member>
+	</members>
+	<signals>
+		<signal name="curve_changed">
+			<description>
+				Emitted when the internal curve for [member path_d] is changed.
+			</description>
+		</signal>
+		<signal name="mesh_changed">
+			<description>
+				Emitted when [member multi_mesh] is changed.
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="DISTRIBUTE_BY_COUNT" value="0" enum="Distribution">
+			When [member distribution] is set to this value, the instances are distributed by count.
+		</constant>
+		<constant name="DISTRIBUTE_BY_DISTANCE" value="1" enum="Distribution">
+			When [member distribution] is set to this value, the instances are distributed by distance.
+		</constant>
+		<constant name="DISTRIBUTE_MAX" value="2" enum="Distribution">
+			The number of distribution method constants.
+		</constant>
+		<constant name="ROTATE_FIXED" value="0" enum="Rotation">
+			When [member rotation_mode] is set to this value, the instances are rotated to a fixed Euler angle.
+		</constant>
+		<constant name="ROTATE_PATH" value="1" enum="Rotation">
+			When [member rotation_mode] is set to this value, the instances are rotated relative to the path.
+		</constant>
+		<constant name="ROTATE_RANDOM" value="2" enum="Rotation">
+			When [member rotation_mode] is set to this value, the instances are rotated along their local Y axis by a random amount.
+		</constant>
+		<constant name="ROTATE_MAX" value="3" enum="Rotation">
+			The number of rotation method constants.
+		</constant>
+		<constant name="ALIGN_FROM_START" value="0" enum="Alignment">
+			When [member distribution] is set to [constant DISTRIBUTE_BY_DISTANCE] and [member alignment] is set to this value, the instances are aligned from the start of the path.
+		</constant>
+		<constant name="ALIGN_CENTERED" value="1" enum="Alignment">
+			When [member distribution] is set to [constant DISTRIBUTE_BY_DISTANCE] and [member alignment] is set to this value, the instances are centered along the path.
+		</constant>
+		<constant name="ALIGN_FROM_END" value="2" enum="Alignment">
+			When [member distribution] is set to [constant DISTRIBUTE_BY_DISTANCE] and [member alignment] is set to this value, the instances are aligned from the end of the path.
+		</constant>
+		<constant name="ALIGN_MAX" value="3" enum="Alignment">
+			The number of alignment method constants.
+		</constant>
+	</constants>
+</class>

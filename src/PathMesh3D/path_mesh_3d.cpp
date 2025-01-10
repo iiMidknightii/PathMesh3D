@@ -132,7 +132,6 @@ void PathMesh3D::set_mesh(const Ref<Mesh> &p_mesh) {
             _on_mesh_changed();
         } else {
             surfaces.clear();
-            set_base(RID());
         }
 
         notify_property_list_changed();

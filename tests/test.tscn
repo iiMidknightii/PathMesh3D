@@ -1,38 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://bpo0gwnewgno0"]
+[gd_scene load_steps=3 format=3 uid="uid://bpo0gwnewgno0"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_60i82"]
-lightmap_size_hint = Vector2i(14, 21)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htkbp"]
-transparency = 1
-albedo_color = Color(1, 1, 1, 0.560784)
-metallic = 1.0
-roughness = 0.0
-emission = Color(0.376488, 0.212372, 0.191434, 1)
-rim_enabled = true
-clearcoat_enabled = true
-clearcoat_roughness = 0.0
-subsurf_scatter_strength = 1.0
-refraction_enabled = true
+[sub_resource type="TorusMesh" id="TorusMesh_qn2fg"]
 
 [sub_resource type="Curve3D" id="Curve3D_jw5u5"]
 _data = {
-"points": PackedVector3Array(-1.36493, -2.66308, 0.276633, 1.36493, 2.66308, -0.276633, -1.61166, 1.2489, -0.435888, -1.19369, 1.25921, 0.307141, 1.19369, -1.25921, -0.307141, 5.18191, 1.91117, -1.38258, -0.88963, 1.45287, 0.399683, 0.88963, -1.45287, -0.399683, 7.92646, -0.0632663, -0.945479),
-"tilts": PackedFloat32Array(-1.8326, 2.7523, -2.5922)
+"points": PackedVector3Array(-1.36493, -2.66308, 0.276633, 1.36493, 2.66308, -0.276633, -1.61166, 1.2489, -0.435888, -0.88963, 1.45287, 0.399683, 0.88963, -1.45287, -0.399683, 7.92646, -0.0632663, -0.945479),
+"tilts": PackedFloat32Array(-1.8326, 2.61799)
 }
-point_count = 3
+point_count = 2
 
 [node name="PathMesh3D" type="PathMesh3D" node_paths=PackedStringArray("path_3d")]
-mesh = SubResource("BoxMesh_60i82")
+mesh = SubResource("TorusMesh_qn2fg")
 path_3d = NodePath("Path3D")
-surface_0/distribution = 1
+surface_0/distribution = 0
 surface_0/alignment = 2
-surface_0/count = 9
-surface_0/warp_along_curve = false
+surface_0/warp_along_curve = true
 surface_0/sample_cubic = true
 surface_0/tilt = true
-surface_0/offset = Vector2(0.705, 0.285)
-material_override = SubResource("StandardMaterial3D_htkbp")
+surface_0/offset = Vector2(0, 0)
 
 [node name="Path3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_jw5u5")

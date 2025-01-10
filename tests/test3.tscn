@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://cx2dyo8lnm20t"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0tymh"]
+
+[sub_resource type="MultiMesh" id="MultiMesh_5ckd3"]
+transform_format = 1
+instance_count = 5
+mesh = SubResource("BoxMesh_0tymh")
+buffer = PackedFloat32Array(0.69545, -0.314393, -0.646148, -2.54904, 0, 0.899207, -0.437523, 0.646952, 0.718575, 0.304275, 0.625354, 0.989812, 0.315196, 0.288985, -0.903958, -1.06858, -0.035432, 0.955429, 0.293086, 0.775759, 0.948365, -0.0603502, 0.311386, 0.100851, 0.4992, -0.0029885, -0.866481, 0.564876, -0.061833, 0.997322, -0.0390632, 0.775641, 0.864278, 0.0730775, 0.497679, -0.791438, -0.0584985, 0.881956, -0.467687, 2.16864, 0.273832, 0.464697, 0.842065, 0.447006, 0.959997, -0.0788081, -0.268691, -1.463, 0.457795, 0.0627071, -0.886844, 3.20597, -0.0618415, 0.997339, 0.0385971, -0.611258, 0.886904, 0.0371742, 0.460455, -1.37092)
+
+[sub_resource type="Curve3D" id="Curve3D_d3bec"]
+_data = {
+"points": PackedVector3Array(-0.487603, -0.330168, 0.471911, 0.487603, 0.330168, -0.471911, -2.54904, 0.646952, 0.989812, -0.542209, 0.321245, 0.0962329, 0.542209, -0.321245, -0.0962329, -1.16569, 0.816498, 0.128541, -0.237257, 0.815011, -0.377735, 0.237257, -0.815011, 0.377735, 2.20229, 0.370324, -1.43365, -0.956795, 0.0416415, 0.496774, 0.956795, -0.0416415, -0.496774, 3.20597, -0.611258, -1.37092),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
+
+[node name="PathMultiMesh3D" type="PathMultiMesh3D" node_paths=PackedStringArray("path_3d")]
+multi_mesh = SubResource("MultiMesh_5ckd3")
+path_3d = NodePath("Path3D")
+alignment = 1
+count = 5
+sample_cubic = true
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_d3bec")

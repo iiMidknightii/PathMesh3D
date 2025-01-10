@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="PathExtrude3D" inherits="GeometryInstance3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		The PathExtrude3D node allows for the extrusion of a 2D shape along a 3D path, creating a 3D mesh. This is useful for creating complex 3D shapes from simpler 2D profiles.
+	</brief_description>
+	<description>
+		The PathExtrude3D node is used to create a 3D mesh by extruding a 2D shape along a 3D path. 
+		This can be useful for creating complex 3D models such as pipes, cables, or any other object 
+		that follows a specific path in 3D space.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="queue_rebuild">
+			<return type="void" />
+			<description>
+				Rebuilds the extrusion mesh. This method is called automatically when the PathExtrude3D node is modified, but it can be called manually to force an update.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="cross_section" type="PackedVector2Array" setter="set_cross_section" getter="get_cross_section" default="PackedVector2Array()">
+			An array of Vector2 points that define the cross-section to be extruded along the [member path].
+		</member>
+		<member name="end_cap_mode" type="int" setter="set_end_cap_mode" getter="get_end_cap_mode" enum="PathExtrude3D.EndCaps" is_bitfield="true" default="3">
+			The end cap mode for the extrusion. This can be one of the following values:
+			- [constant END_CAPS_NONE]: No end caps are created.
+			- [constant END_CAPS_START]: An end cap is created at the start of the extrusion.
+			- [constant END_CAPS_END]: An end cap is created at the end of the extrusion.
+			- [constant END_CAPS_BOTH]: End caps are created at both the start and end of the extrusion.
+		</member>
+		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
+			A spatial offset in the X any Y direction along the path.
+		</member>
+		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
+			The 3D path along which the cross-section is extruded.
+		</member>
+		<member name="sample_cubic" type="bool" setter="set_sample_cubic" getter="get_sample_cubic" default="false">
+			If [code]true[/code], the cross-section is sampled using cubic interpolation. If [code]false[/code], the cross-section is sampled using linear interpolation.
+		</member>
+		<member name="smooth" type="bool" setter="set_smooth" getter="get_smooth" default="false">
+			If [code]true[/code], the extrusion mesh is smoothed along hard edges.
+		</member>
+		<member name="tessellation_max_stages" type="int" setter="set_tessellation_max_stages" getter="get_tessellation_max_stages" default="5">
+			The maximum number of tessellation stages used for the extrusion.
+		</member>
+		<member name="tessellation_tolerance_degrees" type="float" setter="set_tessellation_tolerance_degrees" getter="get_tessellation_tolerance_degrees" default="4.0">
+			The maximum angle in degrees between two adjacent segments before a new tessellation stage is added.
+		</member>
+		<member name="tilt" type="bool" setter="set_tilt" getter="get_tilt" default="true">
+			If [code]true[/code], the cross-section is rotated to follow the path's rotation and tilt.
+		</member>
+	</members>
+	<signals>
+		<signal name="cross_section_changed">
+			<description>
+				Emitted when the [member cross_section] property changes.
+			</description>
+		</signal>
+		<signal name="curve_changed">
+			<description>
+				Emitted when the curve in the [member path_3d] property changes.
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="END_CAPS_NONE" value="0" enum="EndCaps" is_bitfield="true">
+			When [member end_cap_mode] is set to this value, no end caps are created.
+		</constant>
+		<constant name="END_CAPS_START" value="1" enum="EndCaps" is_bitfield="true">
+			When [member end_cap_mode] is set to this value, an end cap is created at the start of the extrusion.
+		</constant>
+		<constant name="END_CAPS_END" value="2" enum="EndCaps" is_bitfield="true">
+			When [member end_cap_mode] is set to this value, an end cap is created at the end of the extrusion.
+		</constant>
+		<constant name="END_CAPS_BOTH" value="3" enum="EndCaps" is_bitfield="true">
+			When [member end_cap_mode] is set to this value, end caps are created at both the start and end of the extrusion.
+		</constant>
+	</constants>
+</class>
