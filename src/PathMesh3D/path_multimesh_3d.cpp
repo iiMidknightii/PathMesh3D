@@ -76,7 +76,7 @@ PathMultiMesh3D::Alignment PathMultiMesh3D::get_alignment() const {
 
 void PathMultiMesh3D::set_count(uint64_t p_count) {
     if (count != p_count) {
-        count = Math::max(p_count, 0ULL);
+        count = Math::max(p_count, uint64_t(0));
         if (distribution == DISTRIBUTE_BY_COUNT) {
             queue_rebuild();
         }

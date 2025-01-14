@@ -42,7 +42,7 @@ PathMesh3D::Alignment PathMesh3D::get_alignment(uint64_t p_surface_idx) const {
 
 void PathMesh3D::set_count(uint64_t p_surface_idx, uint64_t p_count) {
     CHECK_SURFACE_IDX(p_surface_idx);
-    p_count = Math::clamp(p_count, 2ULL, _get_max_count());
+    p_count = Math::clamp(p_count, uint64_t(2), _get_max_count());
 
     if (surfaces[p_surface_idx].count != p_count) {
         surfaces.write[p_surface_idx].count = p_count;
@@ -380,7 +380,7 @@ void PathMesh3D::_rebuild_mesh() {
         }
 
         #define MAKE_OLD_ARRAY(m_type, m_name, m_index) \
-            m_type m_name = has_column[m_index] ? arrays[m_index] : m_type()
+            m_type m_name = has_column[m_index] ? m_type(arrays[m_index]) : m_type()
         MAKE_OLD_ARRAY(PackedVector3Array, old_norms, Mesh::ARRAY_NORMAL);
         MAKE_OLD_ARRAY(PackedFloat32Array, old_tang, Mesh::ARRAY_TANGENT);
         MAKE_OLD_ARRAY(PackedVector2Array, old_uv1, Mesh::ARRAY_TEX_UV);
@@ -416,7 +416,7 @@ void PathMesh3D::_rebuild_mesh() {
         uint64_t max_count = _get_max_count();
         switch (surf.distribution) {
             case Distribution::DISTRIBUTE_BY_COUNT: {
-                count = Math::clamp(surf.count, 2ULL, max_count);
+                count = Math::clamp(surf.count, uint64_t(2), max_count);
             } break;
             case Distribution::DISTRIBUTE_BY_MODEL_LENGTH: {
                 count = max_count;
@@ -521,7 +521,7 @@ void PathMesh3D::_rebuild_mesh() {
         arrays.resize(Mesh::ARRAY_MAX);
         arrays.fill(Variant());
         arrays[Mesh::ARRAY_VERTEX] = new_verts;
-        #define MAKE_NEW_ARRAY(m_index, m_name) arrays[m_index] = m_name.is_empty() ? Variant() : m_name
+        #define MAKE_NEW_ARRAY(m_index, m_name) arrays[m_index] = m_name.is_empty() ? Variant() : Variant(m_name)
         MAKE_NEW_ARRAY(Mesh::ARRAY_NORMAL, new_norms);
         MAKE_NEW_ARRAY(Mesh::ARRAY_TANGENT, new_tang);
         MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV, new_uv1);
