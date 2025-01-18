@@ -232,6 +232,9 @@ void PathMesh3D::create_multiple_convex_collision(const Ref<MeshConvexDecomposit
 void PathMesh3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("queue_rebuild"), &PathMesh3D::queue_rebuild);
     ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathMesh3D::get_baked_mesh);
+    ClassDB::bind_method(D_METHOD("create_trimesh_collision"), &PathMesh3D::create_trimesh_collision);
+    ClassDB::bind_method(D_METHOD("create_convex_collision", "clean", "simplify"), &PathMesh3D::create_convex_collision);
+    ClassDB::bind_method(D_METHOD("create_multiple_convex_collision", "settings"), &PathMesh3D::create_multiple_convex_collision);
 
     ClassDB::bind_method(D_METHOD("set_distribution", "surface_index", "distribution"), &PathMesh3D::set_distribution);
     ClassDB::bind_method(D_METHOD("get_distribution", "surface_index"), &PathMesh3D::get_distribution);
