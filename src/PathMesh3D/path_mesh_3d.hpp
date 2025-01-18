@@ -7,6 +7,8 @@
 #include <godot_cpp/classes/path3d.hpp>
 #include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
+#include <godot_cpp/classes/mesh_convex_decomposition_settings.hpp>
+#include <godot_cpp/classes/shape3d.hpp>
 
 namespace godot {
 
@@ -58,6 +60,15 @@ public:
     
     Ref<ArrayMesh> get_baked_mesh() const;
 
+    Node *create_trimesh_collision_node();
+    void create_trimesh_collision();
+
+    Node *create_convex_collision_node(bool p_clean = true, bool p_simplify = false);
+    void create_convex_collision(bool p_clean = true, bool p_simplify = false);
+
+    Node *create_multiple_convex_collision_node(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
+    void create_multiple_convex_collision(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
+
 protected:
     static void _bind_methods();
     void _notification(int p_what);
@@ -87,6 +98,8 @@ private:
     void _queue_surface(uint64_t p_surface_idx);
     void _rebuild_mesh();
     bool _are_any_dirty() const;
+    Node *_setup_collision_node(const Ref<Shape3D> &shape);
+    void _add_child_collision_node(Node *p_node);
     Pair<uint64_t, String> _decode_dynamic_propname(const StringName &p_name) const;
     uint64_t _get_max_count() const;
     void _on_mesh_changed();

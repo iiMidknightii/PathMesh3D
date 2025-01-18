@@ -3,25 +3,22 @@
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
+#include <godot_cpp/classes/editor_plugin_registration.hpp>
 
 #include "path_mesh_3d.hpp"
 #include "path_extrude_3d.hpp"
 #include "path_multimesh_3d.hpp"
 
 void initialize_path_mesh_3d(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
-	}
-
-    GDREGISTER_CLASS(PathMesh3D);
-    GDREGISTER_CLASS(PathExtrude3D);
-    GDREGISTER_CLASS(PathMultiMesh3D);
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+        GDREGISTER_CLASS(PathMesh3D);
+        GDREGISTER_CLASS(PathExtrude3D);
+        GDREGISTER_CLASS(PathMultiMesh3D);
+    }
 }
 
 void uninitialize_path_mesh_3d(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
-	}
+	// void
 }
 
 extern "C" {

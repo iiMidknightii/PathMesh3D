@@ -3,6 +3,10 @@
 #include <godot_cpp/classes/curve3d.hpp>
 #include <godot_cpp/classes/geometry2d.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/classes/static_body3d.hpp>
+#include <godot_cpp/classes/collision_shape3d.hpp>
+#include <godot_cpp/classes/concave_polygon_shape3d.hpp>
+#include <godot_cpp/classes/convex_polygon_shape3d.hpp>
 
 using namespace godot;
 
@@ -118,8 +122,65 @@ Ref<ArrayMesh> PathExtrude3D::get_baked_mesh() const {
     return generated_mesh->duplicate();
 }
 
+Node *PathExtrude3D::create_trimesh_collision_node() {
+    return _setup_collision_node(generated_mesh->create_trimesh_shape());
+}
+
+void PathExtrude3D::create_trimesh_collision() {
+    _add_child_collision_node(create_trimesh_collision_node());
+}
+
+Node *PathExtrude3D::create_convex_collision_node(bool p_clean, bool p_simplify) {
+    return _setup_collision_node(generated_mesh->create_convex_shape(p_clean, p_simplify));
+}
+
+void PathExtrude3D::create_convex_collision(bool p_clean, bool p_simplify) {
+    _add_child_collision_node(create_convex_collision_node(p_clean, p_simplify));
+}
+
+Node *PathExtrude3D::create_multiple_convex_collision_node(const Ref<MeshConvexDecompositionSettings> &p_settings) {
+    Ref<MeshConvexDecompositionSettings> settings = p_settings;
+    if (settings.is_null()) {
+        settings.instantiate();
+    }
+
+    // # TODO: GDExtension doesn't have API parity here...
+    Vector<Ref<Shape3D>> shapes; // = generated_mesh->convex_decompose(settings); 
+    if (shapes.is_empty()) {
+        return nullptr;
+    }
+
+    StaticBody3D *static_body = memnew(StaticBody3D);
+    for (int i = 0; i < shapes.size(); ++i) {
+        CollisionShape3D *cshape = memnew(CollisionShape3D);
+        cshape->set_shape(shapes[i]);
+        static_body->add_child(cshape, true);
+    }
+    return static_body;
+}
+
+void PathExtrude3D::create_multiple_convex_collision(const Ref<MeshConvexDecompositionSettings> &p_settings) {
+    StaticBody3D *static_body = Object::cast_to<StaticBody3D>(create_multiple_convex_collision_node(p_settings));
+    ERR_FAIL_NULL(static_body);
+    static_body->set_name(String(get_name()) + "Collision");
+
+    add_child(static_body, true);
+    if (get_owner() != nullptr) {
+        static_body->set_owner(get_owner());
+        int count = static_body->get_child_count();
+        for (int i = 0; i < count; ++i) {
+            CollisionShape3D *cshape = Object::cast_to<CollisionShape3D>(static_body->get_child(i));
+            cshape->set_owner(get_owner());
+        }
+    }
+}
+
 void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("queue_rebuild"), &PathExtrude3D::queue_rebuild);
+    ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathExtrude3D::get_baked_mesh);
+    ClassDB::bind_method(D_METHOD("create_trimesh_collision"), &PathExtrude3D::create_trimesh_collision);
+    ClassDB::bind_method(D_METHOD("create_convex_collision", "clean", "simplify"), &PathExtrude3D::create_convex_collision);
+    ClassDB::bind_method(D_METHOD("create_multiple_convex_collision", "settings"), &PathExtrude3D::create_multiple_convex_collision);
 
     ClassDB::bind_method(D_METHOD("set_path_3d", "path"), &PathExtrude3D::set_path_3d);
     ClassDB::bind_method(D_METHOD("get_path_3d"), &PathExtrude3D::get_path_3d);
@@ -173,6 +234,27 @@ void PathExtrude3D::_notification(int p_what) {
             set_base(generated_mesh->get_rid());
             queue_rebuild();
         } break;
+    }
+}
+
+Node *PathExtrude3D::_setup_collision_node(const Ref<Shape3D> &shape) {
+    StaticBody3D *static_body = memnew(StaticBody3D);
+    CollisionShape3D *cshape = memnew(CollisionShape3D);
+    cshape->set_shape(shape);
+    static_body->add_child(cshape, true);
+    return static_body;
+}
+
+void PathExtrude3D::_add_child_collision_node(Node *p_node) {
+    if (p_node != nullptr) {
+        add_child(p_node, true);
+        if (get_owner() != nullptr) {
+            CollisionShape3D *cshape = Object::cast_to<CollisionShape3D>(p_node->get_child(0));
+            p_node->set_owner(get_owner());
+            if (cshape != nullptr) {
+                cshape->set_owner(get_owner());
+            }
+        }
     }
 }
 
