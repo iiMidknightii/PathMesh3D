@@ -5,12 +5,37 @@
 	</brief_description>
 	<description>
 		This node allows for full 3D mesh resources to be "tiled" along a path, creating a new mesh that is deformed along the path. The input mesh is repeated along the path, and the PathMesh3D node can control the alignment, distribution, offset, and other properties of each surface along the path.
-		
-		[b]NOTE[/b]: For best results, the input mesh should not have any faces along the -Z or +Z axis. This is because the mesh is repeated along the path, and faces along the Z axis will be repeated as well, creating artifacts. 
+
+		[b]NOTE[/b]: For best results, the input mesh should not have any faces along the -Z or +Z axis. This is because the mesh is repeated along the path, and faces along the Z axis will be repeated as well, creating artifacts.
 	</description>
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="create_convex_collision">
+			<return type="void" />
+			<param index="0" name="clean" type="bool" />
+			<param index="1" name="simplify" type="bool" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConvexPolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+
+				If [param clean] is [code]true[/code], duplicate and interior vertices are removed automatically. You can set it to false to make the process faster if not needed.
+
+				If [param simplify] is [code]true[/code], the geometry can be further simplified to reduce the number of vertices. Disabled by default.
+			</description>
+		</method>
+		<method name="create_multiple_convex_collision">
+			<return type="void" />
+			<param index="0" name="settings" type="MeshConvexDecompositionSettings" />
+			<description>
+				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
+			</description>
+		</method>
+		<method name="create_trimesh_collision">
+			<return type="void" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConcavePolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+			</description>
+		</method>
 		<method name="get_alignment" qualifiers="const">
 			<return type="int" enum="PathMesh3D.Alignment" />
 			<param index="0" name="surface_index" type="int" />

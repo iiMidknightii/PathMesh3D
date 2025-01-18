@@ -11,6 +11,37 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="create_convex_collision">
+			<return type="void" />
+			<param index="0" name="clean" type="bool" />
+			<param index="1" name="simplify" type="bool" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConvexPolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+
+				If [param clean] is [code]true[/code], duplicate and interior vertices are removed automatically. You can set it to false to make the process faster if not needed.
+
+				If [param simplify] is [code]true[/code], the geometry can be further simplified to reduce the number of vertices. Disabled by default.
+			</description>
+		</method>
+		<method name="create_multiple_convex_collision">
+			<return type="void" />
+			<param index="0" name="settings" type="MeshConvexDecompositionSettings" />
+			<description>
+				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
+			</description>
+		</method>
+		<method name="create_trimesh_collision">
+			<return type="void" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConcavePolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+			</description>
+		</method>
+		<method name="get_baked_mesh" qualifiers="const">
+			<return type="ArrayMesh" />
+			<description>
+				Returns the baked mesh that is generated from the extrusion.
+			</description>
+		</method>
 		<method name="queue_rebuild">
 			<return type="void" />
 			<description>
