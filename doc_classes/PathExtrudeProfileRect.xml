@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="PathExtrudeProfileRect" inherits="PathExtrudeProfileBase" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A resource to define a rectangular extrusion profile for [PathExtrude3D].
+	</brief_description>
+	<description>
+		This resource defines the parameters to extrude a rectangle across the path in a [PathExtrude3D] node.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="rect" type="Rect2" setter="set_rect" getter="get_rect" default="Rect2(0, 0, 0, 0)">
+			The rectangle to extrude.
+		</member>
+		<member name="subdivisions" type="Vector2i" setter="set_subdivisions" getter="get_subdivisions" default="Vector2i(0, 0)">
+			The number of times in width (x) and height (y) to divide the square for better twisting.
+		</member>
+	</members>
+</class>

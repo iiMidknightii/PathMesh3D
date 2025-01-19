@@ -6,6 +6,7 @@
 #include <godot_cpp/classes/array_mesh.hpp>
 #include <godot_cpp/classes/mesh_convex_decomposition_settings.hpp>
 #include <godot_cpp/classes/shape3d.hpp>
+#include "path_extrude_profile_base.hpp"
 
 namespace godot {
 
@@ -23,8 +24,8 @@ public:
     void set_path_3d(Path3D *p_path);
     Path3D *get_path_3d() const;
 
-    void set_cross_section(PackedVector2Array p_cross_section);
-    PackedVector2Array get_cross_section() const;
+    void set_profile(const Ref<PathExtrudeProfileBase> &p_profile);
+    Ref<PathExtrudeProfileBase> get_profile() const;
 
     void set_smooth(const bool p_smooth);
     bool get_smooth() const;
@@ -60,12 +61,15 @@ public:
     Node *create_multiple_convex_collision_node(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
     void create_multiple_convex_collision(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
 
+    PathExtrude3D();
+    ~PathExtrude3D();
+
 protected:
     static void _bind_methods();
     void _notification(int p_what);
 
 private:
-    PackedVector2Array cross_section;
+    Ref<PathExtrudeProfileBase> profile;
     Ref<ArrayMesh> generated_mesh;
     Path3D *path3d = nullptr;
 
@@ -77,8 +81,10 @@ private:
     bool tilt = true;
     EndCaps end_cap_mode = END_CAPS_BOTH;
     bool dirty = true;
+    bool initial_dirty = true;
 
     void _rebuild_mesh();
+    void _on_profile_changed();
     void _on_curve_changed();
     Node *_setup_collision_node(const Ref<Shape3D> &shape);
     void _add_child_collision_node(Node *p_node);
