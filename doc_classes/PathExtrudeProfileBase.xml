@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="PathExtrudeProfileBase" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A base class for defining the cross-sectional profile to extrude in a [PathExtrude3D] node.
+	</brief_description>
+	<description>
+		This serves as the base for other classes that return the extruded profile in [member get_cross_section].  You can extend this class with custom scripts that override [method _generate_cross_section] in order to customize your own profile.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="_generate_cross_section" qualifiers="virtual">
+			<return type="PackedVector2Array" />
+			<description>
+				An overrideable, virtual method for defining custom cross-sectional profiles using your own custom code.
+				[b]Note:[/b] You must use a [code]@tool[/code] script to see the mesh build in the editor.
+			</description>
+		</method>
+		<method name="get_cross_section" qualifiers="const">
+			<return type="PackedVector2Array" />
+			<description>
+				Returns an array of Vector2s defining the cross section profile to be extruded.
+			</description>
+		</method>
+		<method name="queue_update">
+			<return type="void" />
+			<description>
+				Manually updates the cross section and alerts the [PathExtrude3D] to rebuild.  This is called automatically, but you can call it manually if you need to.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="flip_normals" type="bool" setter="set_flip_normals" getter="get_flip_normals" default="false">
+			If [code]true[/code], the extruded profile will have its faces flipped, e.g. pipes become hollow tubes.
+		</member>
+	</members>
+</class>

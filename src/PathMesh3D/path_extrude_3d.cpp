@@ -2,7 +2,6 @@
 
 #include <godot_cpp/classes/curve3d.hpp>
 #include <godot_cpp/classes/geometry2d.hpp>
-#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/static_body3d.hpp>
 #include <godot_cpp/classes/collision_shape3d.hpp>
 #include <godot_cpp/classes/concave_polygon_shape3d.hpp>
@@ -20,8 +19,9 @@ void PathExtrude3D::set_path_3d(Path3D *p_path) {
 
         if (path3d != nullptr) {
             path3d->connect("curve_changed", callable_mp(this, &PathExtrude3D::_on_curve_changed));
-            _on_curve_changed();
         }
+
+        _on_curve_changed();
     }
 }
 
@@ -29,16 +29,22 @@ Path3D *PathExtrude3D::get_path_3d() const {
     return path3d;
 }
 
-void PathExtrude3D::set_cross_section(PackedVector2Array p_cross_section) {
-    if (p_cross_section != cross_section) {
-        cross_section = p_cross_section;
-        emit_signal("cross_section_changed");
-        queue_rebuild();
+void PathExtrude3D::set_profile(const Ref<PathExtrudeProfileBase> &p_profile) {
+    if (p_profile != profile) {
+        if (profile.is_valid() && profile->is_connected("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed))) {
+            profile->disconnect("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed));
+        }
+        profile = p_profile;
+        if (profile.is_valid()) {
+            profile->connect("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed));
+        }
+
+        _on_profile_changed();
     }
 }
 
-PackedVector2Array PathExtrude3D::get_cross_section() const {
-    return cross_section;
+Ref<PathExtrudeProfileBase> PathExtrude3D::get_profile() const {
+    return profile;
 }
 
 void PathExtrude3D::set_smooth(const bool p_smooth) {
@@ -175,6 +181,14 @@ void PathExtrude3D::create_multiple_convex_collision(const Ref<MeshConvexDecompo
     }
 }
 
+PathExtrude3D::PathExtrude3D() {
+    generated_mesh.instantiate();
+}
+
+PathExtrude3D::~PathExtrude3D() {
+    generated_mesh.unref();
+}
+
 void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("queue_rebuild"), &PathExtrude3D::queue_rebuild);
     ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathExtrude3D::get_baked_mesh);
@@ -186,9 +200,9 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_path_3d"), &PathExtrude3D::get_path_3d);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "path_3d", PROPERTY_HINT_NODE_TYPE, "Path3D"), "set_path_3d", "get_path_3d");
 
-    ClassDB::bind_method(D_METHOD("set_cross_section", "cross_section"), &PathExtrude3D::set_cross_section);
-    ClassDB::bind_method(D_METHOD("get_cross_section"), &PathExtrude3D::get_cross_section);
-    ADD_PROPERTY(PropertyInfo(Variant::PACKED_VECTOR2_ARRAY, "cross_section"), "set_cross_section", "get_cross_section");
+    ClassDB::bind_method(D_METHOD("set_profile", "profile"), &PathExtrude3D::set_profile);
+    ClassDB::bind_method(D_METHOD("get_profile"), &PathExtrude3D::get_profile);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "profile", PROPERTY_HINT_RESOURCE_TYPE, "PathExtrudeProfileBase"), "set_profile", "get_profile");
 
     ClassDB::bind_method(D_METHOD("set_smooth", "smooth"), &PathExtrude3D::set_smooth);
     ClassDB::bind_method(D_METHOD("get_smooth"), &PathExtrude3D::get_smooth);
@@ -229,9 +243,15 @@ void PathExtrude3D::_bind_methods() {
 
 void PathExtrude3D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_ENTER_TREE: {
-            generated_mesh.instantiate();
-            set_base(generated_mesh->get_rid());
+        case NOTIFICATION_INTERNAL_PROCESS: {
+            if (!initial_dirty) {
+                break;
+            }
+            initial_dirty = false;
+            set_process_internal(false);
+        }
+        case NOTIFICATION_READY: {
+            set_process_internal(true);
             queue_rebuild();
         } break;
     }
@@ -264,13 +284,19 @@ void PathExtrude3D::queue_rebuild() {
 }
 
 void PathExtrude3D::_rebuild_mesh() {
-    if (path3d == nullptr || path3d->get_curve().is_null() || !dirty) {
+    generated_mesh->clear_surfaces();
+
+    if (!dirty) {
+        return;
+    }
+    dirty = false;
+
+    if (profile.is_null() || path3d == nullptr || path3d->get_curve().is_null()) {
         return;
     }
 
-    dirty = false;
+    PackedVector2Array cross_section = profile->get_cross_section();
 
-    generated_mesh->clear_surfaces();
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
         return;
@@ -385,6 +411,9 @@ void PathExtrude3D::_rebuild_mesh() {
 
     PackedInt32Array cap = end_cap_mode == END_CAPS_NONE ? 
         PackedInt32Array() : Geometry2D::get_singleton()->triangulate_polygon(offset_cs);
+    if (profile->get_flip_normals()) {
+        cap.reverse();
+    }
 
     if (end_cap_mode & END_CAPS_START) {
         PackedInt32Array cap1 = cap;
@@ -452,6 +481,12 @@ void PathExtrude3D::_rebuild_mesh() {
     arrays[Mesh::ARRAY_TEX_UV] = uvs;
 
     generated_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, arrays);
+    set_base(generated_mesh->get_rid());
+}
+
+void PathExtrude3D::_on_profile_changed() {
+    queue_rebuild();
+    emit_signal("cross_section_changed");
 }
 
 void PathExtrude3D::_on_curve_changed() {

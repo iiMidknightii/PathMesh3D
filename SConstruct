@@ -18,7 +18,7 @@ bin_folder = "addons/" + plugin + "/bin/"
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/" + plugin + "/"])
-sources = Glob("src/" + plugin + "/*.cpp")
+sources = Glob("src/" + plugin + "/*.cpp") + Glob("src/" + plugin + "/extrude_profiles/*.cpp")
 
 if env["target"] in ["editor", "template_debug"]:
     try:
