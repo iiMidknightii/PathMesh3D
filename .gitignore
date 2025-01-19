@@ -19,4 +19,5 @@ mono_crash.*.json
 ~*
 .vscode
 *.dblite
-project.godot
+addons.zip
+tmp.log
