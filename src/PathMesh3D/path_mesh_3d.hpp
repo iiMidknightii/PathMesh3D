@@ -35,6 +35,12 @@ public:
     void set_mesh(const Ref<Mesh> &p_mesh);
     Ref<Mesh> get_mesh() const;
 
+    void set_tile_rotation(uint64_t p_surface_idx, Vector3 p_rotation);
+    Vector3 get_tile_rotation(uint64_t p_surface_idx) const;
+
+    void set_tile_rotation_order(uint64_t p_surface_idx, EulerOrder p_order);
+    EulerOrder get_tile_rotation_order(uint64_t p_surface_idx) const;
+
     void set_distribution(uint64_t p_surface_idx, Distribution p_distribution);
     Distribution get_distribution(uint64_t p_surface_idx) const;
 
@@ -84,6 +90,8 @@ private:
     Path3D *path3d = nullptr;
 
     struct SurfaceData {
+        Vector3 tile_rotation = Vector3();
+        EulerOrder tile_rotation_order = EulerOrder::EULER_ORDER_YXZ;
         Distribution distribution = Distribution::DISTRIBUTE_BY_MODEL_LENGTH;
         Alignment alignment = Alignment::ALIGN_STRETCH;
         uint64_t count = 2;
@@ -101,6 +109,7 @@ private:
     Node *_setup_collision_node(const Ref<Shape3D> &shape);
     void _add_child_collision_node(Node *p_node);
     Pair<uint64_t, String> _decode_dynamic_propname(const StringName &p_name) const;
+    double _get_mesh_length() const;
     uint64_t _get_max_count() const;
     void _on_mesh_changed();
     void _on_curve_changed();

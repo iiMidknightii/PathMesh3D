@@ -83,14 +83,14 @@
 		</member>
 	</members>
 	<signals>
-		<signal name="cross_section_changed">
-			<description>
-				Emitted when the [member cross_section] property changes.
-			</description>
-		</signal>
 		<signal name="curve_changed">
 			<description>
 				Emitted when the curve in the [member path_3d] property changes.
+			</description>
+		</signal>
+		<signal name="profile_changed">
+			<description>
+				Emitted when the extrusion profile has changed.
 			</description>
 		</signal>
 	</signals>

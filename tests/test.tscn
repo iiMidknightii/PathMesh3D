@@ -12,6 +12,8 @@ point_count = 2
 [node name="PathMesh3D" type="PathMesh3D" node_paths=PackedStringArray("path_3d")]
 mesh = SubResource("TorusMesh_qn2fg")
 path_3d = NodePath("Path3D")
+surface_0/tile_rotation = Vector3(0, 0, 0)
+surface_0/tile_rotation_order = 2
 surface_0/distribution = 0
 surface_0/alignment = 2
 surface_0/warp_along_curve = true

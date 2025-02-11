@@ -77,6 +77,20 @@
 				Returns whether the surface is sampled using cubic interpolation.
 			</description>
 		</method>
+		<method name="get_tile_rotation" qualifiers="const">
+			<return type="Vector3" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the rotation of the surface along the path.
+			</description>
+		</method>
+		<method name="get_tile_rotation_order" qualifiers="const">
+			<return type="int" enum="EulerOrder" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the order of the axes used to rotate the surface along the path.
+			</description>
+		</method>
 		<method name="get_tilt" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="surface_index" type="int" />
@@ -135,6 +149,22 @@
 			<param index="1" name="cubic" type="bool" />
 			<description>
 				If [code]true[/code], the surface is sampled using cubic interpolation. If [code]false[/code], the surface is sampled using linear interpolation.
+			</description>
+		</method>
+		<method name="set_tile_rotation">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="rotation" type="Vector3" />
+			<description>
+				Sets an Euler angle rotation for the surface.
+			</description>
+		</method>
+		<method name="set_tile_rotation_order">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="order" type="int" enum="EulerOrder" />
+			<description>
+				Sets the order of the axes used to rotate the surface.
 			</description>
 		</method>
 		<method name="set_tilt">

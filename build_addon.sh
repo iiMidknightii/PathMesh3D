@@ -11,4 +11,6 @@ wsl -e scons target=template_debug
 wsl -e scons target=template_release
 
 rm -f addons/*/bin/~*.TMP
+cp LICENSE README.md addons/
 wsl zip -9 -r addons.zip addons/
+rm -f addons/README.md addons/LICENSE
