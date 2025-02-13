@@ -21,6 +21,9 @@
 		<member name="segments" type="int" setter="set_segments" getter="get_segments" default="32">
 			The number of line segments to use when constructing the circle.
 		</member>
+		<member name="smooth_normals" type="bool" setter="set_smooth_normals" getter="get_smooth_normals" default="true">
+			If true, the normals of the circle will be smoothed.
+		</member>
 		<member name="starting_angle" type="float" setter="set_starting_angle" getter="get_starting_angle" default="0.0">
 			The angle in which the profile sweep will begin.
 		</member>

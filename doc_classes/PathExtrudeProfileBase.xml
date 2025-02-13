@@ -10,9 +10,9 @@
 	</tutorials>
 	<methods>
 		<method name="_generate_cross_section" qualifiers="virtual">
-			<return type="PackedVector2Array" />
+			<return type="Array" />
 			<description>
-				An overrideable, virtual method for defining custom cross-sectional profiles using your own custom code.
+				An overrideable, virtual method for defining custom cross-sectional profiles using your own custom code.  Populate the array with elements indexed similarly to [Mesh] [enum ArrayMesh.ArrayFormat] constants.
 				[b]Note:[/b] You must use a [code]@tool[/code] script to see the mesh build in the editor.
 			</description>
 		</method>

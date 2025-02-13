@@ -88,7 +88,7 @@
 			<return type="int" enum="EulerOrder" />
 			<param index="0" name="surface_index" type="int" />
 			<description>
-				Returns the order of the axes used to rotate the surface along the path.
+				Returns the rotation order of the surface along the path.
 			</description>
 		</method>
 		<method name="get_tilt" qualifiers="const">
@@ -156,7 +156,7 @@
 			<param index="0" name="surface_index" type="int" />
 			<param index="1" name="rotation" type="Vector3" />
 			<description>
-				Sets an Euler angle rotation for the surface.
+				Sets the rotation of the surface along the path.
 			</description>
 		</method>
 		<method name="set_tile_rotation_order">
@@ -164,7 +164,7 @@
 			<param index="0" name="surface_index" type="int" />
 			<param index="1" name="order" type="int" enum="EulerOrder" />
 			<description>
-				Sets the order of the axes used to rotate the surface.
+				Sets the rotation order of the surface along the path.
 			</description>
 		</method>
 		<method name="set_tilt">

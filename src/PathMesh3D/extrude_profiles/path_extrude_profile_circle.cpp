@@ -2,27 +2,54 @@
 
 using namespace godot;
 
-PackedVector2Array PathExtrudeProfileCircle::_generate_cross_section() {
+Array PathExtrudeProfileCircle::_generate_cross_section() {
     PackedVector2Array cs;
+    PackedVector2Array norms;
 
     double swept_angle = ending_angle - starting_angle;
     if (swept_angle <= 0.0) {
-        return cs;
+        return Array::make(cs, norms);
     }
 
     double da = swept_angle / double(segments);
 
-    cs.resize(segments + 1);
-    for (uint64_t i = 0; i <= segments; ++i) {
-        double ang = ending_angle - da * i;
-        cs[i] = Vector2(Math::sin(ang) * radius, Math::cos(ang) * radius);
+    if (smooth_normals) {
+        cs.resize(segments + 1);
+        norms.resize(segments + 1);
+        for (uint64_t i = 0; i <= segments; ++i) {
+            double ang = ending_angle - da * i;
+            norms[i] = Vector2(Math::sin(ang), Math::cos(ang));
+            cs[i] = norms[i] * radius;
+        }
+    } else {
+        cs.resize(segments * 2);
+        norms.resize(segments * 2);
+        for (uint64_t i = 0; i < segments; ++i) {
+            double ang = ending_angle - da * i;
+            Vector2 start_segment = Vector2(Math::sin(ang), Math::cos(ang));
+            Vector2 end_segment = Vector2(Math::sin(ang - da), Math::cos(ang - da));
+            Vector2 segment = end_segment - start_segment;
+            Vector2 segment_normal = Vector2(segment.y, -segment.x).normalized();
+
+            cs[i * 2] = start_segment * radius;
+            cs[i * 2 + 1] = end_segment * radius;
+            norms[i * 2] = segment_normal;
+            norms[i * 2 + 1] = segment_normal;
+        }
     }
 
     if (closed && cs[0].distance_squared_to(cs[cs.size() - 1]) > 1.0e-6) {
-        cs.push_back(cs[0]);
+        Vector2 end_segment_start = cs[cs.size() - 1];
+        Vector2 end_segment_end = cs[0];
+        Vector2 end_segment = end_segment_end - end_segment_start;
+        Vector2 end_segment_normal = Vector2(end_segment.y, -end_segment.x).normalized();
+        cs.push_back(end_segment_start);
+        cs.push_back(end_segment_end);
+        norms.push_back(end_segment_normal);
+        norms.push_back(end_segment_normal);
     }
 
-    return cs;
+    return Array::make(cs, norms);
 }
 
 void PathExtrudeProfileCircle::_bind_methods() {
@@ -45,4 +72,8 @@ void PathExtrudeProfileCircle::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_segments", "segments"), &PathExtrudeProfileCircle::set_segments);
     ClassDB::bind_method(D_METHOD("get_segments"), &PathExtrudeProfileCircle::get_segments);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "segments", PROPERTY_HINT_RANGE, "0,256,1,or_greater"), "set_segments", "get_segments");
+
+    ClassDB::bind_method(D_METHOD("set_smooth_normals", "smooth_normals"), &PathExtrudeProfileCircle::set_smooth_normals);
+    ClassDB::bind_method(D_METHOD("get_smooth_normals"), &PathExtrudeProfileCircle::get_smooth_normals);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "smooth_normals"), "set_smooth_normals", "get_smooth_normals");
 }

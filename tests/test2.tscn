@@ -1,6 +1,8 @@
 [gd_scene load_steps=3 format=3 uid="uid://b8gswamttwis8"]
 
-[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_0aric"]
+[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_1cn84"]
+starting_angle = 1.5708
+ending_angle = 4.71239
 
 [sub_resource type="Curve3D" id="Curve3D_vx06t"]
 _data = {
@@ -11,10 +13,9 @@ point_count = 2
 
 [node name="PathExtrude3D" type="PathExtrude3D" node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("Path3D")
-profile = SubResource("PathExtrudeProfileCircle_0aric")
-smooth = true
+profile = SubResource("PathExtrudeProfileCircle_1cn84")
 tessellation_max_stages = 8
-tessellation_tolerance_degrees = 0.015
+tessellation_tolerance_degrees = 0.05
 sample_cubic = true
 
 [node name="Path3D" type="Path3D" parent="."]

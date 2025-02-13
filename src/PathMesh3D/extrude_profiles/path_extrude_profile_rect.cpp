@@ -3,29 +3,90 @@
 using namespace godot;
 
 
-PackedVector2Array PathExtrudeProfileRect::_generate_cross_section() {
+Array PathExtrudeProfileRect::_generate_cross_section() {
     PackedVector2Array cs;
+    PackedVector2Array norms;
     
-    double height_subdiv = rect.size.y / (subdivisions.y + 1);
-    double width_subdiv = rect.size.x / (subdivisions.x + 1);
+    const double height_subdiv = rect.size.y / (subdivisions.y + 1);
+    const double width_subdiv = rect.size.x / (subdivisions.x + 1);
+    const double norm_length = 1.0 / Math::sqrt(2.0);
 
-    for (uint64_t i = 0; i <= subdivisions.y; ++i) {
-        cs.push_back(Vector2(rect.position.x, rect.position.y + height_subdiv * i));
-    }
-    for (uint64_t i = 0; i <= subdivisions.x; ++i) {
-        cs.push_back(Vector2(rect.position.x + width_subdiv * i, rect.position.y + rect.size.y));
-    }
-    for (uint64_t i = 0; i <= subdivisions.y; ++i) {
-        cs.push_back(Vector2(rect.position.x + rect.size.x, rect.position.y + rect.size.y - height_subdiv * i));
-    }
-    for (uint64_t i = 0; i <= subdivisions.x; ++i) {
-        cs.push_back(Vector2(rect.position.x + rect.size.x - width_subdiv * i, rect.position.y));
-    }
-    cs.push_back(Vector2(rect.position.x, rect.position.y));
+    double x = rect.position.x;
+    double y = rect.position.y;
 
-    cs.reverse();
+    cs.push_back(Vector2(x, y));
+    if (smooth_normals) {
+        norms.push_back(Vector2(-norm_length, -norm_length));
+    } else {
+        norms.push_back(Vector2(0.0, -1.0));
+    }
 
-    return cs;
+    for (uint64_t idx = 0; idx < subdivisions.x; ++idx) {
+        x += width_subdiv;
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(0.0, -1.0));
+    }
+    x += width_subdiv;
+
+    if (smooth_normals) {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(norm_length, -norm_length));
+    } else {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(0.0, -1.0));
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(1.0, 0.0));
+    }
+
+    for (uint64_t idx = 0; idx < subdivisions.y; ++idx) {
+        y += height_subdiv;
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(1.0, 0.0));
+    }
+    y += height_subdiv;
+
+    if (smooth_normals) {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(norm_length, norm_length));
+    } else {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(1.0, 0.0));
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(0.0, 1.0));
+    }
+
+    for (uint64_t idx = 0; idx < subdivisions.x; ++idx) {
+        x -= width_subdiv;
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(0.0, 1.0));
+    }
+    x -= width_subdiv;
+
+    if (smooth_normals) {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(-norm_length, norm_length));
+    } else {
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(0.0, 1.0));
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(-1.0, 0.0));
+    }
+
+    for (uint64_t idx = 0; idx < subdivisions.y; ++idx) {
+        y -= height_subdiv;
+        cs.push_back(Vector2(x, y));
+        norms.push_back(Vector2(-1.0, 0.0));
+    }
+    y -= height_subdiv;
+
+    cs.push_back(Vector2(x, y));
+    if (smooth_normals) {
+        norms.push_back(Vector2(-norm_length, -norm_length));
+    } else {
+        norms.push_back(Vector2(-1.0, 0.0));
+    }
+
+    return Array::make(cs, norms);
 }
 
 void PathExtrudeProfileRect::_bind_methods() {
@@ -37,5 +98,7 @@ void PathExtrudeProfileRect::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_subdivisions"), &PathExtrudeProfileRect::get_subdivisions);
     ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "subdivisions", PROPERTY_HINT_RANGE, "0,256,1,or_greater"), "set_subdivisions", "get_subdivisions");
 
-    
+    ClassDB::bind_method(D_METHOD("set_smooth_normals", "smooth_normals"), &PathExtrudeProfileRect::set_smooth_normals);
+    ClassDB::bind_method(D_METHOD("get_smooth_normals"), &PathExtrudeProfileRect::get_smooth_normals);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "smooth_normals"), "set_smooth_normals", "get_smooth_normals");
 }

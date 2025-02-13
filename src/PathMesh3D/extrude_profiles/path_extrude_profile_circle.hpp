@@ -39,6 +39,14 @@ public:
     }
     _ALWAYS_INLINE_ double get_ending_angle() const { return ending_angle; }
 
+    _ALWAYS_INLINE_ void set_smooth_normals(const bool p_smooth_normals) { 
+        if (p_smooth_normals != smooth_normals) { 
+            smooth_normals = p_smooth_normals; 
+            queue_update(); 
+        } 
+    }
+    _ALWAYS_INLINE_ bool get_smooth_normals() const { return smooth_normals; }
+
     _ALWAYS_INLINE_ void set_closed(const bool p_closed) { 
         if (p_closed != closed) { 
             closed = p_closed; 
@@ -56,13 +64,14 @@ public:
     _ALWAYS_INLINE_ uint64_t get_segments() const { return segments; }
 
 protected:
-    virtual PackedVector2Array _generate_cross_section() override;
+    virtual Array _generate_cross_section() override;
     static void _bind_methods();
 
 private:
     double radius = 1.0;
     double starting_angle = 0.0;
     double ending_angle = Math_TAU;
+    bool smooth_normals = true;
     bool closed = true;
     uint64_t segments = 32;
 };

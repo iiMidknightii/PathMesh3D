@@ -6,6 +6,7 @@
 #include <godot_cpp/classes/array_mesh.hpp>
 #include <godot_cpp/classes/mesh_convex_decomposition_settings.hpp>
 #include <godot_cpp/classes/shape3d.hpp>
+#include <godot_cpp/classes/material.hpp>
 #include "path_extrude_profile_base.hpp"
 
 namespace godot {
@@ -27,9 +28,6 @@ public:
     void set_profile(const Ref<PathExtrudeProfileBase> &p_profile);
     Ref<PathExtrudeProfileBase> get_profile() const;
 
-    void set_smooth(const bool p_smooth);
-    bool get_smooth() const;
-
     void set_tessellation_max_stages(const int32_t p_tessellation_max_stages);
     int32_t get_tessellation_max_stages() const;
 
@@ -42,11 +40,22 @@ public:
     void set_offset(const Vector2 p_offset);
     Vector2 get_offset() const;
 
+    void set_offset_angle(const double p_offset_angle);
+    double get_offset_angle() const;
+
     void set_sample_cubic(const bool p_cubic);
     bool get_sample_cubic() const;
 
     void set_tilt(const bool p_tilt);
     bool get_tilt() const;
+
+    _ALWAYS_INLINE_ void set_material(const Ref<Material> &p_material) {
+        material = p_material;
+        if (generated_mesh.is_valid() && generated_mesh->get_surface_count() > 0) {
+            generated_mesh->surface_set_material(0, material);
+        }
+    }
+    _ALWAYS_INLINE_ Ref<Material> get_material() const { return material; }
 
     void queue_rebuild();
 
@@ -73,13 +82,14 @@ private:
     Ref<ArrayMesh> generated_mesh;
     Path3D *path3d = nullptr;
 
-    bool smooth = false;
     int32_t tessellation_max_stages = 5;
     double tessellation_tolerance_degrees = 4.0;
     Vector2 offset = Vector2();
+    double offset_angle = 0.0;
     bool sample_cubic = false;
     bool tilt = true;
     EndCaps end_cap_mode = END_CAPS_BOTH;
+    Ref<Material> material;
     bool dirty = true;
     bool initial_dirty = true;
 

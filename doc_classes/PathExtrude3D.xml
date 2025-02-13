@@ -57,8 +57,14 @@
 			- [constant END_CAPS_END]: An end cap is created at the end of the extrusion.
 			- [constant END_CAPS_BOTH]: End caps are created at both the start and end of the extrusion.
 		</member>
+		<member name="material" type="Material" setter="set_material" getter="get_material">
+			The material used for the extrusion.  Similar to [CSGPolygon3D], the bttom left of the texture is applied to the starting end cap, and the bottom right of the texture is applied to the end cap.  The top half of the texture is applied to the extruded profile, with U increasing along the path length.
+		</member>
 		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
 			A spatial offset in the X any Y direction along the path.
+		</member>
+		<member name="offset_angle" type="float" setter="set_offset_angle" getter="get_offset_angle" default="0.0">
+			The angle to rotate the cross-section around the path's tangeant.
 		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
 			The 3D path along which the cross-section is extruded.
@@ -68,9 +74,6 @@
 		</member>
 		<member name="sample_cubic" type="bool" setter="set_sample_cubic" getter="get_sample_cubic" default="false">
 			If [code]true[/code], the cross-section is sampled using cubic interpolation. If [code]false[/code], the cross-section is sampled using linear interpolation.
-		</member>
-		<member name="smooth" type="bool" setter="set_smooth" getter="get_smooth" default="false">
-			If [code]true[/code], the extrusion mesh is smoothed along hard edges.
 		</member>
 		<member name="tessellation_max_stages" type="int" setter="set_tessellation_max_stages" getter="get_tessellation_max_stages" default="5">
 			The maximum number of tessellation stages used for the extrusion.
@@ -90,7 +93,7 @@
 		</signal>
 		<signal name="profile_changed">
 			<description>
-				Emitted when the extrusion profile has changed.
+				Emitted when the profile in the [member profile] property changes.
 			</description>
 		</signal>
 	</signals>
