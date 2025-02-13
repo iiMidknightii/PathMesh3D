@@ -33,7 +33,7 @@ Simply add the `PathMesh3D` node to the scene, set its `path_3d` property to a `
 ![](screenshots/PathMultiMesh3D.png)
 
 ## Latest Release
-* 1.1 - Added collision object generation and the path extrusion profiles for easier extrusion
+* 1.2 - Updated `PathExtrude3D` normals generation and fleshed out the profile vertex data generation.  In addition, also added base mesh rotation to `PathMesh3D` so the input mesh can be tiled along a specified local rotation.
 
 ## Contributing
 Feel free to leave any feedback, suggestions, bug reports, and contributions to the repository at [https://github.com/iiMidknightii/PathMesh3D](https://github.com/iiMidknightii/PathMesh3D).
