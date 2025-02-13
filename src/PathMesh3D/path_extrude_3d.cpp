@@ -232,7 +232,7 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_tilt"), &PathExtrude3D::get_tilt);
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "tilt"), "set_tilt", "get_tilt");
 
-    ADD_SIGNAL(MethodInfo("cross_section_changed"));
+    ADD_SIGNAL(MethodInfo("profile_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
     BIND_BITFIELD_FLAG(END_CAPS_NONE);
@@ -486,7 +486,7 @@ void PathExtrude3D::_rebuild_mesh() {
 
 void PathExtrude3D::_on_profile_changed() {
     queue_rebuild();
-    emit_signal("cross_section_changed");
+    emit_signal("profile_changed");
 }
 
 void PathExtrude3D::_on_curve_changed() {
