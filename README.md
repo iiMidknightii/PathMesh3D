@@ -3,10 +3,7 @@
 
 ## Installation
 ### From Godot Asset Library in the Editor
-Click the `AssetLib` button at the top of the Godot editor and search for `PathMesh3D`.  When prompted where to install it, you can select only the folder named "addons".  If you wish to modify or recompile the addon, then you'll need to include the "godot-cpp" and "src" folders along with the "SConstruct" file.
-
-> [!WARNING]
-> If you are downloading this directly into your project, you will want to uncheck the files in the base folder, as they may overwrite your own if you aren't careful.
+Click the `AssetLib` button at the top of the Godot editor and search for `PathMesh3D`.  When prompted where to install it, you can select only the folder named "addons".  If you wish to modify or recompile the addon, then you'll need to include the "godot-cpp" and "src" folders along with the "SConstruct" file from this repository.
 
  ### From Godot Asset Library Web
  Head over to [the PathMesh3D page on the asset library website](https://godotengine.org/asset-library/asset) and click the download button.  Unzip the download into a location of your choosing.  To put the addon in your project, just copy the "addons" folder into the project directory.

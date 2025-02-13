@@ -237,7 +237,7 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_material"), &PathExtrude3D::get_material);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 
-    ADD_SIGNAL(MethodInfo("cross_section_changed"));
+    ADD_SIGNAL(MethodInfo("profile_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
     BIND_BITFIELD_FLAG(END_CAPS_NONE);
@@ -691,7 +691,7 @@ void PathExtrude3D::_rebuild_mesh() {
 
 void PathExtrude3D::_on_profile_changed() {
     queue_rebuild();
-    emit_signal("cross_section_changed");
+    emit_signal("profile_changed");
 }
 
 void PathExtrude3D::_on_curve_changed() {
