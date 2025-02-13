@@ -15,5 +15,8 @@
 		<member name="cross_section" type="PackedVector2Array" setter="set_manual_cross_section" getter="get_manual_cross_section" default="PackedVector2Array()">
 			The cross-sectional profile to extrude in the [PathExtrude3D].
 		</member>
+		<member name="smooth_normals" type="bool" setter="set_smooth_normals" getter="get_smooth_normals" default="false">
+			If [code]true[/code], the normals of the cross-section will be smoothed.
+		</member>
 	</members>
 </class>

@@ -21,13 +21,22 @@ public:
     }
     _ALWAYS_INLINE_ Vector2i get_subdivisions() const { return subdivisions; }
 
+    _ALWAYS_INLINE_ void set_smooth_normals(const bool p_smooth_normals) { 
+        if (p_smooth_normals != smooth_normals) { 
+            smooth_normals = p_smooth_normals; 
+            queue_update(); 
+        } 
+    }
+    _ALWAYS_INLINE_ bool get_smooth_normals() const { return smooth_normals; }
+
 protected:
-    PackedVector2Array _generate_cross_section() override;
+    Array _generate_cross_section() override;
     static void _bind_methods();
     
 private:
     Rect2 rect;
     Vector2i subdivisions;
+    bool smooth_normals = false;
 };
 
 }

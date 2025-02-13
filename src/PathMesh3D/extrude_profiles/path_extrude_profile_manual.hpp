@@ -17,6 +17,14 @@ public:
     }
     _ALWAYS_INLINE_ PackedVector2Array get_manual_cross_section() const { return manual_cross_section; }
 
+    _ALWAYS_INLINE_ void set_smooth_normals(bool p_smooth_normals) {
+        if (p_smooth_normals != smooth_normals) {
+            smooth_normals = p_smooth_normals;
+            queue_update();
+        }
+    }
+    _ALWAYS_INLINE_ bool get_smooth_normals() const { return smooth_normals; }
+    
     _ALWAYS_INLINE_ void set_closed(bool p_closed) {
         if (p_closed != closed) {
             closed = p_closed;
@@ -26,12 +34,13 @@ public:
     _ALWAYS_INLINE_ bool get_closed() const { return closed; }
 
 protected:
-    PackedVector2Array _generate_cross_section() override;
+    Array _generate_cross_section() override;
 
     static void _bind_methods();
 
 private:
     PackedVector2Array manual_cross_section;
+    bool smooth_normals = false;
     bool closed = true;
 };
 

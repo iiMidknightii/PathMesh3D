@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bf6p2xos0dryr"]
 
-[ext_resource type="Script" path="res://addons/PathMesh3D/scripts/path_mesh_3d_options.gd" id="1_ljqft"]
+[ext_resource type="Script" uid="uid://k16bgqnrauft" path="res://addons/PathMesh3D/scripts/path_mesh_3d_options.gd" id="1_ljqft"]
 [ext_resource type="Texture2D" uid="uid://bh5p7hkaa8hie" path="res://addons/PathMesh3D/icons/PathMesh3D.svg" id="1_sjiwc"]
 
 [node name="MenuButton" type="MenuButton"]
