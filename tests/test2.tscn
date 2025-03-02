@@ -1,8 +1,42 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8gswamttwis8"]
+[gd_scene load_steps=9 format=3 uid="uid://b8gswamttwis8"]
 
-[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_1cn84"]
-starting_angle = 1.5708
-ending_angle = 4.71239
+[ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_jtvri"]
+
+[sub_resource type="PathExtrudeProfileRect" id="PathExtrudeProfileRect_2fsul"]
+rect = Rect2(0, 0, 1, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eywb8"]
+albedo_texture = ExtResource("1_jtvri")
+texture_filter = 0
+
+[sub_resource type="GDScript" id="GDScript_x3lis"]
+script/source = "extends PathExtrude3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if Engine.get_frames_drawn() % 1000 == 0:
+		get_tree().reload_current_scene()
+		print(\"yo\")
+"
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_yblif"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_fb1ea"]
+sky_material = SubResource("ProceduralSkyMaterial_yblif")
+
+[sub_resource type="Environment" id="Environment_tln77"]
+background_mode = 2
+sky = SubResource("Sky_fb1ea")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="Curve3D" id="Curve3D_vx06t"]
 _data = {
@@ -13,10 +47,22 @@ point_count = 2
 
 [node name="PathExtrude3D" type="PathExtrude3D" node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("Path3D")
-profile = SubResource("PathExtrudeProfileCircle_1cn84")
+profile = SubResource("PathExtrudeProfileRect_2fsul")
 tessellation_max_stages = 8
 tessellation_tolerance_degrees = 0.05
-sample_cubic = true
+tilt = false
+material = SubResource("StandardMaterial3D_eywb8")
+script = SubResource("GDScript_x3lis")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_tln77")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
 
 [node name="Path3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_vx06t")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)

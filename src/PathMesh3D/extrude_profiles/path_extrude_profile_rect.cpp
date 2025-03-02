@@ -86,7 +86,12 @@ Array PathExtrudeProfileRect::_generate_cross_section() {
         norms.push_back(Vector2(-1.0, 0.0));
     }
 
-    return Array::make(cs, norms);
+    Array out;
+    out.resize(Mesh::ARRAY_MAX);
+    out[Mesh::ARRAY_VERTEX] = cs;
+    out[Mesh::ARRAY_NORMAL] = norms;
+    out[Mesh::ARRAY_TEX_UV] = _generate_v(cs);
+    return out;
 }
 
 void PathExtrudeProfileRect::_bind_methods() {

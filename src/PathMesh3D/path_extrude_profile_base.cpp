@@ -3,6 +3,22 @@
 
 using namespace godot;
 
+
+PackedFloat64Array PathExtrudeProfileBase::_generate_v(const PackedVector2Array &p_vertices) {
+    PackedFloat64Array v;
+    v.resize(p_vertices.size());
+    v[0] = 0.0;
+    for (uint64_t i = 1; i < p_vertices.size(); ++i) {
+        v[i] = v[i - 1] + p_vertices[i].distance_to(p_vertices[i - 1]);
+    }
+    for (uint64_t i = 1; i < v.size() - 1; ++i) {
+        v[i] /= v[v.size() - 1];
+    }
+    v[v.size() - 1] = 1.0;
+
+    return v;
+}
+
 Array PathExtrudeProfileBase::_generate_cross_section() {
     Array out;
     GDVIRTUAL_CALL(_generate_cross_section, out);
@@ -53,8 +69,8 @@ void PathExtrudeProfileBase::_regen() {
             m_type m_name = has_column[m_index] ? m_type(new_mesh_array[m_index]) : m_type()
         MAKE_ARRAY(PackedVector2Array, normals, Mesh::ARRAY_NORMAL);
         MAKE_ARRAY(PackedFloat32Array, tangents, Mesh::ARRAY_TANGENT);
-        MAKE_ARRAY(PackedVector2Array, uv1, Mesh::ARRAY_TEX_UV);
-        MAKE_ARRAY(PackedVector2Array, uv2, Mesh::ARRAY_TEX_UV2);
+        MAKE_ARRAY(PackedFloat64Array, v1, Mesh::ARRAY_TEX_UV);
+        MAKE_ARRAY(PackedFloat64Array, v2, Mesh::ARRAY_TEX_UV2);
         MAKE_ARRAY(PackedColorArray, colors, Mesh::ARRAY_COLOR);
         MAKE_ARRAY(PackedColorArray, custom0, Mesh::ARRAY_CUSTOM0);
         MAKE_ARRAY(PackedByteArray, custom1, Mesh::ARRAY_CUSTOM1);
@@ -78,8 +94,8 @@ void PathExtrudeProfileBase::_regen() {
                 }
             }
             tangents.reverse();
-            uv1.reverse();
-            uv2.reverse();
+            v1.reverse();
+            v2.reverse();
             colors.reverse();
             custom0.reverse();
             custom1.reverse();
@@ -95,8 +111,8 @@ void PathExtrudeProfileBase::_regen() {
         #define MAKE_NEW_ARRAY(m_index, m_name) new_mesh_array[m_index] = m_name.is_empty() ? Variant() : Variant(m_name)
         MAKE_NEW_ARRAY(Mesh::ARRAY_NORMAL, normals);
         MAKE_NEW_ARRAY(Mesh::ARRAY_TANGENT, tangents);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV, uv1);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV2, uv2);
+        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV, v1);
+        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV2, v2);
         MAKE_NEW_ARRAY(Mesh::ARRAY_COLOR, colors);
         MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM0, custom0);
         MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM1, custom1);

@@ -8,14 +8,13 @@ Array PathExtrudeProfileManual::_generate_cross_section()  {
         return Array::make(PackedVector2Array());
     }
 
-    Array out;
-
     Vector2 start = manual_cross_section[0];
     Vector2 end = manual_cross_section[manual_cross_section.size() - 1];
     bool already_closed = start.distance_squared_to(end) < 1.0e-6;
 
     PackedVector2Array cs;
     PackedVector2Array norms;
+
     if (smooth_normals) {
         cs = manual_cross_section;
         norms.resize(cs.size());
@@ -55,9 +54,11 @@ Array PathExtrudeProfileManual::_generate_cross_section()  {
         norms.push_back(end_segment_normal);
     }
 
-    out.push_back(cs);
-    out.push_back(norms);
-
+    Array out;
+    out.resize(Mesh::ARRAY_MAX);
+    out[Mesh::ARRAY_VERTEX] = cs;
+    out[Mesh::ARRAY_NORMAL] = norms;
+    out[Mesh::ARRAY_TEX_UV] = _generate_v(cs);
     return out;
 }
 
