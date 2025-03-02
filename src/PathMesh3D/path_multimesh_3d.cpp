@@ -40,8 +40,9 @@ void PathMultiMesh3D::set_path_3d(Path3D *p_path) {
 
         if (path3d != nullptr) {
             path3d->connect("curve_changed", callable_mp(this, &PathMultiMesh3D::_on_curve_changed));
-            _on_curve_changed();
         }
+        
+        _on_curve_changed();
     }
 }
 
@@ -199,6 +200,16 @@ void PathMultiMesh3D::_notification(int p_what) {
         case NOTIFICATION_ENTER_TREE: {
             queue_rebuild();
         } break;
+
+        case NOTIFICATION_READY: {
+            set_process_internal(true);
+        } break;
+
+        case NOTIFICATION_INTERNAL_PROCESS: {
+            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
+                _on_curve_changed();
+            }
+        } break;
     }
 }
 
@@ -225,11 +236,13 @@ void PathMultiMesh3D::_on_curve_changed() {
 }
 
 void PathMultiMesh3D::_rebuild_mesh() {
-    if (path3d == nullptr || path3d->get_curve().is_null() || multi_mesh == nullptr || !dirty) {
+    if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree() || multi_mesh == nullptr || !dirty) {
         return;
     }
 
     dirty = false;
+
+    path_transform = path3d->get_global_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -296,6 +309,8 @@ void PathMultiMesh3D::_rebuild_mesh() {
             default:
                 ERR_FAIL();
         }
+
+        transform = get_global_transform().affine_inverse() * path_transform * transform;
 
         multi_mesh->set_instance_transform(i, transform);
         offset += separation;

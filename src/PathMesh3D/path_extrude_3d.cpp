@@ -18,7 +18,7 @@ void PathExtrude3D::set_path_3d(Path3D *p_path) {
 
         path3d = p_path;
 
-        if (path3d != nullptr) {
+        if (path3d != nullptr && !path3d->is_connected("curve_changed", callable_mp(this, &PathExtrude3D::_on_curve_changed))) {
             path3d->connect("curve_changed", callable_mp(this, &PathExtrude3D::_on_curve_changed));
         }
 
@@ -248,16 +248,23 @@ void PathExtrude3D::_bind_methods() {
 
 void PathExtrude3D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_INTERNAL_PROCESS: {
-            if (!initial_dirty) {
-                break;
-            }
-            initial_dirty = false;
-            set_process_internal(false);
-        }
+        case NOTIFICATION_ENTER_TREE: {
+            queue_rebuild();
+        } break;
+
         case NOTIFICATION_READY: {
             set_process_internal(true);
-            queue_rebuild();
+        } break;
+
+        case NOTIFICATION_INTERNAL_PROCESS: {
+            if (!initial_dirty) {
+                queue_rebuild();
+                initial_dirty = false;
+            }
+
+            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
+                queue_rebuild();
+            }
         } break;
     }
 }
@@ -296,9 +303,11 @@ void PathExtrude3D::_rebuild_mesh() {
 
     generated_mesh->clear_surfaces();
 
-    if (profile.is_null() || path3d == nullptr || path3d->get_curve().is_null()) {
+    if (profile.is_null() || path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree()) {
         return;
     }
+
+    path_transform = path3d->get_global_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -362,7 +371,7 @@ void PathExtrude3D::_rebuild_mesh() {
     Vector<Transform3D> transforms;
     transforms.resize(n_slices);
     for (uint64_t idx_slice = 0; idx_slice < n_slices; ++idx_slice) {
-        transforms.write[idx_slice] = curve->sample_baked_with_rotation(
+        transforms.write[idx_slice] = get_global_transform().affine_inverse() * path_transform * curve->sample_baked_with_rotation(
                 curve->get_closest_offset(tessellated_points[idx_slice]), sample_cubic, tilt);
     }
 

@@ -23,7 +23,7 @@ Simply add the `PathMesh3D` node to the scene, set its `path_3d` property to a `
 ![](screenshots/PathMesh3D.png)
 
 ### PathExtrude3D
-`PathExtrude3D` works similarly to the `CSGPolygon` node when in path mode.  First, you define the cross section using the `profile` property.  This property uses any one of the `PathExtrudeProfileBase` classes, including rectangular, circular, etc.  You can also create your own profile by creating a custom script inheriting from `PathExtrudeProfileBase` and overriding the virtual `_generate_cross_section` method.  This resource stores the points as a `PackedVector2Array` that will be used by the `PathExtrude3D`.  Next, set the `path_3d` property to any `Path3D` node in the scene.  From there, the cross section will be extruded according to the settings you have chosen.
+`PathExtrude3D` works similarly to the `CSGPolygon` node when in path mode.  First, you define the cross section using the `profile` property.  This property uses any one of the `PathExtrudeProfileBase` classes, including rectangular, circular, etc.  You can also create your own profile by creating a custom script inheriting from `PathExtrudeProfileBase` and overriding the virtual `_generate_cross_section` method.  This resource stores the cross section vertices in arrays similar to `ArrayMesh` that will be used by the `PathExtrude3D`.  Next, set the `path_3d` property to any `Path3D` node in the scene.  From there, the cross section will be extruded according to the settings you have chosen.
 
 ![](screenshots/PathExtrude3D.png)
 
@@ -32,8 +32,13 @@ Simply add the `PathMesh3D` node to the scene, set its `path_3d` property to a `
 
 ![](screenshots/PathMultiMesh3D.png)
 
-## Latest Release
-* 1.2 - Updated `PathExtrude3D` normals generation and fleshed out the profile vertex data generation.  In addition, also added base mesh rotation to `PathMesh3D` so the input mesh can be tiled along a specified local rotation.
+### PathScene3D
+`PathScene3D` creates instances of a `PackedScene` resource along the the path.  It will automatically add the instances as internal children of itself and distribute their transforms according to selected settings.  If it is desired, the instances can be "baked" by calling `bake_instances`, which unparents them from the `PathScene3D` node and returns them in an array.  From there, they can be reparented as more permanent nodes.
+
+## Latest Release - v1.3.0
+* Fixed `PathExtrude3D` UV generation and material issues.  
+* Added the `PathScene3D` node. 
+* Applied the `Path3D` node transform to the generated meshes/instances, while un-applying the helper node's transform (meaning the mesh/instance will always follow the curve in the editor no matter the relative node transformations).
 
 ## Contributing
 Feel free to leave any feedback, suggestions, bug reports, and contributions to the repository at [https://github.com/iiMidknightii/PathMesh3D](https://github.com/iiMidknightii/PathMesh3D).

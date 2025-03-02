@@ -186,8 +186,9 @@ void PathMesh3D::set_path_3d(Path3D *p_path) {
 
         if (path3d != nullptr) {
             path3d->connect("curve_changed", callable_mp(this, &PathMesh3D::_on_curve_changed));
-            _on_curve_changed();
         }
+        
+        _on_curve_changed();
     }
 }
 
@@ -311,6 +312,16 @@ void PathMesh3D::_notification(int p_what) {
             set_base(generated_mesh->get_rid());
             queue_rebuild();
         } break;
+
+        case NOTIFICATION_READY: {
+            set_process_internal(true);
+        } break;
+
+        case NOTIFICATION_INTERNAL_PROCESS: {
+            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
+                _on_curve_changed();
+            }
+        }
     }
 }
 
@@ -477,13 +488,15 @@ void PathMesh3D::_queue_surface(uint64_t p_surface_idx) {
 }
 
 void PathMesh3D::_rebuild_mesh() {
-    if (path3d == nullptr || path3d->get_curve().is_null() || source_mesh.is_null() || !_are_any_dirty()) {
+    if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree() || source_mesh.is_null() || !_are_any_dirty()) {
         return;
     }
 
     generated_mesh->clear_surfaces();
-    Ref<Curve3D> curve = path3d->get_curve();
 
+    path_transform = path3d->get_global_transform();
+
+    Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
         return;
     }
@@ -639,6 +652,8 @@ void PathMesh3D::_rebuild_mesh() {
                     transform = curve->sample_baked_with_rotation(z_offset, surf.cubic, surf.tilt);
                     transform.basis.set_column(2, Vector3(0.0, 0.0, 0.0));
                 }
+
+                transform = path_transform * transform;
 
                 new_verts[k] = transform.xform(old_verts[idx_vert]);
                 if (has_column[Mesh::ARRAY_NORMAL]) {

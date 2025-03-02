@@ -62,6 +62,7 @@ transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -
 shadow_enabled = true
 
 [node name="Path3D" type="Path3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.75648)
 curve = SubResource("Curve3D_vx06t")
 
 [node name="Camera3D" type="Camera3D" parent="."]

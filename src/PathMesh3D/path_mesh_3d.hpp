@@ -102,6 +102,7 @@ private:
         bool dirty = true;
     };
     Vector<SurfaceData> surfaces;
+    Transform3D path_transform = Transform3D();
 
     void _queue_surface(uint64_t p_surface_idx);
     void _rebuild_mesh();

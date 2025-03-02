@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccvxxiocy5t84"]
+
+[ext_resource type="PackedScene" uid="uid://raln2ubgyedb" path="res://tests/instance_3d.tscn" id="1_31dx7"]
+
+[sub_resource type="Curve3D" id="Curve3D_r0b1d"]
+_data = {
+"points": PackedVector3Array(-0.303501, 0, 4.79107, 0.303501, 0, -4.79107, 0, 0, 10, -1.11022, 0, 3.45518, 1.11022, 0, -3.45518, -4.72624, 0.0159912, 1.02722, 0.010436, 0, 2.99874, -0.010436, 0, -2.99874, 0.200701, -2.15788, -5.46748, -1.61156, 0, 3.12829, 1.61156, 0, -3.12829, -5.39292, 3.63772, -5.91237),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
+
+[node name="PathScene3D" type="PathScene3D" node_paths=PackedStringArray("path_3d")]
+scene = ExtResource("1_31dx7")
+path_3d = NodePath("Path3D")
+count = 8
+distance = 0.86
+
+[node name="Path3D" type="Path3D" parent="."]
+transform = Transform3D(0.592781, 0.798212, -0.107094, -0.615964, 0.535016, 0.578227, 0.518844, -0.276796, 0.808817, 10.5311, 0, 9.90576)
+curve = SubResource("Curve3D_r0b1d")

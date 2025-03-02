@@ -8,7 +8,7 @@
 namespace godot {
 
 class PathMultiMesh3D : public GeometryInstance3D {
-    GDCLASS(PathMultiMesh3D, GeometryInstance3D);
+    GDCLASS(PathMultiMesh3D, GeometryInstance3D)
 
 public:
     enum Distribution {
@@ -74,6 +74,8 @@ private:
     Vector3 rotation = Vector3();
     bool sample_cubic = false;
     bool dirty = true;
+
+    Transform3D path_transform = Transform3D();
 
     void _on_mesh_changed();
     void _on_curve_changed();

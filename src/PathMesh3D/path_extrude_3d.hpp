@@ -93,6 +93,8 @@ private:
     bool dirty = true;
     bool initial_dirty = true;
 
+    Transform3D path_transform = Transform3D();
+
     void _rebuild_mesh();
     void _on_profile_changed();
     void _on_curve_changed();
