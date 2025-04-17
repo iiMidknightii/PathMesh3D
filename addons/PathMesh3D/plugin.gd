@@ -29,24 +29,24 @@ func _exit_tree() -> void:
 
 
 func _handles(object: Object) -> bool:
-	return object is PathMesh3D or object is PathExtrude3D or object is PathScene3D
+	return is_instance_valid(object) and (object is PathMesh3D or object is PathExtrude3D or object is PathScene3D)
 
 
 func _edit(object: Object) -> void:
-	if object is PathMesh3D or object is PathExtrude3D and _mesh_editor_button:
+	if is_instance_valid(object) and (object is PathMesh3D or object is PathExtrude3D) and _mesh_editor_button:
 		_path_object = object
 		_mesh_editor_button.path_mesh = object
 		_mesh_editor_button.ur = get_undo_redo()
-	elif object is PathScene3D and _scene_editor_button:
+	elif is_instance_valid(object) and object is PathScene3D and _scene_editor_button:
 		_path_object = object
 		_scene_editor_button.path_scene = object
 		_scene_editor_button.ur = get_undo_redo()
 
 
 func _make_visible(visible: bool) -> void:
-	if _path_object is PathMesh3D or _path_object is PathExtrude3D and visible:
+	if is_instance_valid(_path_object) and (_path_object is PathMesh3D or _path_object is PathExtrude3D) and visible:
 		_mesh_editor_button.visible = visible
-	elif _path_object is PathScene3D and visible:
+	elif is_instance_valid(_path_object) and _path_object is PathScene3D and visible:
 		_scene_editor_button.visible = visible
 	elif not visible:
 		_mesh_editor_button.visible = visible

@@ -13,6 +13,17 @@ using namespace godot;
 #define CHECK_SURFACE_IDX(m_idx) ERR_FAIL_COND(m_idx < 0 || m_idx >= surfaces.size())
 #define CHECK_SURFACE_IDX_V(m_idx, m_ret) ERR_FAIL_COND_V(m_idx < 0 || m_idx >= surfaces.size(), m_ret)
 
+void PathMesh3D::set_mesh_transform(MeshTransform p_transform) {
+    if (mesh_transform != p_transform) {
+        mesh_transform = p_transform;
+        queue_rebuild();
+    }
+}
+
+PathMesh3D::MeshTransform PathMesh3D::get_mesh_transform() const {
+    return mesh_transform;
+}
+
 void PathMesh3D::set_tile_rotation(uint64_t p_surface_idx, Vector3 p_rotation) {
     CHECK_SURFACE_IDX(p_surface_idx);
 
@@ -200,7 +211,6 @@ void PathMesh3D::queue_rebuild() {
     for (SurfaceData &surf : surfaces) {
         surf.dirty = true;
     }
-    callable_mp(this, &PathMesh3D::_rebuild_mesh).call_deferred();
 }
 
 Ref<ArrayMesh> PathMesh3D::get_baked_mesh() const {
@@ -286,6 +296,10 @@ void PathMesh3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_offset", "surface_index", "offset"), &PathMesh3D::set_offset);
     ClassDB::bind_method(D_METHOD("get_offset", "surface_index"), &PathMesh3D::get_offset);
 
+    ClassDB::bind_method(D_METHOD("set_mesh_transform", "transform"), &PathMesh3D::set_mesh_transform);
+    ClassDB::bind_method(D_METHOD("get_mesh_transform"), &PathMesh3D::get_mesh_transform);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "mesh_transform", PROPERTY_HINT_ENUM, "Transform Mesh Local,Transform Mesh to Path Node"), "set_mesh_transform", "get_mesh_transform");
+
     ClassDB::bind_method(D_METHOD("set_mesh", "mesh"), &PathMesh3D::set_mesh);
     ClassDB::bind_method(D_METHOD("get_mesh"), &PathMesh3D::get_mesh);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mesh", PROPERTY_HINT_RESOURCE_TYPE, "Mesh"), "set_mesh", "get_mesh");
@@ -297,6 +311,8 @@ void PathMesh3D::_bind_methods() {
     ADD_SIGNAL(MethodInfo("mesh_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_LOCAL);
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_PATH_NODE);
     BIND_ENUM_CONSTANT(DISTRIBUTE_BY_COUNT);
     BIND_ENUM_CONSTANT(DISTRIBUTE_BY_MODEL_LENGTH);
     BIND_ENUM_CONSTANT(ALIGN_STRETCH);
@@ -307,21 +323,20 @@ void PathMesh3D::_bind_methods() {
 
 void PathMesh3D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_POST_ENTER_TREE: {
-            generated_mesh.instantiate();
-            set_base(generated_mesh->get_rid());
-            queue_rebuild();
-        } break;
-
         case NOTIFICATION_READY: {
             set_process_internal(true);
         } break;
 
         case NOTIFICATION_INTERNAL_PROCESS: {
-            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
-                _on_curve_changed();
+            bool dirty = _are_any_dirty();
+            dirty |= mesh_transform == TRANSFORM_MESH_PATH_NODE && 
+                (local_transform != get_global_transform() || (
+                    path3d != nullptr &&
+                    path3d->get_global_transform() != path_transform));
+            if (dirty) {
+                _rebuild_mesh();
             }
-        }
+        } break;
     }
 }
 
@@ -484,7 +499,6 @@ void PathMesh3D::_queue_surface(uint64_t p_surface_idx) {
     ERR_FAIL_COND(p_surface_idx < 0 || p_surface_idx >= surfaces.size());
 
     surfaces.write[p_surface_idx].dirty = true;
-    callable_mp(this, &PathMesh3D::_rebuild_mesh).call_deferred();
 }
 
 void PathMesh3D::_rebuild_mesh() {
@@ -495,6 +509,8 @@ void PathMesh3D::_rebuild_mesh() {
     generated_mesh->clear_surfaces();
 
     path_transform = path3d->get_global_transform();
+    local_transform = get_global_transform();
+    Transform3D mod_transform = local_transform.affine_inverse() * path_transform;
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -653,7 +669,9 @@ void PathMesh3D::_rebuild_mesh() {
                     transform.basis.set_column(2, Vector3(0.0, 0.0, 0.0));
                 }
 
-                transform = path_transform * transform;
+                if (mesh_transform == TRANSFORM_MESH_PATH_NODE) {
+                    transform = mod_transform * transform;
+                }
 
                 new_verts[k] = transform.xform(old_verts[idx_vert]);
                 if (has_column[Mesh::ARRAY_NORMAL]) {
@@ -786,4 +804,28 @@ void PathMesh3D::_on_mesh_changed() {
 void PathMesh3D::_on_curve_changed() {
     emit_signal("curve_changed");
     queue_rebuild();
+}
+
+PathMesh3D::PathMesh3D() {
+    generated_mesh.instantiate();
+    set_base(generated_mesh->get_rid());
+}
+
+PathMesh3D::~PathMesh3D() {
+    if (source_mesh.is_valid()) {
+        if (source_mesh->is_connected("changed", callable_mp(this, &PathMesh3D::_on_mesh_changed))) {
+            source_mesh->disconnect("changed", callable_mp(this, &PathMesh3D::_on_mesh_changed));
+        }
+        source_mesh.unref();
+    }
+    if (path3d != nullptr) {
+        if (UtilityFunctions::is_instance_id_valid(path3d->get_instance_id()) && 
+                path3d->is_connected("curve_changed", callable_mp(this, &PathMesh3D::_on_curve_changed))) {
+            path3d->disconnect("curve_changed", callable_mp(this, &PathMesh3D::_on_curve_changed));
+        }
+        path3d = nullptr;
+    }
+    generated_mesh->clear_surfaces();
+    generated_mesh.unref();
+    surfaces.clear();
 }

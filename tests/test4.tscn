@@ -9,12 +9,15 @@ _data = {
 }
 point_count = 4
 
-[node name="PathScene3D" type="PathScene3D" node_paths=PackedStringArray("path_3d")]
+[node name="Node3D" type="Node3D"]
+
+[node name="PathScene3D" type="PathScene3D" parent="." node_paths=PackedStringArray("path_3d")]
 scene = ExtResource("1_31dx7")
-path_3d = NodePath("Path3D")
+path_3d = NodePath("../Path3D")
 count = 8
 distance = 0.86
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49097, 7.04617, 3.94408)
 
 [node name="Path3D" type="Path3D" parent="."]
-transform = Transform3D(0.592781, 0.798212, -0.107094, -0.615964, 0.535016, 0.578227, 0.518844, -0.276796, 0.808817, 10.5311, 0, 9.90576)
+transform = Transform3D(0.592781, 0.798212, -0.107094, -0.615964, 0.535016, 0.578227, 0.518844, -0.276796, 0.808817, 5.98394, 4.42591, 9.90576)
 curve = SubResource("Curve3D_r0b1d")

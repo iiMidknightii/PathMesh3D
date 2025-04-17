@@ -50,6 +50,17 @@ Path3D *PathMultiMesh3D::get_path_3d() const {
     return path3d;
 }
 
+void PathMultiMesh3D::set_mesh_transform(MeshTransform p_transform) {
+    if (mesh_transform != p_transform) {
+        mesh_transform = p_transform;
+        queue_rebuild();
+    }
+}
+
+PathMultiMesh3D::MeshTransform PathMultiMesh3D::get_mesh_transform() const {
+    return mesh_transform;
+}
+
 void PathMultiMesh3D::set_distribution(Distribution p_distribution) {
     if (distribution != p_distribution) {
         distribution = p_distribution;
@@ -137,7 +148,6 @@ bool PathMultiMesh3D::get_sample_cubic() const {
 
 void PathMultiMesh3D::queue_rebuild() {
     dirty = true;
-    callable_mp(this, &PathMultiMesh3D::_rebuild_mesh).call_deferred();
 }
 
 void PathMultiMesh3D::_bind_methods() {
@@ -150,6 +160,10 @@ void PathMultiMesh3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_path_3d", "path"), &PathMultiMesh3D::set_path_3d);
     ClassDB::bind_method(D_METHOD("get_path_3d"), &PathMultiMesh3D::get_path_3d);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "path_3d", PROPERTY_HINT_NODE_TYPE, "Path3D"), "set_path_3d", "get_path_3d");
+
+    ClassDB::bind_method(D_METHOD("set_mesh_transform", "transform"), &PathMultiMesh3D::set_mesh_transform);
+    ClassDB::bind_method(D_METHOD("get_mesh_transform"), &PathMultiMesh3D::get_mesh_transform);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "mesh_transform", PROPERTY_HINT_ENUM, "Transform Mesh Local,Transform Mesh to Path Node"), "set_mesh_transform", "get_mesh_transform");
 
     ClassDB::bind_method(D_METHOD("set_distribution", "distribution"), &PathMultiMesh3D::set_distribution);
     ClassDB::bind_method(D_METHOD("get_distribution"), &PathMultiMesh3D::get_distribution);
@@ -182,6 +196,8 @@ void PathMultiMesh3D::_bind_methods() {
     ADD_SIGNAL(MethodInfo("mesh_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_LOCAL);
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_PATH_NODE);
     BIND_ENUM_CONSTANT(DISTRIBUTE_BY_COUNT);
     BIND_ENUM_CONSTANT(DISTRIBUTE_BY_DISTANCE);
     BIND_ENUM_CONSTANT(DISTRIBUTE_MAX);
@@ -197,17 +213,17 @@ void PathMultiMesh3D::_bind_methods() {
 
 void PathMultiMesh3D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_ENTER_TREE: {
-            queue_rebuild();
-        } break;
-
         case NOTIFICATION_READY: {
             set_process_internal(true);
         } break;
 
         case NOTIFICATION_INTERNAL_PROCESS: {
-            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
-                _on_curve_changed();
+            dirty |= mesh_transform == TRANSFORM_MESH_PATH_NODE && 
+                (local_transform != get_global_transform() || (
+                    path3d != nullptr &&
+                    path3d->get_global_transform() != path_transform));
+            if (dirty) {
+                _rebuild_mesh();
             }
         } break;
     }
@@ -242,7 +258,9 @@ void PathMultiMesh3D::_rebuild_mesh() {
 
     dirty = false;
 
+    local_transform = get_global_transform();
     path_transform = path3d->get_global_transform();
+    Transform3D mod_transform = local_transform.affine_inverse() * path_transform;
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -310,9 +328,27 @@ void PathMultiMesh3D::_rebuild_mesh() {
                 ERR_FAIL();
         }
 
-        transform = get_global_transform().affine_inverse() * path_transform * transform;
+        if (mesh_transform == TRANSFORM_MESH_PATH_NODE) {
+            transform = mod_transform * transform;
+        }
 
         multi_mesh->set_instance_transform(i, transform);
         offset += separation;
+    }
+}
+
+PathMultiMesh3D::~PathMultiMesh3D() {
+    if (multi_mesh.is_valid()) {
+        if (multi_mesh->is_connected("changed", callable_mp(this, &PathMultiMesh3D::_on_mesh_changed))) {
+            multi_mesh->disconnect("changed", callable_mp(this, &PathMultiMesh3D::_on_mesh_changed));
+        }
+        multi_mesh.unref();
+    }
+    if (path3d != nullptr) {
+        if (UtilityFunctions::is_instance_id_valid(path3d->get_instance_id()) && 
+                path3d->is_connected("curve_changed", callable_mp(this, &PathMultiMesh3D::_on_curve_changed))) {
+            path3d->disconnect("curve_changed", callable_mp(this, &PathMultiMesh3D::_on_curve_changed));
+        }
+        path3d = nullptr;
     }
 }

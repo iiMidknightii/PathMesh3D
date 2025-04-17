@@ -15,6 +15,11 @@ class PathExtrude3D : public GeometryInstance3D {
     GDCLASS(PathExtrude3D, GeometryInstance3D)
 
 public:
+    enum MeshTransform {
+        TRANSFORM_MESH_LOCAL,
+        TRANSFORM_MESH_PATH_NODE,
+        TRANSFORM_MESH_MAX,
+    };
     enum EndCaps {
         END_CAPS_NONE = 0, 
         END_CAPS_START = 1 << 0, 
@@ -27,6 +32,9 @@ public:
 
     void set_profile(const Ref<PathExtrudeProfileBase> &p_profile);
     Ref<PathExtrudeProfileBase> get_profile() const;
+
+    void set_mesh_transform(const MeshTransform p_transform);
+    MeshTransform get_mesh_transform() const;
 
     void set_tessellation_max_stages(const int32_t p_tessellation_max_stages);
     int32_t get_tessellation_max_stages() const;
@@ -82,6 +90,8 @@ private:
     Ref<ArrayMesh> generated_mesh;
     Path3D *path3d = nullptr;
 
+    MeshTransform mesh_transform = TRANSFORM_MESH_LOCAL;
+
     int32_t tessellation_max_stages = 5;
     double tessellation_tolerance_degrees = 4.0;
     Vector2 offset = Vector2();
@@ -91,8 +101,8 @@ private:
     EndCaps end_cap_mode = END_CAPS_BOTH;
     Ref<Material> material;
     bool dirty = true;
-    bool initial_dirty = true;
 
+    Transform3D local_transform = Transform3D();
     Transform3D path_transform = Transform3D();
 
     void _rebuild_mesh();
@@ -103,6 +113,7 @@ private:
 };
 }
 
+VARIANT_ENUM_CAST(PathExtrude3D::MeshTransform);
 VARIANT_BITFIELD_CAST(PathExtrude3D::EndCaps);
 
 #endif

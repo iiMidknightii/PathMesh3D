@@ -45,25 +45,29 @@ _data = {
 }
 point_count = 2
 
-[node name="PathExtrude3D" type="PathExtrude3D" node_paths=PackedStringArray("path_3d")]
-path_3d = NodePath("Path3D")
+[node name="Node3D" type="Node3D"]
+
+[node name="PathExtrude3D" type="PathExtrude3D" parent="." node_paths=PackedStringArray("path_3d")]
+path_3d = NodePath("../Path3D")
 profile = SubResource("PathExtrudeProfileRect_2fsul")
+mesh_transform = 1
 tessellation_max_stages = 8
 tessellation_tolerance_degrees = 0.05
 tilt = false
 material = SubResource("StandardMaterial3D_eywb8")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15287, -0.660449)
 script = SubResource("GDScript_x3lis")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_tln77")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
-shadow_enabled = true
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)
 
 [node name="Path3D" type="Path3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.75648)
 curve = SubResource("Curve3D_vx06t")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true

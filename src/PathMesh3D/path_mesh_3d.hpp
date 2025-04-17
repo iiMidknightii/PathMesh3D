@@ -16,6 +16,11 @@ class PathMesh3D : public GeometryInstance3D {
     GDCLASS(PathMesh3D, GeometryInstance3D)
 
 public:
+    enum MeshTransform {
+        TRANSFORM_MESH_LOCAL,
+        TRANSFORM_MESH_PATH_NODE,
+        TRANSFORM_MESH_MAX,
+    };
     enum Distribution {
         DISTRIBUTE_BY_MODEL_LENGTH,
         DISTRIBUTE_BY_COUNT,
@@ -34,6 +39,9 @@ public:
 
     void set_mesh(const Ref<Mesh> &p_mesh);
     Ref<Mesh> get_mesh() const;
+
+    void set_mesh_transform(MeshTransform p_transform);
+    MeshTransform get_mesh_transform() const;
 
     void set_tile_rotation(uint64_t p_surface_idx, Vector3 p_rotation);
     Vector3 get_tile_rotation(uint64_t p_surface_idx) const;
@@ -75,6 +83,9 @@ public:
     Node *create_multiple_convex_collision_node(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
     void create_multiple_convex_collision(const Ref<MeshConvexDecompositionSettings> &p_settings = nullptr);
 
+    PathMesh3D();
+    ~PathMesh3D() override;
+
 protected:
     static void _bind_methods();
     void _notification(int p_what);
@@ -89,6 +100,8 @@ private:
     Ref<ArrayMesh> generated_mesh;
     Path3D *path3d = nullptr;
 
+    MeshTransform mesh_transform = TRANSFORM_MESH_LOCAL;
+
     struct SurfaceData {
         Vector3 tile_rotation = Vector3();
         EulerOrder tile_rotation_order = EulerOrder::EULER_ORDER_YXZ;
@@ -102,6 +115,7 @@ private:
         bool dirty = true;
     };
     Vector<SurfaceData> surfaces;
+    Transform3D local_transform = Transform3D();
     Transform3D path_transform = Transform3D();
 
     void _queue_surface(uint64_t p_surface_idx);
@@ -118,6 +132,7 @@ private:
 
 }
 
+VARIANT_ENUM_CAST(PathMesh3D::MeshTransform);
 VARIANT_ENUM_CAST(PathMesh3D::Distribution);
 VARIANT_ENUM_CAST(PathMesh3D::Alignment);
 

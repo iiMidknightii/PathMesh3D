@@ -60,6 +60,9 @@
 		<member name="material" type="Material" setter="set_material" getter="get_material">
 			The material used for the extrusion.  Similar to [CSGPolygon3D], the bttom left of the texture is applied to the starting end cap, and the bottom right of the texture is applied to the end cap.  The top half of the texture is applied to the extruded profile, with U increasing along the path length.
 		</member>
+		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathExtrude3D.MeshTransform" default="0">
+			Sets the overall transform of the generated mesh to either follow the PathExtrude3D node's transform or the transform of the Path3D node.
+		</member>
 		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
 			A spatial offset in the X any Y direction along the path.
 		</member>
@@ -98,6 +101,12 @@
 		</signal>
 	</signals>
 	<constants>
+		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="MeshTransform">
+			When [member mesh_transform] is set to this value, the mesh is transformed using the PathExtrude3D node's transform.
+		</constant>
+		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="MeshTransform">
+			When [member mesh_transform] is set to this value, the mesh is transformed using the Path3D node's transform.
+		</constant>
 		<constant name="END_CAPS_NONE" value="0" enum="EndCaps" is_bitfield="true">
 			When [member end_cap_mode] is set to this value, no end caps are created.
 		</constant>

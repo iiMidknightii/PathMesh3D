@@ -48,6 +48,17 @@ Ref<PathExtrudeProfileBase> PathExtrude3D::get_profile() const {
     return profile;
 }
 
+void PathExtrude3D::set_mesh_transform(const MeshTransform p_transform) {
+    if (mesh_transform != p_transform) {
+        mesh_transform = p_transform;
+        queue_rebuild();
+    }
+}
+
+PathExtrude3D::MeshTransform PathExtrude3D::get_mesh_transform() const {
+    return mesh_transform;
+}
+
 void PathExtrude3D::set_tessellation_max_stages(const int32_t p_tesselation_max_stages) {
     if (tessellation_max_stages != p_tesselation_max_stages) {
         tessellation_max_stages = p_tesselation_max_stages;
@@ -182,11 +193,31 @@ void PathExtrude3D::create_multiple_convex_collision(const Ref<MeshConvexDecompo
     }
 }
 
+
+void PathExtrude3D::queue_rebuild() {
+    dirty = true;
+}
+
 PathExtrude3D::PathExtrude3D() {
     generated_mesh.instantiate();
+    set_base(generated_mesh->get_rid());
 }
 
 PathExtrude3D::~PathExtrude3D() {
+    if (profile.is_valid()) {
+        if (profile->is_connected("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed))) {
+            profile->disconnect("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed));
+        }
+        profile.unref();
+    }
+    if (path3d != nullptr) {
+        if (UtilityFunctions::is_instance_id_valid(path3d->get_instance_id()) && 
+                path3d->is_connected("curve_changed", callable_mp(this, &PathExtrude3D::_on_curve_changed))) {
+            path3d->disconnect("curve_changed", callable_mp(this, &PathExtrude3D::_on_curve_changed));
+        }
+        path3d = nullptr;
+    }
+    generated_mesh->clear_surfaces();
     generated_mesh.unref();
 }
 
@@ -204,6 +235,10 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_profile", "profile"), &PathExtrude3D::set_profile);
     ClassDB::bind_method(D_METHOD("get_profile"), &PathExtrude3D::get_profile);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "profile", PROPERTY_HINT_RESOURCE_TYPE, "PathExtrudeProfileBase"), "set_profile", "get_profile");
+
+    ClassDB::bind_method(D_METHOD("set_mesh_transform", "transform"), &PathExtrude3D::set_mesh_transform);
+    ClassDB::bind_method(D_METHOD("get_mesh_transform"), &PathExtrude3D::get_mesh_transform);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "mesh_transform", PROPERTY_HINT_ENUM, "Transform Mesh Local,Transform Mesh to Path Node"), "set_mesh_transform", "get_mesh_transform");
 
     ClassDB::bind_method(D_METHOD("set_tessellation_max_stages", "tessellation_max_stages"), &PathExtrude3D::set_tessellation_max_stages);
     ClassDB::bind_method(D_METHOD("get_tessellation_max_stages"), &PathExtrude3D::get_tessellation_max_stages);
@@ -240,6 +275,9 @@ void PathExtrude3D::_bind_methods() {
     ADD_SIGNAL(MethodInfo("profile_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_LOCAL);
+    BIND_ENUM_CONSTANT(TRANSFORM_MESH_PATH_NODE);
+
     BIND_BITFIELD_FLAG(END_CAPS_NONE);
     BIND_BITFIELD_FLAG(END_CAPS_START);
     BIND_BITFIELD_FLAG(END_CAPS_END);
@@ -248,22 +286,17 @@ void PathExtrude3D::_bind_methods() {
 
 void PathExtrude3D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_ENTER_TREE: {
-            queue_rebuild();
-        } break;
-
         case NOTIFICATION_READY: {
             set_process_internal(true);
         } break;
 
         case NOTIFICATION_INTERNAL_PROCESS: {
-            if (!initial_dirty) {
-                queue_rebuild();
-                initial_dirty = false;
-            }
-
-            if (path3d != nullptr && path3d->get_global_transform() != path_transform) {
-                queue_rebuild();
+            dirty |= mesh_transform == TRANSFORM_MESH_PATH_NODE && 
+                (local_transform != get_global_transform() || (
+                    path3d != nullptr &&
+                    path3d->get_global_transform() != path_transform));
+            if (dirty) {
+                _rebuild_mesh();
             }
         } break;
     }
@@ -290,11 +323,6 @@ void PathExtrude3D::_add_child_collision_node(Node *p_node) {
     }
 }
 
-void PathExtrude3D::queue_rebuild() {
-    dirty = true;
-    callable_mp(this, &PathExtrude3D::_rebuild_mesh).call_deferred();
-}
-
 void PathExtrude3D::_rebuild_mesh() {
     if (!dirty) {
         return;
@@ -307,6 +335,7 @@ void PathExtrude3D::_rebuild_mesh() {
         return;
     }
 
+    local_transform = get_global_transform();
     path_transform = path3d->get_global_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
@@ -371,8 +400,15 @@ void PathExtrude3D::_rebuild_mesh() {
     Vector<Transform3D> transforms;
     transforms.resize(n_slices);
     for (uint64_t idx_slice = 0; idx_slice < n_slices; ++idx_slice) {
-        transforms.write[idx_slice] = get_global_transform().affine_inverse() * path_transform * curve->sample_baked_with_rotation(
+        transforms.write[idx_slice] = curve->sample_baked_with_rotation(
                 curve->get_closest_offset(tessellated_points[idx_slice]), sample_cubic, tilt);
+    }
+
+    if (mesh_transform == TRANSFORM_MESH_PATH_NODE) {
+        Transform3D transform = local_transform.affine_inverse() * path_transform;
+        for (uint64_t idx_slice = 0; idx_slice < n_slices; ++idx_slice) {
+            transforms.write[idx_slice] = transform * transforms[idx_slice];
+        }
     }
 
     uint64_t new_size = n_slices * n_vertices * 6;
@@ -713,7 +749,6 @@ void PathExtrude3D::_rebuild_mesh() {
 
     generated_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, arrays);
     generated_mesh->surface_set_material(0, material);
-    set_base(generated_mesh->get_rid());
 }
 
 void PathExtrude3D::_on_profile_changed() {
