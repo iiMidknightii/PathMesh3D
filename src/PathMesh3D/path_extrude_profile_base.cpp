@@ -4,57 +4,37 @@
 using namespace godot;
 
 
-PackedFloat64Array PathExtrudeProfileBase::_generate_v(const PackedVector2Array &p_vertices) {
-    PackedFloat64Array v;
-    v.resize(p_vertices.size());
-    v[0] = 0.0;
-    for (uint64_t i = 1; i < p_vertices.size(); ++i) {
-        v[i] = v[i - 1] + p_vertices[i].distance_to(p_vertices[i - 1]);
-    }
-    for (uint64_t i = 1; i < v.size() - 1; ++i) {
-        v[i] /= v[v.size() - 1];
-    }
-    v[v.size() - 1] = 1.0;
-
-    return v;
+Array PathExtrudeProfileBase::get_mesh_arrays() const {
+    return mesh_array.duplicate();
 }
 
-Array PathExtrudeProfileBase::_generate_cross_section() {
-    Array out;
-    GDVIRTUAL_CALL(_generate_cross_section, out);
-    // must have at least an empty array of vertices
-    if (out.size() < Mesh::ARRAY_VERTEX) {
-        out.resize(Mesh::ARRAY_VERTEX + 1);
-        out[Mesh::ARRAY_VERTEX] = PackedVector2Array();
-    }
-    return out;
+PackedVector2Array PathExtrudeProfileBase::get_cross_section() const {
+    return mesh_array[Mesh::ARRAY_VERTEX];
 }
 
-void PathExtrudeProfileBase::_notification(int p_what) {
-    switch (p_what) {
-        case NOTIFICATION_POSTINITIALIZE: {
-            queue_update();
-        } break;
+void PathExtrudeProfileBase::set_flip_normals(bool p_flip_normals) {
+    if (p_flip_normals != flip_normals) {
+        flip_normals = p_flip_normals;
+        queue_update();
     }
 }
 
-void PathExtrudeProfileBase::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("get_cross_section"), &PathExtrudeProfileBase::get_cross_section);
-    ClassDB::bind_method(D_METHOD("queue_update"), &PathExtrudeProfileBase::queue_update);
-
-    ClassDB::bind_method(D_METHOD("set_flip_normals", "flip_normals"), &PathExtrudeProfileBase::set_flip_normals);
-    ClassDB::bind_method(D_METHOD("get_flip_normals"), &PathExtrudeProfileBase::get_flip_normals);
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_normals"), "set_flip_normals", "get_flip_normals");
-
-    GDVIRTUAL_BIND(_generate_cross_section)
+bool PathExtrudeProfileBase::get_flip_normals() const {
+    return flip_normals;
 }
 
-void PathExtrudeProfileBase::_regen() {
+void PathExtrudeProfileBase::queue_update() {
+    dirty = true;
+}
+
+bool PathExtrudeProfileBase::_regen_if_dirty() {
+    bool r_value = dirty;
+    
     if (dirty) {
         dirty = false;
         Array new_mesh_array = _generate_cross_section();
         if (new_mesh_array == mesh_array) {
-            return;
+            return false;
         }
 
         Vector<bool> has_column;
@@ -125,4 +105,48 @@ void PathExtrudeProfileBase::_regen() {
         mesh_array = new_mesh_array;
         emit_changed();
     }
+
+    return r_value;
+}
+
+PackedFloat64Array PathExtrudeProfileBase::_generate_v(const PackedVector2Array &p_vertices) {
+    PackedFloat64Array v;
+    v.resize(p_vertices.size());
+
+    if (v.size() == 0) {
+        return v;
+    }
+
+    v[0] = 0.0;
+    for (uint64_t i = 1; i < p_vertices.size(); ++i) {
+        v[i] = v[i - 1] + p_vertices[i].distance_to(p_vertices[i - 1]);
+    }
+    for (uint64_t i = 1; i < v.size() - 1; ++i) {
+        v[i] /= v[v.size() - 1];
+    }
+    v[v.size() - 1] = 1.0;
+
+    return v;
+}
+
+Array PathExtrudeProfileBase::_generate_cross_section() {
+    Array out;
+    GDVIRTUAL_CALL(_generate_cross_section, out);
+    // must have at least an empty array of vertices
+    if (out.size() < Mesh::ARRAY_VERTEX) {
+        out.resize(Mesh::ARRAY_VERTEX + 1);
+        out[Mesh::ARRAY_VERTEX] = PackedVector2Array();
+    }
+    return out;
+}
+
+void PathExtrudeProfileBase::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_cross_section"), &PathExtrudeProfileBase::get_cross_section);
+    ClassDB::bind_method(D_METHOD("queue_update"), &PathExtrudeProfileBase::queue_update);
+
+    ClassDB::bind_method(D_METHOD("set_flip_normals", "flip_normals"), &PathExtrudeProfileBase::set_flip_normals);
+    ClassDB::bind_method(D_METHOD("get_flip_normals"), &PathExtrudeProfileBase::get_flip_normals);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_normals"), "set_flip_normals", "get_flip_normals");
+
+    GDVIRTUAL_BIND(_generate_cross_section)
 }

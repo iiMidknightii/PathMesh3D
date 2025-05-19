@@ -15,7 +15,7 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 "
 
-[sub_resource type="TorusMesh" id="TorusMesh_qn2fg"]
+[sub_resource type="TorusMesh" id="TorusMesh_eedmf"]
 
 [sub_resource type="Curve3D" id="Curve3D_jw5u5"]
 _data = {
@@ -29,18 +29,17 @@ script = SubResource("GDScript_bfc6h")
 
 [node name="PathMesh3D" type="PathMesh3D" parent="." node_paths=PackedStringArray("path_3d")]
 mesh_transform = 1
-mesh = SubResource("TorusMesh_qn2fg")
+mesh = SubResource("TorusMesh_eedmf")
 path_3d = NodePath("../Path3D")
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
 surface_0/distribution = 0
-surface_0/alignment = 2
+surface_0/alignment = 0
 surface_0/warp_along_curve = true
-surface_0/sample_cubic = true
+surface_0/sample_cubic = false
 surface_0/tilt = true
 surface_0/offset = Vector2(0, 0)
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.815, 3.625, 0)
+surface_0/triangle_count = 3575
 
 [node name="Path3D" type="Path3D" parent="."]
-transform = Transform3D(1.16827, -0.22639, 0, 0.22639, 1.16827, 0, 0, 0, 1.19, 0, 0, -0.536434)
 curve = SubResource("Curve3D_jw5u5")

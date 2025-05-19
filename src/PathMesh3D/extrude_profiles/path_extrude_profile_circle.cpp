@@ -3,6 +3,78 @@
 
 using namespace godot;
 
+void PathExtrudeProfileCircle::set_radius(const double p_radius) {
+    if (p_radius != radius) {
+        radius = p_radius;
+        queue_update();
+    }
+}
+
+double PathExtrudeProfileCircle::get_radius() const { 
+    return radius; 
+}
+
+void PathExtrudeProfileCircle::set_starting_angle(const double p_starting_angle) {
+    if (p_starting_angle != starting_angle) { 
+        starting_angle = Math::clamp(p_starting_angle, double(0.0), double(Math_TAU)); 
+        if (starting_angle > ending_angle) {
+            ending_angle = starting_angle;
+        }
+        queue_update(); 
+    } 
+}
+
+double PathExtrudeProfileCircle::get_starting_angle() const { 
+    return starting_angle; 
+}
+
+void PathExtrudeProfileCircle::set_ending_angle(const double p_ending_angle) { 
+    if (p_ending_angle != ending_angle) { 
+        ending_angle = Math::clamp(p_ending_angle, double(0.0), double(Math_TAU)); 
+        if (ending_angle < starting_angle) {
+            starting_angle = ending_angle;
+        }
+        queue_update(); 
+    } 
+}
+
+double PathExtrudeProfileCircle::get_ending_angle() const { 
+    return ending_angle; 
+}
+
+void PathExtrudeProfileCircle::set_smooth_normals(const bool p_smooth_normals) { 
+    if (p_smooth_normals != smooth_normals) { 
+        smooth_normals = p_smooth_normals; 
+        queue_update(); 
+    } 
+}
+
+bool PathExtrudeProfileCircle::get_smooth_normals() const { 
+    return smooth_normals; 
+}
+
+void PathExtrudeProfileCircle::set_closed(const bool p_closed) { 
+    if (p_closed != closed) { 
+        closed = p_closed; 
+        queue_update(); 
+    } 
+}
+
+bool PathExtrudeProfileCircle::is_closed() const { 
+    return closed; 
+}
+
+void PathExtrudeProfileCircle::set_segments(const uint64_t p_segments) { 
+    if (p_segments != segments && p_segments > 1) { 
+        segments = p_segments; 
+        queue_update(); 
+    } 
+}
+
+uint64_t PathExtrudeProfileCircle::get_segments() const { 
+    return segments; 
+}
+
 Array PathExtrudeProfileCircle::_generate_cross_section() {
     PackedVector2Array cs;
     PackedVector2Array norms;

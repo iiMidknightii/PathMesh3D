@@ -2,8 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_jtvri"]
 
-[sub_resource type="PathExtrudeProfileRect" id="PathExtrudeProfileRect_2fsul"]
-rect = Rect2(0, 0, 1, 0.1)
+[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_yx5hd"]
+radius = 0.52
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eywb8"]
 albedo_texture = ExtResource("1_jtvri")
@@ -40,7 +40,7 @@ glow_enabled = true
 
 [sub_resource type="Curve3D" id="Curve3D_vx06t"]
 _data = {
-"points": PackedVector3Array(-1.8314, -0.130915, 2.09006, 1.8314, 0.130915, -2.09006, -5.11597, 0.190727, 0.34203, -1.16177, 0.3153, 4.33177, 1.16177, -0.3153, -4.33177, 2.60477, 0.701425, -0.999865),
+"points": PackedVector3Array(-1.8314, -0.130915, 2.09006, 1.8314, 0.130915, -2.09006, -1.42203, 0.941492, 3.01894, -1.16177, 0.3153, 4.33177, 1.16177, -0.3153, -4.33177, 2.60477, 0.701425, -0.999865),
 "tilts": PackedFloat32Array(3.01723, -1.805)
 }
 point_count = 2
@@ -49,7 +49,7 @@ point_count = 2
 
 [node name="PathExtrude3D" type="PathExtrude3D" parent="." node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
-profile = SubResource("PathExtrudeProfileRect_2fsul")
+profile = SubResource("PathExtrudeProfileCircle_yx5hd")
 mesh_transform = 1
 tessellation_max_stages = 8
 tessellation_tolerance_degrees = 0.05

@@ -7,6 +7,134 @@
 using namespace godot;
 
 
+void PathScene3D::set_scene(const Ref<PackedScene> &p_scene) { 
+    if (p_scene != scene) {
+        if (scene.is_valid() && scene->is_connected("changed", callable_mp(this, &PathScene3D::_on_scene_changed))) {
+            scene->disconnect("changed", callable_mp(this, &PathScene3D::_on_scene_changed));
+        }
+        scene = p_scene;
+        if (scene.is_valid()) {
+            scene->connect("changed", callable_mp(this, &PathScene3D::_on_scene_changed));
+            _on_scene_changed();
+        }
+    }
+}
+
+Ref<PackedScene> PathScene3D::get_scene() const { 
+    return scene; 
+}
+
+void PathScene3D::set_path_3d(Path3D *p_path) { 
+    if (p_path != path3d) {
+        if (path3d != nullptr && path3d->is_connected("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed))) {
+            path3d->disconnect("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed));
+        }
+        path3d = p_path;
+        if (path3d != nullptr) {
+            path3d->connect("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed));
+        }
+        _on_curve_changed();
+    }
+}
+
+Path3D *PathScene3D::get_path_3d() const { 
+    return path3d; 
+}
+
+void PathScene3D::set_scene_transform(const SceneTransform p_transform) { 
+    if (scene_transform != p_transform) {
+        scene_transform = p_transform;
+        queue_rebuild();
+    }
+}
+
+PathScene3D::SceneTransform PathScene3D::get_scene_transform() const { 
+    return scene_transform; 
+}
+
+void PathScene3D::set_distribution(Distribution p_distribution) { 
+    if (distribution != p_distribution) {
+        distribution = p_distribution;
+        queue_rebuild();
+        notify_property_list_changed();
+    }
+}
+
+PathScene3D::Distribution PathScene3D::get_distribution() const { 
+    return distribution; 
+}
+
+void PathScene3D::set_alignment(Alignment p_alignment) { 
+    if (alignment != p_alignment) {
+        alignment = p_alignment;
+        queue_rebuild();
+    }
+}
+
+PathScene3D::Alignment PathScene3D::get_alignment() const { 
+    return alignment; 
+}
+
+void PathScene3D::set_count(uint64_t p_count) { 
+    if (count != p_count) {
+        count = p_count;
+        queue_rebuild();
+    }
+}
+
+uint64_t PathScene3D::get_count() const { 
+    return count; 
+}
+
+void PathScene3D::set_distance(double p_distance) { 
+    if (distance != p_distance) {
+        distance = p_distance;
+        queue_rebuild();
+    }
+}
+
+double PathScene3D::get_distance() const { 
+    return distance; 
+}
+
+void PathScene3D::set_rotation_mode(Rotation p_rotation_mode) { 
+    if (rotation_mode != p_rotation_mode) {
+        rotation_mode = p_rotation_mode;
+        queue_rebuild();
+        notify_property_list_changed();
+    }
+}
+
+PathScene3D::Rotation PathScene3D::get_rotation_mode() const { 
+    return rotation_mode; 
+}
+
+void PathScene3D::set_rotation(const Vector3 &p_rotation) { 
+    if (rotation != p_rotation) {
+        rotation = p_rotation;
+        queue_rebuild();
+    }
+}
+
+Vector3 PathScene3D::get_rotation() const { 
+    return rotation; 
+}
+
+void PathScene3D::set_sample_cubic(bool p_cubic) { 
+    if (sample_cubic != p_cubic) {
+        sample_cubic = p_cubic;
+        queue_rebuild();
+    }
+}
+
+bool PathScene3D::get_sample_cubic() const { 
+    return sample_cubic; 
+}
+
+void PathScene3D::queue_rebuild() { 
+    dirty = true;
+}
+
 TypedArray<Node3D> PathScene3D::bake_instances() {
     TypedArray<Node3D> out;
     for (Node3D *instance : instances) {
@@ -91,10 +219,12 @@ void PathScene3D::_notification(int p_what) {
         } break;
 
         case NOTIFICATION_INTERNAL_PROCESS: {
-            dirty |= scene_transform == TRANSFORM_SCENE_PATH_NODE && 
-                (local_transform != get_global_transform() || (
-                    path3d != nullptr &&
-                    path3d->get_global_transform() != path_transform));
+            bool local_transform_dirty = local_transform != get_global_transform();
+            bool path_transform_dirty = path3d  != nullptr && path3d->get_global_transform() != path_transform;
+            bool transform_dirty = scene_transform == TRANSFORM_SCENE_PATH_NODE && (local_transform_dirty || path_transform_dirty);
+            
+            dirty |= transform_dirty;
+            
             if (dirty) {
                 _rebuild_scene();
             }

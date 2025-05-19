@@ -35,10 +35,11 @@ Simply add the `PathMesh3D` node to the scene, set its `path_3d` property to a `
 ### PathScene3D
 `PathScene3D` creates instances of a `PackedScene` resource along the the path.  It will automatically add the instances as internal children of itself and distribute their transforms according to selected settings.  If it is desired, the instances can be "baked" by calling `bake_instances`, which unparents them from the `PathScene3D` node and returns them in an array.  From there, they can be reparented as more permanent nodes.
 
-## Latest Release - v1.3.1
-* Fixed `PathMesh3D` transform issue.
-* All nodes now have the ability to either place the generated mesh local to their own global transform or "stick" to the `Path3D` node's global transform.
-* Regenerated using Godot-CPP 4.4.1
+## Latest Release - v1.3.2
+* Fixed several crash-causing bugs
+* Added triangle count properties to `PathMesh3D` and `PathExtrude3D`
+* Fixed incorrectly generated normals for `PathMesh3D` when warping along curve
+* Cleaned up code a bit
 
 ## Contributing
 Feel free to leave any feedback, suggestions, bug reports, and contributions to the repository at [https://github.com/iiMidknightii/PathMesh3D](https://github.com/iiMidknightii/PathMesh3D).

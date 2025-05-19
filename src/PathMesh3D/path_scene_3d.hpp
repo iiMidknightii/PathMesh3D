@@ -34,104 +34,38 @@ public:
         ALIGN_MAX = 3,
     };
 
-    _ALWAYS_INLINE_ void set_scene(const Ref<PackedScene> &p_scene) { 
-        if (p_scene != scene) {
-            if (scene.is_valid() && scene->is_connected("changed", callable_mp(this, &PathScene3D::_on_scene_changed))) {
-                scene->disconnect("changed", callable_mp(this, &PathScene3D::_on_scene_changed));
-            }
-            scene = p_scene;
-            if (scene.is_valid()) {
-                scene->connect("changed", callable_mp(this, &PathScene3D::_on_scene_changed));
-                _on_scene_changed();
-            }
-        }
-    }
-    _ALWAYS_INLINE_ Ref<PackedScene> get_scene() const { return scene; }
+    void set_scene(const Ref<PackedScene> &p_scene);
+    Ref<PackedScene> get_scene() const;
 
-    _ALWAYS_INLINE_ void set_path_3d(Path3D *p_path) { 
-        if (p_path != path3d) {
-            if (path3d != nullptr && path3d->is_connected("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed))) {
-                path3d->disconnect("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed));
-            }
-            path3d = p_path;
-            if (path3d != nullptr) {
-                path3d->connect("curve_changed", callable_mp(this, &PathScene3D::_on_curve_changed));
-            }
-            _on_curve_changed();
-        }
-    }
-    _ALWAYS_INLINE_ Path3D *get_path_3d() const { return path3d; }
+    void set_path_3d(Path3D *p_path);
+    Path3D *get_path_3d() const;
 
-    _ALWAYS_INLINE_ void set_scene_transform(const SceneTransform p_transform) { 
-        if (scene_transform != p_transform) {
-            scene_transform = p_transform;
-            queue_rebuild();
-        }
-    }
+    void set_scene_transform(const SceneTransform p_transform);
 
-    _ALWAYS_INLINE_ SceneTransform get_scene_transform() const { return scene_transform; }
+    SceneTransform get_scene_transform() const;
 
-    _ALWAYS_INLINE_ void set_distribution(Distribution p_distribution) { 
-        if (distribution != p_distribution) {
-            distribution = p_distribution;
-            queue_rebuild();
-            notify_property_list_changed();
-        }
-    }
-    _ALWAYS_INLINE_ Distribution get_distribution() const { return distribution; }
+    void set_distribution(Distribution p_distribution);
+    Distribution get_distribution() const;
 
-    _ALWAYS_INLINE_ void set_alignment(Alignment p_alignment) { 
-        if (alignment != p_alignment) {
-            alignment = p_alignment;
-            queue_rebuild();
-        }
-    }
-    _ALWAYS_INLINE_ Alignment get_alignment() const { return alignment; }
+    void set_alignment(Alignment p_alignment);
+    Alignment get_alignment() const;
 
-    _ALWAYS_INLINE_ void set_count(uint64_t p_count) { 
-        if (count != p_count) {
-            count = p_count;
-            queue_rebuild();
-        }
-    }
-    _ALWAYS_INLINE_ uint64_t get_count() const { return count; }
+    void set_count(uint64_t p_count);
+    uint64_t get_count() const;
 
-    _ALWAYS_INLINE_ void set_distance(double p_distance) { 
-        if (distance != p_distance) {
-            distance = p_distance;
-            queue_rebuild();
-        }
-    }
-    _ALWAYS_INLINE_ double get_distance() const { return distance; }
+    void set_distance(double p_distance);
+    double get_distance() const;
 
-    _ALWAYS_INLINE_ void set_rotation_mode(Rotation p_rotation_mode) { 
-        if (rotation_mode != p_rotation_mode) {
-            rotation_mode = p_rotation_mode;
-            queue_rebuild();
-            notify_property_list_changed();
-        }
-    }
-    _ALWAYS_INLINE_ Rotation get_rotation_mode() const { return rotation_mode; }
+    void set_rotation_mode(Rotation p_rotation_mode);
+    Rotation get_rotation_mode() const;
 
-    _ALWAYS_INLINE_ void set_rotation(const Vector3 &p_rotation) { 
-        if (rotation != p_rotation) {
-            rotation = p_rotation;
-            queue_rebuild();
-        }
-    }
-    _ALWAYS_INLINE_ Vector3 get_rotation() const { return rotation; }
+    void set_rotation(const Vector3 &p_rotation);
+    Vector3 get_rotation() const;
 
-    _ALWAYS_INLINE_ void set_sample_cubic(bool p_cubic) { 
-        if (sample_cubic != p_cubic) {
-            sample_cubic = p_cubic;
-            queue_rebuild();
-        }
-    }
-    _ALWAYS_INLINE_ bool get_sample_cubic() const { return sample_cubic; }
+    void set_sample_cubic(bool p_cubic);
+    bool get_sample_cubic() const;
 
-    _ALWAYS_INLINE_ void queue_rebuild() { 
-        dirty = true;
-    }
+    void queue_rebuild();
 
     TypedArray<Node3D> bake_instances();
 

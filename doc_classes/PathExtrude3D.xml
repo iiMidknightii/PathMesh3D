@@ -87,6 +87,9 @@
 		<member name="tilt" type="bool" setter="set_tilt" getter="get_tilt" default="true">
 			If [code]true[/code], the cross-section is rotated to follow the path's rotation and tilt.
 		</member>
+		<member name="triangle_count" type="int" setter="" getter="get_triangle_count" default="0">
+			A read-only property that represents the number of triangles generated in the extrusion.
+		</member>
 	</members>
 	<signals>
 		<signal name="curve_changed">

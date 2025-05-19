@@ -74,6 +74,8 @@ public:
     
     Ref<ArrayMesh> get_baked_mesh() const;
 
+    uint64_t get_triangle_count(uint64_t p_surface_idx) const;
+
     Node *create_trimesh_collision_node();
     void create_trimesh_collision();
 
@@ -102,6 +104,7 @@ private:
 
     MeshTransform mesh_transform = TRANSFORM_MESH_LOCAL;
 
+    bool dirty = false;
     struct SurfaceData {
         Vector3 tile_rotation = Vector3();
         EulerOrder tile_rotation_order = EulerOrder::EULER_ORDER_YXZ;
@@ -112,15 +115,13 @@ private:
         bool cubic = false;
         bool tilt = true;
         Vector2 offset = Vector2();
-        bool dirty = true;
+        uint64_t n_tris = 0;
     };
     Vector<SurfaceData> surfaces;
     Transform3D local_transform = Transform3D();
     Transform3D path_transform = Transform3D();
 
-    void _queue_surface(uint64_t p_surface_idx);
     void _rebuild_mesh();
-    bool _are_any_dirty() const;
     Node *_setup_collision_node(const Ref<Shape3D> &shape);
     void _add_child_collision_node(Node *p_node);
     Pair<uint64_t, String> _decode_dynamic_propname(const StringName &p_name) const;

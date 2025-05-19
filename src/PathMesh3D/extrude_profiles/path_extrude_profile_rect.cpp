@@ -2,6 +2,39 @@
 
 using namespace godot;
 
+void PathExtrudeProfileRect::set_rect(const Rect2 &p_rect) { 
+    if (p_rect != rect) { 
+        rect = p_rect;  
+        queue_update(); 
+    } 
+}
+
+Rect2 PathExtrudeProfileRect::get_rect() const { 
+    return rect; 
+}
+
+void PathExtrudeProfileRect::set_subdivisions(const Vector2i p_subdivisions) {
+    if (p_subdivisions != subdivisions) {
+        subdivisions = p_subdivisions;
+        queue_update();
+    }
+}
+
+Vector2i PathExtrudeProfileRect::get_subdivisions() const { 
+    return subdivisions;
+}
+
+void PathExtrudeProfileRect::set_smooth_normals(const bool p_smooth_normals) { 
+    if (p_smooth_normals != smooth_normals) { 
+        smooth_normals = p_smooth_normals; 
+        queue_update(); 
+    } 
+}
+
+bool PathExtrudeProfileRect::get_smooth_normals() const { 
+    return smooth_normals; 
+}
+
 
 Array PathExtrudeProfileRect::_generate_cross_section() {
     PackedVector2Array cs;

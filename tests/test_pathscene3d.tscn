@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ccvxxiocy5t84"]
 
-[ext_resource type="PackedScene" uid="uid://raln2ubgyedb" path="res://tests/instance_3d.tscn" id="1_31dx7"]
+[ext_resource type="PackedScene" uid="uid://raln2ubgyedb" path="res://tests/instance_3d.tscn" id="1_ws1wl"]
 
 [sub_resource type="Curve3D" id="Curve3D_r0b1d"]
 _data = {
@@ -12,11 +12,12 @@ point_count = 4
 [node name="Node3D" type="Node3D"]
 
 [node name="PathScene3D" type="PathScene3D" parent="." node_paths=PackedStringArray("path_3d")]
-scene = ExtResource("1_31dx7")
+scene = ExtResource("1_ws1wl")
 path_3d = NodePath("../Path3D")
+scene_transform = 1
 count = 8
 distance = 0.86
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49097, 7.04617, 3.94408)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.491, 6.771, 3.944)
 
 [node name="Path3D" type="Path3D" parent="."]
 transform = Transform3D(0.592781, 0.798212, -0.107094, -0.615964, 0.535016, 0.578227, 0.518844, -0.276796, 0.808817, 5.98394, 4.42591, 9.90576)

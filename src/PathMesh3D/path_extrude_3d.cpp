@@ -41,6 +41,7 @@ void PathExtrude3D::set_profile(const Ref<PathExtrudeProfileBase> &p_profile) {
         }
 
         _on_profile_changed();
+        queue_rebuild();
     }
 }
 
@@ -136,8 +137,23 @@ bool PathExtrude3D::get_tilt() const {
     return tilt;
 }
 
+void PathExtrude3D::set_material(const Ref<Material> &p_material) {
+    material = p_material;
+    if (generated_mesh.is_valid() && generated_mesh->get_surface_count() > 0) {
+        generated_mesh->surface_set_material(0, material);
+    }
+}
+
+Ref<Material> PathExtrude3D::get_material() const { 
+    return material;
+}
+
 Ref<ArrayMesh> PathExtrude3D::get_baked_mesh() const {
     return generated_mesh->duplicate();
+}
+
+uint64_t PathExtrude3D::get_triangle_count() const {
+    return n_tris;
 }
 
 Node *PathExtrude3D::create_trimesh_collision_node() {
@@ -272,6 +288,9 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_material"), &PathExtrude3D::get_material);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 
+    ClassDB::bind_method(D_METHOD("get_triangle_count"), &PathExtrude3D::get_triangle_count);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "triangle_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY), "", "get_triangle_count");
+
     ADD_SIGNAL(MethodInfo("profile_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
 
@@ -291,10 +310,14 @@ void PathExtrude3D::_notification(int p_what) {
         } break;
 
         case NOTIFICATION_INTERNAL_PROCESS: {
-            dirty |= mesh_transform == TRANSFORM_MESH_PATH_NODE && 
-                (local_transform != get_global_transform() || (
-                    path3d != nullptr &&
-                    path3d->get_global_transform() != path_transform));
+            bool dirty_local_transform = local_transform != get_global_transform();
+            bool dirty_path_transform = path3d != nullptr && path3d->get_global_transform() != path_transform;
+            bool dirty_transform = mesh_transform == TRANSFORM_MESH_PATH_NODE && (dirty_local_transform || dirty_path_transform);
+
+            bool dirty_profile = profile.is_valid() && profile->_regen_if_dirty();
+
+            dirty = dirty || dirty_transform || dirty_profile;
+
             if (dirty) {
                 _rebuild_mesh();
             }
@@ -330,6 +353,7 @@ void PathExtrude3D::_rebuild_mesh() {
     dirty = false;
 
     generated_mesh->clear_surfaces();
+    n_tris = 0;
 
     if (profile.is_null() || path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree()) {
         return;
@@ -345,22 +369,18 @@ void PathExtrude3D::_rebuild_mesh() {
 
     PackedVector3Array tessellated_points = curve->tessellate(tessellation_max_stages, tessellation_tolerance_degrees);
     uint64_t n_slices = tessellated_points.size();
-    if (n_slices < 2) {
-        return;
-    }
+    ERR_FAIL_COND_MSG(n_slices < 2, "Not enough points on curve to tesselate.");
 
     double baked_l = curve->get_baked_length();
+    ERR_FAIL_COND_MSG(baked_l == 0.0, "Curve has no length.");
 
     Array arrays = profile->get_mesh_arrays();
-    if (arrays.size() == 0 || arrays[0].get_type() != Variant::PACKED_VECTOR2_ARRAY) {
-        return;
-    }
+    ERR_FAIL_COND_MSG(arrays.size() == 0, "Mesh has no array data.");
+    ERR_FAIL_COND_MSG(arrays[0].get_type() != Variant::PACKED_VECTOR2_ARRAY, "First (and required) element of mesh array must be a PackedVector2Array.");
 
     PackedVector2Array cross_section = arrays[0];
     uint64_t n_vertices = cross_section.size();
-    if (n_vertices < 2) {
-        return;
-    }
+    ERR_FAIL_COND_MSG(n_vertices < 2, "Number of vertices provided in cross section < 2.");
 
     Vector<bool> has_column;
     has_column.resize(Mesh::ARRAY_MAX);
@@ -749,10 +769,11 @@ void PathExtrude3D::_rebuild_mesh() {
 
     generated_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, arrays);
     generated_mesh->surface_set_material(0, material);
+
+    n_tris = new_vertices.size() / 3;
 }
 
 void PathExtrude3D::_on_profile_changed() {
-    queue_rebuild();
     emit_signal("profile_changed");
 }
 
