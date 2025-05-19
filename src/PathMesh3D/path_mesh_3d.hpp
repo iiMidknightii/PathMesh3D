@@ -75,6 +75,7 @@ public:
     Ref<ArrayMesh> get_baked_mesh() const;
 
     uint64_t get_triangle_count(uint64_t p_surface_idx) const;
+    uint64_t get_total_triangle_count() const;
 
     Node *create_trimesh_collision_node();
     void create_trimesh_collision();

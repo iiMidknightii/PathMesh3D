@@ -220,6 +220,15 @@ uint64_t PathMesh3D::get_triangle_count(uint64_t p_surface_idx) const {
     return surfaces[p_surface_idx].n_tris;
 }
 
+uint64_t PathMesh3D::get_total_triangle_count() const {
+    uint64_t r_value = 0;
+    for (const SurfaceData &surf : surfaces) {
+        r_value += surf.n_tris;
+    }
+
+    return r_value;
+}
+
 Node *PathMesh3D::create_trimesh_collision_node() {
     return _setup_collision_node(generated_mesh->create_trimesh_shape());
 }
@@ -310,6 +319,9 @@ void PathMesh3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_path_3d", "path"), &PathMesh3D::set_path_3d);
     ClassDB::bind_method(D_METHOD("get_path_3d"), &PathMesh3D::get_path_3d);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "path_3d", PROPERTY_HINT_NODE_TYPE, "Path3D"), "set_path_3d", "get_path_3d");
+
+    ClassDB::bind_method(D_METHOD("get_total_triangle_count"), &PathMesh3D::get_total_triangle_count);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "total_triangle_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY), "", "get_total_triangle_count");
     
     ADD_SIGNAL(MethodInfo("mesh_changed"));
     ADD_SIGNAL(MethodInfo("curve_changed"));
@@ -664,21 +676,25 @@ void PathMesh3D::_rebuild_mesh() {
 
         for (uint64_t idx_count = 0; idx_count < count; ++idx_count) {
             for (uint64_t idx_vert = 0; idx_vert < old_verts.size(); ++idx_vert) {
+                Vector3 vertex;
                 Transform3D transform;
                 if (surf.warp_along_curve) {
                     double z_offset = z + z_stretch * (mesh_l - old_verts[idx_vert].z);
                     transform = curve->sample_baked_with_rotation(z_offset, surf.cubic, surf.tilt);
-                    transform.basis.set_column(2, {0.0, 0.0, 0.0});
+                    
+                    // Avoid double transforming the Z position by zeroing out the original Z value
+                    vertex = { old_verts[idx_vert].x, old_verts[idx_vert].y, 0.0 };
                 } else {
                     double z_offset = z + z_stretch * mesh_l;
                     transform = curve->sample_baked_with_rotation(z_offset, surf.cubic, surf.tilt);
+                    vertex = old_verts[idx_vert];
                 }
-
+                
                 if (mesh_transform == TRANSFORM_MESH_PATH_NODE) {
                     transform = mod_transform * transform;
                 }
 
-                new_verts[k] = transform.xform(old_verts[idx_vert]);
+                new_verts[k] = transform.xform(vertex);
                 if (has_column[Mesh::ARRAY_NORMAL]) {
                     new_norms[k] = transform.basis.xform(old_norms[idx_vert]);
                 }

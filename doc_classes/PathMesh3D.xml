@@ -194,6 +194,9 @@
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
 			The Path3D node that the input mesh will be tiled along.
 		</member>
+		<member name="total_triangle_count" type="int" setter="" getter="get_total_triangle_count" default="0">
+			A read-only value that stores the triangle count of the generated mesh.
+		</member>
 	</members>
 	<signals>
 		<signal name="curve_changed">
