@@ -29,7 +29,7 @@
 		<member name="distribution" type="int" setter="set_distribution" getter="get_distribution" enum="PathMultiMesh3D.Distribution" default="0">
 			Sets the method in which instances are spaced along the path.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMultiMesh3D.MeshTransform" default="0">
+		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMultiMesh3D.RelativeTransform" default="0">
 			Sets the transform of the generated mesh to be relative to the Path3D node or the transform of the PathMultiMesh3D node.
 		</member>
 		<member name="multi_mesh" type="MultiMesh" setter="set_multi_mesh" getter="get_multi_mesh">
@@ -61,10 +61,10 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
 			When [member mesh_transform] is set to this value, the generated mesh is transformed relative to the PathMultiMesh3D node.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
 			When [member mesh_transform] is set to this value, the generated mesh is transformed relative to the Path3D node.
 		</constant>
 		<constant name="DISTRIBUTE_BY_COUNT" value="0" enum="Distribution">

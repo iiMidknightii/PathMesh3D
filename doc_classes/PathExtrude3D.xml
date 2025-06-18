@@ -13,8 +13,8 @@
 	<methods>
 		<method name="create_convex_collision">
 			<return type="void" />
-			<param index="0" name="clean" type="bool" />
-			<param index="1" name="simplify" type="bool" />
+			<param index="0" name="clean" type="bool" default="true" />
+			<param index="1" name="simplify" type="bool" default="false" />
 			<description>
 				This helper creates a StaticBody3D child node with a ConvexPolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
 
@@ -25,7 +25,7 @@
 		</method>
 		<method name="create_multiple_convex_collision">
 			<return type="void" />
-			<param index="0" name="settings" type="MeshConvexDecompositionSettings" />
+			<param index="0" name="settings" type="MeshConvexDecompositionSettings" default="null" />
 			<description>
 				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
 			</description>
@@ -50,17 +50,26 @@
 		</method>
 	</methods>
 	<members>
+		<member name="collision_mode" type="int" setter="set_generate_collision" getter="get_generate_collision" enum="PathExtrude3D.CollisionMode" default="0">
+			The automatic collision generation mode for the extrusion. This can be one of the following values:
+			See [enum CollisionMode] for more information.
+
+			NOTE: Collision generation is expensive and should only be used for simple shapes that need to have updated collision data in real time.  For static objects, it's recommended to use the [method create_trimesh_collision], [method create_convex_collision], or [method create_multiple_convex_collision] methods instead.
+		</member>
+		<member name="convex_collision_clean" type="bool" setter="set_convex_collision_clean" getter="get_convex_collision_clean">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to remove duplicate and interior vertices from the generated convex collision shape. This can improve performance but may slightly alter the shape.
+		</member>
+		<member name="convex_collision_simplify" type="bool" setter="set_convex_collision_simplify" getter="get_convex_collision_simplify">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to simplify the generated convex collision shape to reduce the number of vertices. This can improve performance but may slightly alter the shape.
+		</member>
 		<member name="end_cap_mode" type="int" setter="set_end_cap_mode" getter="get_end_cap_mode" enum="PathExtrude3D.EndCaps" is_bitfield="true" default="3">
 			The end cap mode for the extrusion. This can be one of the following values:
-			- [constant END_CAPS_NONE]: No end caps are created.
-			- [constant END_CAPS_START]: An end cap is created at the start of the extrusion.
-			- [constant END_CAPS_END]: An end cap is created at the end of the extrusion.
-			- [constant END_CAPS_BOTH]: End caps are created at both the start and end of the extrusion.
+			See [enum EndCaps] for more information.
 		</member>
 		<member name="material" type="Material" setter="set_material" getter="get_material">
 			The material used for the extrusion.  Similar to [CSGPolygon3D], the bttom left of the texture is applied to the starting end cap, and the bottom right of the texture is applied to the end cap.  The top half of the texture is applied to the extruded profile, with U increasing along the path length.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathExtrude3D.MeshTransform" default="0">
+		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathExtrude3D.RelativeTransform" default="0">
 			Sets the overall transform of the generated mesh to either follow the PathExtrude3D node's transform or the transform of the Path3D node.
 		</member>
 		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
@@ -104,11 +113,23 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
 			When [member mesh_transform] is set to this value, the mesh is transformed using the PathExtrude3D node's transform.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
 			When [member mesh_transform] is set to this value, the mesh is transformed using the Path3D node's transform.
+		</constant>
+		<constant name="COLLISION_MODE_NONE" value="0" enum="CollisionMode">
+			When [member collision_mode] is set to this value, no collision is automatically generated.  [method create_trimesh_collision], [method create_convex_collision], or [method create_multiple_convex_collision] can be used to manually generate collision.
+		</constant>
+		<constant name="COLLISION_MODE_TRIMESH" value="1" enum="CollisionMode">
+			When [member collision_mode] is set to this value, a ConcavePolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_CONVEX" value="2" enum="CollisionMode">
+			When [member collision_mode] is set to this value, a ConvexPolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_MULTIPLE_CONVEX" value="3" enum="CollisionMode">
+			When [member collision_mode] is set to this value, multiple ConvexPolygonShape3D collision shapes are generated using convex decomposition.
 		</constant>
 		<constant name="END_CAPS_NONE" value="0" enum="EndCaps" is_bitfield="true">
 			When [member end_cap_mode] is set to this value, no end caps are created.

@@ -11,7 +11,7 @@ wsl -e scons target=template_debug
 wsl -e scons target=template_release
 
 rm -f addons/*/bin/~*.TMP
-cp LICENSE README.md addons/
+cp LICENSE README.md addons/PathMesh3D
 
 prev_dir=$(basename $PWD)
 cd ..

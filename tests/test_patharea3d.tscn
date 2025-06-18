@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://b31mwa40uh630"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_wrtcq"]
+
+[sub_resource type="Curve3D" id="Curve3D_wrtcq"]
+_data = {
+"points": PackedVector3Array(0.824938, -0.767446, 0.908389, -0.825, 0, -0.908, -2.352, 0, 1.077, -0.92, 0, -0.377, 0.92, 0, 0.377, -1.079, 0, -0.053, -1.29, 0, -0.675, 1.29, 0, 0.675, 1.399, 0, -1.268, -0.584, 0, -1.092, 0.584, 0, 1.092, 2.718, 0, -1.306, 1.739, 0, -1.638, -1.739, 0, 1.638, -1.214, 0, 1.406, -1.997, 0, 1.921, 1.997, 0, -1.921, 1.965, 0, 2.474, -0.076, 0, -1.68, 0.0759192, -1.37312, 1.67962, 8.05164, 0, 2),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 7
+
+[node name="Node3D" type="Node3D"]
+
+[node name="PathArea3D" type="PathArea3D" parent="." node_paths=PackedStringArray("path_3d")]
+path_3d = NodePath("../Path3D")
+shape = SubResource("SphereShape3D_wrtcq")
+distribution = 1
+alignment = 1
+distance = 1.0
+sample_cubic = true
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_wrtcq")

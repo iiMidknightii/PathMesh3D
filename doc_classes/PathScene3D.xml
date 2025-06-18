@@ -50,8 +50,8 @@
 		<member name="scene" type="PackedScene" setter="set_scene" getter="get_scene">
 			A [PackedScene] resource used to instance scenes along the path.
 		</member>
-		<member name="scene_transform" type="int" setter="set_scene_transform" getter="get_scene_transform" enum="PathScene3D.SceneTransform" default="0">
-			Sets the transform of the generated scene to be relative to the Path3D node or the transform of the PathScene3D node.
+		<member name="scene_transform" type="int" setter="set_scene_transform" getter="get_scene_transform" enum="PathScene3D.RelativeTransform" default="0">
+			Sets the transform relative to the path for the generated scenes.
 		</member>
 	</members>
 	<signals>
@@ -67,10 +67,10 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_SCENE_LOCAL" value="0" enum="SceneTransform">
+		<constant name="TRANSFORM_SCENE_LOCAL" value="0" enum="RelativeTransform">
 			When [member scene_transform] is set to this value, the generated scenes are transformed relative to the PathScene3D node.
 		</constant>
-		<constant name="TRANSFORM_SCENE_PATH_NODE" value="1" enum="SceneTransform">
+		<constant name="TRANSFORM_SCENE_PATH_NODE" value="1" enum="RelativeTransform">
 			When [member scene_transform] is set to this value, the generated scenes are transformed relative to the Path3D node.
 		</constant>
 		<constant name="DISTRIBUTE_BY_COUNT" value="0" enum="Distribution">

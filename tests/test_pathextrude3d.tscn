@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://b8gswamttwis8"]
+[gd_scene load_steps=8 format=3 uid="uid://b8gswamttwis8"]
 
 [ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_jtvri"]
 
 [sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_yx5hd"]
 radius = 0.52
+segments = 12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eywb8"]
 albedo_texture = ExtResource("1_jtvri")
@@ -25,49 +26,45 @@ func _process(delta: float) -> void:
 		print(\"yo\")
 "
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_yblif"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+[sub_resource type="Curve" id="Curve_2g0eo"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.753859, 0), -0.0378524, -0.0378524, 0, 0, Vector2(0.9494, 0.442167), 5.8086, 5.8086, 0, 0, Vector2(1, 1), 14.9377, 0.0, 0, 0]
+point_count = 4
 
-[sub_resource type="Sky" id="Sky_fb1ea"]
-sky_material = SubResource("ProceduralSkyMaterial_yblif")
+[sub_resource type="GDScript" id="GDScript_2g0eo"]
+script/source = "@tool extends PathModifier3D
 
-[sub_resource type="Environment" id="Environment_tln77"]
-background_mode = 2
-sky = SubResource("Sky_fb1ea")
-tonemap_mode = 2
-glow_enabled = true
+func _process(delta: float) -> void:
+	uv_offset_modifier += Vector2(0.1 * delta, 0.0)
+"
 
 [sub_resource type="Curve3D" id="Curve3D_vx06t"]
 _data = {
-"points": PackedVector3Array(-1.8314, -0.130915, 2.09006, 1.8314, 0.130915, -2.09006, -1.42203, 0.941492, 3.01894, -1.16177, 0.3153, 4.33177, 1.16177, -0.3153, -4.33177, 2.60477, 0.701425, -0.999865),
-"tilts": PackedFloat32Array(3.01723, -1.805)
+"points": PackedVector3Array(0.162846, -0.544799, 1.51087, -0.162846, 0.544799, -1.51087, 0.893575, 1.12331, 3.36361, 2.36698, -0.148876, 1.87897, -2.36698, 0.148876, -1.87897, 2.60477, 0.701425, -0.999865, 0.20386, 1.18696, -1.22073, -0.20386, -1.18696, 1.22073, 0.887123, 2.20234, 2.2783),
+"tilts": PackedFloat32Array(3.01723, -1.805, 0)
 }
-point_count = 2
+point_count = 3
 
 [node name="Node3D" type="Node3D"]
 
 [node name="PathExtrude3D" type="PathExtrude3D" parent="." node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
-profile = SubResource("PathExtrudeProfileCircle_yx5hd")
 mesh_transform = 1
-tessellation_max_stages = 8
-tessellation_tolerance_degrees = 0.05
-tilt = false
+profile = SubResource("PathExtrudeProfileCircle_yx5hd")
+tessellation_tolerance_degrees = 0.5
 material = SubResource("StandardMaterial3D_eywb8")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15287, -0.660449)
 script = SubResource("GDScript_x3lis")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_tln77")
+[node name="PathModifier3D" type="PathModifier3D" parent="PathExtrude3D"]
+curve_offset_end = 11.4352
+influence = SubResource("Curve_2g0eo")
+scale_modifier = Vector3(0, 0, 0)
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)
+[node name="PathModifier3D2" type="PathModifier3D" parent="PathExtrude3D"]
+curve_offset_end = 11.4352
+uv_offset_modifier = Vector2(50.1095, 0)
+script = SubResource("GDScript_2g0eo")
 
 [node name="Path3D" type="Path3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.75648)
 curve = SubResource("Curve3D_vx06t")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -0.500003, 0.749999, -0.43301, 0, 0, 0)
-shadow_enabled = true

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="PathMesh3D" inherits="GeometryInstance3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
-		A PathMesh3D node take an input [Mesh] resource and a [Path3D] resource and creates a mesh that is deformed along the path.
+		A PathMesh3D node takes an input [Mesh] resource and a [Path3D] resource and creates a mesh that is deformed along the path.
 	</brief_description>
 	<description>
 		This node allows for full 3D mesh resources to be "tiled" along a path, creating a new mesh that is deformed along the path. The input mesh is repeated along the path, and the PathMesh3D node can control the alignment, distribution, offset, and other properties of each surface along the path.
@@ -13,8 +13,8 @@
 	<methods>
 		<method name="create_convex_collision">
 			<return type="void" />
-			<param index="0" name="clean" type="bool" />
-			<param index="1" name="simplify" type="bool" />
+			<param index="0" name="clean" type="bool" default="true" />
+			<param index="1" name="simplify" type="bool" default="false" />
 			<description>
 				This helper creates a StaticBody3D child node with a ConvexPolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
 
@@ -25,7 +25,7 @@
 		</method>
 		<method name="create_multiple_convex_collision">
 			<return type="void" />
-			<param index="0" name="settings" type="MeshConvexDecompositionSettings" />
+			<param index="0" name="settings" type="MeshConvexDecompositionSettings" default="null" />
 			<description>
 				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
 			</description>
@@ -185,10 +185,22 @@
 		</method>
 	</methods>
 	<members>
+		<member name="collision_mode" type="int" setter="set_generate_collision" getter="get_generate_collision" enum="PathMesh3D.CollisionMode" default="0">
+			The automatic collision generation mode for the extrusion. This can be one of the following values:
+			See [enum CollisionMode] for more information.
+
+			NOTE: Collision generation is expensive and should only be used for simple shapes that need to have updated collision data in real time.  For static objects, it's recommended to use the [method create_trimesh_collision], [method create_convex_collision], or [method create_multiple_convex_collision] methods instead.
+		</member>
+		<member name="convex_collision_clean" type="bool" setter="set_convex_collision_clean" getter="get_convex_collision_clean">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to remove duplicate and interior vertices from the generated convex collision shape. This can be useful for optimizing the collision shape.
+		</member>
+		<member name="convex_collision_simplify" type="bool" setter="set_convex_collision_simplify" getter="get_convex_collision_simplify">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to simplify the generated convex collision shape. This can be useful for reducing the number of vertices in the collision shape.
+		</member>
 		<member name="mesh" type="Mesh" setter="set_mesh" getter="get_mesh">
 			The input mesh whose surfaces will be tiled along the path.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMesh3D.MeshTransform" default="0">
+		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMesh3D.RelativeTransform" default="0">
 			Sets the overall transform of the generated mesh to either follow the PathMesh3D node's transform or the transform of the Path3D node.
 		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
@@ -211,11 +223,23 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
 			When the [member mesh_transform] property is set to this value, the mesh is transformed using the PathMesh3D node's transform.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="MeshTransform">
+		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
 			When the [member mesh_transform] property is set to this value, the mesh is transformed using the Path3D node's transform.
+		</constant>
+		<constant name="COLLISION_MODE_NONE" value="0" enum="CollisionMode">
+			If [member collision_mode] is set to this value, no collision is generated.
+		</constant>
+		<constant name="COLLISION_MODE_TRIMESH" value="1" enum="CollisionMode">
+			If [member collision_mode] is set to this value, a ConcavePolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_CONVEX" value="2" enum="CollisionMode">
+			If [member collision_mode] is set to this value, a ConvexPolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_MULTIPLE_CONVEX" value="3" enum="CollisionMode">
+			If [member collision_mode] is set to this value, multiple ConvexPolygonShape3D collision shapes are generated using convex decomposition.
 		</constant>
 		<constant name="DISTRIBUTE_BY_COUNT" value="1" enum="Distribution">
 			If [method set_distribution] is called with this value, that surface will be distributed by count.

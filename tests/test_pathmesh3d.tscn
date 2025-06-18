@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://bpo0gwnewgno0"]
+[gd_scene load_steps=5 format=3 uid="uid://bpo0gwnewgno0"]
+
+[ext_resource type="ArrayMesh" uid="uid://ddobn51ge646b" path="res://tests/railroad-straight.res" id="1_wgxgm"]
 
 [sub_resource type="GDScript" id="GDScript_bfc6h"]
 script/source = "extends Node3D
@@ -15,30 +17,36 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 "
 
-[sub_resource type="TorusMesh" id="TorusMesh_8yclp"]
+[sub_resource type="Curve" id="Curve_eedmf"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.498285, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
 
 [sub_resource type="Curve3D" id="Curve3D_jw5u5"]
 _data = {
-"points": PackedVector3Array(-3.31608, -1.98327, -1.27711, 0.39, 0, -0.36, 0, 0, 3, 4.395, 0, 2.57, 2.22368, -1.30632, -0.784215, 0, 0, -3),
-"tilts": PackedFloat32Array(0, 0)
+"points": PackedVector3Array(-0.992874, -0.672518, 2.01513, 0.993, 0, -2.015, 0, 0, 3, 0.481, 0, 0.862, -0.481, 0, -0.862, 0, 0, -3, 1.268, 0, -0.227, -1.268, 0, 0.227, -2.636, 0, -3.924, -3.83053, 1.01841, -2.45066, 3.83053, -1.01841, 2.45066, -2.84019, 0.0907836, 2.8903),
+"tilts": PackedFloat32Array(0, 0, 0, -2.19921)
 }
-point_count = 2
+point_count = 4
 
 [node name="Node3D" type="Node3D"]
 script = SubResource("GDScript_bfc6h")
 
 [node name="PathMesh3D" type="PathMesh3D" parent="." node_paths=PackedStringArray("path_3d")]
-mesh = SubResource("TorusMesh_8yclp")
 path_3d = NodePath("../Path3D")
+mesh = ExtResource("1_wgxgm")
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
 surface_0/distribution = 0
 surface_0/alignment = 0
 surface_0/warp_along_curve = true
 surface_0/sample_cubic = false
-surface_0/tilt = true
+surface_0/tilt = false
 surface_0/offset = Vector2(0, 0)
-surface_0/triangle_count = 2145
+surface_0/triangle_count = 853
+
+[node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D"]
+curve_offset_end = 17.5942
+influence = SubResource("Curve_eedmf")
 
 [node name="Path3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_jw5u5")

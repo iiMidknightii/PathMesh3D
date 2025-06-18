@@ -8,288 +8,51 @@
    inkscape:version="1.4-rc1 (61ec3f2, 2024-09-26)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1">
     <inkscape:path-effect
        effect="powermask"
-       id="path-effect7"
+       id="path-effect2"
        is_visible="true"
        lpeversion="1"
-       uri="#mask-powermask-path-effect7"
+       uri="#mask-powermask-path-effect2"
        invert="false"
        hide_mask="false"
        background="true"
        background_color="#ffffffff" />
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask-powermask-path-effect2">
+      <path
+         id="mask-powermask-path-effect2_box"
+         style="fill:#ffffff;fill-opacity:1"
+         d="M 3.4441753e-8,0 H 15.991804 V 16.003511 H 3.4441753e-8 Z" />
+      <rect
+         style="fill:#000000;stroke-width:1.04654;stroke-linejoin:round"
+         id="rect2"
+         width="8.7858334"
+         height="8.786232"
+         x="3.6074009"
+         y="3.606884"
+         d="m 3.6074009,3.606884 h 8.7858331 v 8.786232 H 3.6074009 Z" />
+    </mask>
     <filter
-       id="mask-powermask-path-effect6_inverse"
-       inkscape:label="filtermask-powermask-path-effect6"
+       id="mask-powermask-path-effect2_inverse"
+       inkscape:label="filtermask-powermask-path-effect2"
        style="color-interpolation-filters:sRGB"
        height="100"
        width="100"
        x="-50"
        y="-50">
       <feColorMatrix
-         id="mask-powermask-path-effect6_primitive1"
+         id="mask-powermask-path-effect2_primitive1"
          values="1"
          type="saturate"
          result="fbSourceGraphic" />
       <feColorMatrix
-         id="mask-powermask-path-effect6_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect9_inverse"
-       inkscape:label="filtermask-powermask-path-effect9"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect9_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect9_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect10_inverse"
-       inkscape:label="filtermask-powermask-path-effect10"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect10_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect10_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect11_inverse"
-       inkscape:label="filtermask-powermask-path-effect11"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect11_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect11_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect12_inverse"
-       inkscape:label="filtermask-powermask-path-effect12"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect12_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect12_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect13_inverse"
-       inkscape:label="filtermask-powermask-path-effect13"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect13_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect13_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect15_inverse"
-       inkscape:label="filtermask-powermask-path-effect15"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect15_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect15_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect16_inverse"
-       inkscape:label="filtermask-powermask-path-effect16"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect16_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect16_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect17_inverse"
-       inkscape:label="filtermask-powermask-path-effect17"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect17_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect17_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect19_inverse"
-       inkscape:label="filtermask-powermask-path-effect19"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect19_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect19_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect20_inverse"
-       inkscape:label="filtermask-powermask-path-effect20"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect20_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect20_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect21_inverse"
-       inkscape:label="filtermask-powermask-path-effect21"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect21_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect21_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect23_inverse"
-       inkscape:label="filtermask-powermask-path-effect23"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect23_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect23_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect24_inverse"
-       inkscape:label="filtermask-powermask-path-effect24"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect24_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect24_primitive2"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
-         in="fbSourceGraphic" />
-    </filter>
-    <filter
-       id="mask-powermask-path-effect25_inverse"
-       inkscape:label="filtermask-powermask-path-effect25"
-       style="color-interpolation-filters:sRGB"
-       height="100"
-       width="100"
-       x="-50"
-       y="-50">
-      <feColorMatrix
-         id="mask-powermask-path-effect25_primitive1"
-         values="1"
-         type="saturate"
-         result="fbSourceGraphic" />
-      <feColorMatrix
-         id="mask-powermask-path-effect25_primitive2"
+         id="mask-powermask-path-effect2_primitive2"
          values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
          in="fbSourceGraphic" />
     </filter>
@@ -303,48 +66,25 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
-     showgrid="false"
-     inkscape:zoom="59.78125"
-     inkscape:cx="9.0663879"
-     inkscape:cy="7.2514375"
-     inkscape:window-width="3840"
-     inkscape:window-height="2131"
-     inkscape:window-x="1341"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
+     inkscape:zoom="40.945902"
+     inkscape:cx="4.9821836"
+     inkscape:cy="9.0485245"
+     inkscape:window-width="1918"
+     inkscape:window-height="2061"
+     inkscape:window-x="-8"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg1" />
   <path
-     style="fill:none;stroke:#fc7f7f;stroke-linejoin:round;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0.2"
-     d="m 1.5,14.122024 c 0,0 2.756775,-0.533036 3.623285,-1.514151 C 5.920321,11.70542 5.421506,10.127583 6.09349,9.1285207 6.736053,8.1731991 8.825218,7.0148981 8.825218,7.0148981"
-     id="path2-5-2-4"
-     sodipodi:nodetypes="caac" />
-  <rect
-     style="fill:none;stroke:#8da5f3;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     id="rect25"
-     width="6"
-     height="6"
-     x="1.5"
-     y="8.5"
-     rx="2.7755576e-17" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#rect25"
-     id="use25"
-     transform="translate(7,-7)" />
+     fill="#8da5f3"
+     d="M 6.0409538,4.4051859 A 1.1982714,1.1982714 0 1 0 4.4053134,6.0408263 V 9.9597728 A 1.1982714,1.1982714 0 1 0 6.0409538,11.594814 H 9.9599002 A 1.1982714,1.1982714 0 1 0 11.594942,9.9591737 V 6.0402272 A 1.1982714,1.1982714 0 1 0 9.9593011,4.4051859 Z m 0.4092096,1.1982714 h 3.5091377 a 1.1982714,1.1982714 0 0 0 0.4367699,0.437369 V 9.5493649 L 6.4495643,5.6034573 Z M 5.6029856,6.4506351 9.548294,10.396543 H 6.0391564 A 1.1982714,1.1982714 0 0 0 5.6023865,9.9591737 V 6.4506351 Z"
+     id="path1"
+     style="stroke-width:0.599136" />
   <path
-     style="fill:none;stroke:#fc7f7f;stroke-linejoin:round;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0.2"
-     d="m 7.2751478,14.423122 c 0,0 2.7567752,-0.533036 3.6232852,-1.514151 0.797036,-0.902453 0.298221,-2.48029 0.970205,-3.4793527 0.642563,-0.9553215 2.731728,-2.1136225 2.731728,-2.1136225"
-     id="path2-5"
-     sodipodi:nodetypes="caac" />
-  <path
-     style="fill:none;stroke:#fc7f7f;stroke-linejoin:round;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0.2"
-     d="m 7.1747823,8.6071256 c 0,0 2.7567747,-0.533036 3.6232847,-1.514151 0.797036,-0.902453 0.298221,-2.48029 0.970205,-3.479352 C 12.410835,2.658301 14.5,1.5 14.5,1.5"
-     id="path2-5-2"
-     sodipodi:nodetypes="caac" />
-  <path
-     style="fill:none;stroke:#fc7f7f;stroke-linejoin:round;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0.2"
-     d="m 1.3755139,8.6907639 c 0,0 2.7567751,-0.533036 3.6232849,-1.514151 0.797036,-0.902453 0.298221,-2.48029 0.970205,-3.4793521 0.642563,-0.9553215 2.731728,-2.1136225 2.731728,-2.1136225"
-     id="path2"
-     sodipodi:nodetypes="caac" />
+     fill="#fc7f7f"
+     d="m 12.99971,1 a 2,2 0 0 0 -1.15,3.633 c -0.193,0.885 -0.554,1.34 -0.987,1.642 -0.644,0.451 -1.7129999,0.606 -2.9629999,0.73 -1.25,0.124 -2.681,0.221 -3.912,1.083 -0.892,0.625 -1.532,1.652 -1.818,3.096 a 2,2 0 1 0 1.98,0.183 c 0.193,-0.885 0.553,-1.337 0.987,-1.64 0.644,-0.451 1.713,-0.606 2.963,-0.73 1.25,-0.124 2.6809999,-0.221 3.9119999,-1.083 0.892,-0.625 1.532,-1.654 1.818,-3.098 A 2,2 0 0 0 12.99971,1 Z"
+     id="path1-8"
+     mask="url(#mask-powermask-path-effect2)"
+     inkscape:path-effect="#path-effect2"
+     inkscape:original-d="m 12.99971,1 a 2,2 0 0 0 -1.15,3.633 c -0.193,0.885 -0.554,1.34 -0.987,1.642 -0.644,0.451 -1.7129999,0.606 -2.9629999,0.73 -1.25,0.124 -2.681,0.221 -3.912,1.083 -0.892,0.625 -1.532,1.652 -1.818,3.096 a 2,2 0 1 0 1.98,0.183 c 0.193,-0.885 0.553,-1.337 0.987,-1.64 0.644,-0.451 1.713,-0.606 2.963,-0.73 1.25,-0.124 2.6809999,-0.221 3.9119999,-1.083 0.892,-0.625 1.532,-1.654 1.818,-3.098 A 2,2 0 0 0 12.99971,1 Z" />
 </svg>
