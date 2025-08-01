@@ -34,6 +34,7 @@ script = SubResource("GDScript_bfc6h")
 [node name="PathMesh3D" type="PathMesh3D" parent="." node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
 mesh = ExtResource("1_wgxgm")
+collision_mode = 1
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
 surface_0/distribution = 0

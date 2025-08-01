@@ -197,9 +197,12 @@ void PathMultiMesh3D::_on_mesh_changed() {
 }
 
 void PathMultiMesh3D::_rebuild_mesh() {
+    if (multi_mesh.is_null()) {
+        return;
+    }
     multi_mesh->set_instance_count(0);
 
-    if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree() || multi_mesh.is_null()) {
+    if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree()) {
         return;
     }
 

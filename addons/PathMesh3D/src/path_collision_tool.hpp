@@ -91,11 +91,6 @@ m_class::~m_class() { \
         } \
         shape.unref(); \
     } \
-    if (collision_debug != nullptr) { \
-        remove_child(collision_debug); \
-        collision_debug->queue_free(); \
-        collision_debug = nullptr; \
-    } \
 } \
 \
 void m_class::set_shape(const Ref<Shape3D> &p_shape) { \
@@ -301,7 +296,7 @@ void m_class::_rebuild_mesh() { \
     \
     if (collision_debug != nullptr) { \
         remove_child(collision_debug); \
-        memdelete(collision_debug); \
+        collision_debug->queue_free(); \
         collision_debug = nullptr; \
     } \
     \
@@ -533,7 +528,7 @@ private: \
         \
         if (collision_debug != nullptr) { \
             remove_child(collision_debug); \
-            memdelete(collision_debug); \
+            collision_debug->queue_free(); \
             collision_debug = nullptr; \
         } \
         \
