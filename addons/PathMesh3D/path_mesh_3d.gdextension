@@ -6,8 +6,8 @@ reloadable = true
 
 [libraries]
 
-macos.debug = "res://addons/PathMesh3D/bin/path_mesh_3d.macos.template_debug.framework"
-macos.release = "res://addons/PathMesh3D/bin/path_mesh_3d.macos.template_release.framework"
+macos.debug = "res://addons/PathMesh3D/bin/libpath_mesh_3d.macos.template_debug.dylib"
+macos.release = "res://addons/PathMesh3D/bin/libpath_mesh_3d.macos.template_release.dylib"
 ios.debug = "res://addons/PathMesh3D/bin/path_mesh_3d.ios.template_debug.xcframework"
 ios.release = "res://addons/PathMesh3D/bin/path_mesh_3d.ios.template_release.xcframework"
 windows.debug.x86_32 = "res://addons/PathMesh3D/bin/path_mesh_3d.windows.template_debug.x86_32.dll"
