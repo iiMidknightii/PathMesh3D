@@ -44,12 +44,12 @@ jobs:
           chmod +x godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64
           ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --headless --version
 
+      - name: Run initial scons
+        run: scons
+
       - name: Generate documentation
         run: |
           ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --doctool ./ --gdextension-docs
-
-      - name: Run initial scons
-        run: scons
 
       - name: Upload generated files
         uses: actions/upload-artifact@v4
