@@ -25,3 +25,6 @@ tmp.log
 *template_debug.dev.*
 .cache/*
 compile_commands.json
+
+doc_classes/
+addons/PathMesh3D/src/gen/

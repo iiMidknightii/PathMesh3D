@@ -123,7 +123,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Create package directory
-        run: mkdir -p package/addons/PathMesh3D
+        run: mkdir -p package/addons/PathMesh3D/bin
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -152,25 +152,25 @@ jobs:
 
       - name: Copy documentation
         run: |
-          cp LICENSE package/
-          cp README.md package/
+          cp LICENSE package/addons/PathMesh3D/
+          cp README.md package/addons/PathMesh3D/
 
       - name: Create zip file
         run: |
           cd package
-          zip -r -9 ../PathMesh3D-addon.zip .
+          zip -r -9 ../addons.zip .
 
       - name: Upload release zip
         uses: actions/upload-artifact@v4
         with:
           name: PathMesh3D-addon-release
-          path: PathMesh3D-addon.zip
+          path: addons.zip
           retention-days: 30
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: PathMesh3D-addon.zip
+          files: addons.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
