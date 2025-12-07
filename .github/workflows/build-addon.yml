@@ -1,0 +1,121 @@
+name: Build Addon
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x86_64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x86_64
+          - os: macos-latest
+            platform: macos
+            arch: x86_64
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install scons
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install scons
+
+      - name: Build for ${{ matrix.platform }} (Debug)
+        run: scons target=template_debug platform=${{ matrix.platform }} arch=${{ matrix.arch }}
+        working-directory: ./addons/PathMesh3D
+
+      - name: Build for ${{ matrix.platform }} (Release)
+        run: scons target=template_release platform=${{ matrix.platform }} arch=${{ matrix.arch }}
+        working-directory: ./addons/PathMesh3D
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PathMesh3D-${{ matrix.platform }}-${{ matrix.arch }}
+          path: addons/PathMesh3D/bin/
+          retention-days: 7
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create package directory
+        run: mkdir -p package/addons/PathMesh3D
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Merge artifacts
+        run: |
+          for dir in artifacts/PathMesh3D-*/; do
+            cp -r "$dir"* package/addons/PathMesh3D/bin/ || true
+          done
+
+      - name: Copy addon files
+        run: |
+          cp -r addons/PathMesh3D/plugin.cfg package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/plugin.gd package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/path_mesh_3d.gdextension package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/icons package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/scenes package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/scripts package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/src package/addons/PathMesh3D/
+
+      - name: Clean up unwanted files
+        run: |
+          find package/addons/PathMesh3D -type f \( -name "*.os" -o -name "*.obj" -o -name "*.o" -o -name "*.a" -o -name "*.exp" -o -name "*.ilk" -o -name "*~*.TMP" \) -delete
+
+      - name: Copy documentation
+        run: |
+          cp LICENSE package/
+          cp README.md package/
+
+      - name: Create zip file
+        run: |
+          cd package
+          zip -r -9 ../PathMesh3D-addon.zip .
+
+      - name: Upload release zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: PathMesh3D-addon-release
+          path: PathMesh3D-addon.zip
+          retention-days: 30
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: PathMesh3D-addon.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
