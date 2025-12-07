@@ -6,9 +6,61 @@ on:
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
+    inputs:
+      godot_version:
+        description: 'Godot version (e.g., 4.3-stable, 4.4-stable, 4.5-stable)'
+        required: false
+        default: '4.5-stable'
+
+env:
+  GODOT_VERSION: ${{ github.event.inputs.godot_version || '4.5-stable' }}
 
 jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: refs/tags/${{ env.GODOT_VERSION }}
+          submodules-depth: 1
+
+      - name: Checkout godot-cpp at correct tag
+        run: |
+          cd godot-cpp
+          git fetch --tags
+          git checkout ${{ env.GODOT_VERSION }}
+          cd ..
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y scons
+
+      - name: Download Godot
+        run: |
+          mkdir -p godot_bin
+          curl -L -o godot_bin/godot https://github.com/godotengine/godot-releases/releases/download/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64
+          chmod +x godot_bin/godot
+          ./godot_bin/godot --headless --version
+
+      - name: Generate documentation
+        run: |
+          ./godot_bin/godot --doctool ./ --gdextension-docs
+
+      - name: Run initial scons
+        run: scons
+
+      - name: Upload generated files
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-files
+          path: addons/PathMesh3D/src/gen/
+          retention-days: 1
+
   build:
+    needs: generate-docs
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -29,6 +81,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Download generated files
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-files
+          path: addons/PathMesh3D/src/gen/
+
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
         run: |
@@ -43,15 +101,13 @@ jobs:
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install scons
+          pip install scons
 
       - name: Build for ${{ matrix.platform }} (Debug)
         run: scons target=template_debug platform=${{ matrix.platform }} arch=${{ matrix.arch }}
-        working-directory: ./addons/PathMesh3D
 
       - name: Build for ${{ matrix.platform }} (Release)
         run: scons target=template_release platform=${{ matrix.platform }} arch=${{ matrix.arch }}
-        working-directory: ./addons/PathMesh3D
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
