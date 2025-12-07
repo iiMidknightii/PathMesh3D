@@ -48,6 +48,9 @@ public:
     void set_warp_along_curve(uint64_t p_surface_idx, bool p_warp);
     bool get_warp_along_curve(uint64_t p_surface_idx) const;
 
+    void set_mesh_length_offset(uint64_t p_surface_idx, real_t p_mesh_length_offset);
+    real_t get_mesh_length_offset(uint64_t p_surface_idx) const;
+
     void set_sample_cubic(uint64_t p_surface_idx, bool p_cubic);
     bool get_sample_cubic(uint64_t p_surface_idx) const;
 
@@ -87,6 +90,7 @@ private:
         bool tilt = true;
         Vector2 offset = Vector2();
         uint64_t n_tris = 0;
+        real_t mesh_length_offset = 0.0;
     };
     LocalVector<SurfaceData> surfaces;
 
