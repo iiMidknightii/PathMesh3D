@@ -28,7 +28,7 @@ jobs:
         run: |
           cd godot-cpp
           git fetch --tags
-          git checkout ${{ env.GODOT_VERSION }}
+          git checkout godot-${{ env.GODOT_VERSION }}
           cd ..
 
       - name: Install dependencies
@@ -39,13 +39,14 @@ jobs:
       - name: Download Godot
         run: |
           mkdir -p godot_bin
-          curl -L -o godot_bin/godot https://github.com/godotengine/godot-releases/releases/download/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64
-          chmod +x godot_bin/godot
-          ./godot_bin/godot --headless --version
+          curl -L -o godot_bin/godot.zip https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64.zip
+          unzip -q godot_bin/godot.zip -d godot_bin/
+          chmod +x godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64
+          ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --headless --version
 
       - name: Generate documentation
         run: |
-          ./godot_bin/godot --doctool ./ --gdextension-docs
+          ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --doctool ./ --gdextension-docs
 
       - name: Run initial scons
         run: scons
