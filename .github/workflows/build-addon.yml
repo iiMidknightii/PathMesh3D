@@ -23,8 +23,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: refs/tags/${{ env.GODOT_VERSION }}
-          submodules-depth: 1
 
       - name: Checkout godot-cpp at correct tag
         run: |
