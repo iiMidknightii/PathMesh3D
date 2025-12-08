@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="PathMesh3D" inherits="GeometryInstance3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A PathMesh3D node takes an input [Mesh] resource and a [Path3D] resource and creates a mesh that is deformed along the path.
+	</brief_description>
+	<description>
+		This node allows for full 3D mesh resources to be "tiled" along a path, creating a new mesh that is deformed along the path. The input mesh is repeated along the path, and the PathMesh3D node can control the alignment, distribution, offset, and other properties of each surface along the path.
+
+		[b]NOTE[/b]: For best results, the input mesh should not have any faces along the -Z or +Z axis. This is because the mesh is repeated along the path, and faces along the Z axis will be repeated as well, creating artifacts.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="create_convex_collision">
+			<return type="void" />
+			<param index="0" name="clean" type="bool" default="true" />
+			<param index="1" name="simplify" type="bool" default="false" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConvexPolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+
+				If [param clean] is [code]true[/code], duplicate and interior vertices are removed automatically. You can set it to false to make the process faster if not needed.
+
+				If [param simplify] is [code]true[/code], the geometry can be further simplified to reduce the number of vertices. Disabled by default.
+			</description>
+		</method>
+		<method name="create_multiple_convex_collision">
+			<return type="void" />
+			<param index="0" name="settings" type="MeshConvexDecompositionSettings" default="null" />
+			<description>
+				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
+			</description>
+		</method>
+		<method name="create_trimesh_collision">
+			<return type="void" />
+			<description>
+				This helper creates a StaticBody3D child node with a ConcavePolygonShape3D collision shape calculated from the extruded mesh geometry. It's mainly used for testing.
+			</description>
+		</method>
+		<method name="get_alignment" qualifiers="const">
+			<return type="int" enum="PathMesh3D.Alignment" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the alignment of the input surface along the path.
+			</description>
+		</method>
+		<method name="get_baked_mesh" qualifiers="const">
+			<return type="ArrayMesh" />
+			<description>
+				Returns the generated mesh that is deformed along the path.
+			</description>
+		</method>
+		<method name="get_count" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the number of times the surface of the mesh is repeated along the path.
+			</description>
+		</method>
+		<method name="get_distribution" qualifiers="const">
+			<return type="int" enum="PathMesh3D.Distribution" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the distribution of the surface along the path.
+			</description>
+		</method>
+		<method name="get_mesh_length_offset" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the mesh length offset of the surface along the path.  The surface is tiled using the length of the mesh in the Z direction plus this offset.
+			</description>
+		</method>
+		<method name="get_offset" qualifiers="const">
+			<return type="Vector2" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the offset of the surface along the path.
+			</description>
+		</method>
+		<method name="get_sample_cubic" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns whether the surface is sampled using cubic interpolation.
+			</description>
+		</method>
+		<method name="get_tile_rotation" qualifiers="const">
+			<return type="Vector3" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the rotation of the surface along the path.
+			</description>
+		</method>
+		<method name="get_tile_rotation_order" qualifiers="const">
+			<return type="int" enum="EulerOrder" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns the rotation order of the surface along the path.
+			</description>
+		</method>
+		<method name="get_tilt" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns whether the surface is tilted and rotated along the path.
+			</description>
+		</method>
+		<method name="get_warp_along_curve" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="surface_index" type="int" />
+			<description>
+				Returns whether the surface is warped along the path.
+			</description>
+		</method>
+		<method name="queue_rebuild">
+			<return type="void" />
+			<description>
+				Rebuilds the mesh along the path. This is called automatically when the input mesh or path changes, but can be called manually to force a rebuild.
+			</description>
+		</method>
+		<method name="set_alignment">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="alignment" type="int" enum="PathMesh3D.Alignment" />
+			<description>
+				Sets the alignment of the input surface along the path.
+			</description>
+		</method>
+		<method name="set_count">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="count" type="int" />
+			<description>
+				Sets the number of times the surface of the mesh is repeated along the path.  This only has an effect if that surface is distributed by count.
+			</description>
+		</method>
+		<method name="set_distribution">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="distribution" type="int" enum="PathMesh3D.Distribution" />
+			<description>
+				Sets the distribution of the surface along the path.
+			</description>
+		</method>
+		<method name="set_mesh_length_offset">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="offset" type="float" />
+			<description>
+				Sets the mesh length offset of the surface along the path.  The surface will be tiled using the length of the mesh in the Z direction plus this offset.
+			</description>
+		</method>
+		<method name="set_offset">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="offset" type="Vector2" />
+			<description>
+				Sets the horizontal and vertical offset of the surface along the path.
+			</description>
+		</method>
+		<method name="set_sample_cubic">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="cubic" type="bool" />
+			<description>
+				If [code]true[/code], the surface is sampled using cubic interpolation. If [code]false[/code], the surface is sampled using linear interpolation.
+			</description>
+		</method>
+		<method name="set_tile_rotation">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="rotation" type="Vector3" />
+			<description>
+				Sets the rotation of the surface along the path.
+			</description>
+		</method>
+		<method name="set_tile_rotation_order">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="order" type="int" enum="EulerOrder" />
+			<description>
+				Sets the rotation order of the surface along the path.
+			</description>
+		</method>
+		<method name="set_tilt">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="tilt" type="bool" />
+			<description>
+				If [code]true[/code], the surface is tilted and rotated along the path. If [code]false[/code], the surface is not tilted.
+			</description>
+		</method>
+		<method name="set_warp_along_curve">
+			<return type="void" />
+			<param index="0" name="surface_index" type="int" />
+			<param index="1" name="warp" type="bool" />
+			<description>
+				When [code]true[/code], each vertex of the surface is indiviaully rotated about the path using the path's local transform.  This effectively "warps" the surface along the path.  When [code]false[/code], the surface is not warped, instead being rotated as a whole along the center point of the mesh.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="collision_layer" type="int" setter="set_collision_layer" getter="get_collision_layer">
+			The collision layer bitmask for the generated collision shapes.
+		</member>
+		<member name="collision_mask" type="int" setter="set_collision_mask" getter="get_collision_mask">
+			The collision mask bitmask for the generated collision shapes.
+		</member>
+		<member name="collision_mode" type="int" setter="set_generate_collision" getter="get_generate_collision" enum="PathMesh3D.CollisionMode" default="0">
+			The automatic collision generation mode for the extrusion. This can be one of the following values:
+			See [enum CollisionMode] for more information.
+
+			NOTE: Collision generation is expensive and should only be used for simple shapes that need to have updated collision data in real time.  For static objects, it's recommended to use the [method create_trimesh_collision], [method create_convex_collision], or [method create_multiple_convex_collision] methods instead.
+		</member>
+		<member name="convex_collision_clean" type="bool" setter="set_convex_collision_clean" getter="get_convex_collision_clean">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to remove duplicate and interior vertices from the generated convex collision shape. This can be useful for optimizing the collision shape.
+		</member>
+		<member name="convex_collision_simplify" type="bool" setter="set_convex_collision_simplify" getter="get_convex_collision_simplify">
+			If [member collision_mode] is set to [constant COLLISION_MODE_CONVEX], this property determines whether to simplify the generated convex collision shape. This can be useful for reducing the number of vertices in the collision shape.
+		</member>
+		<member name="mesh" type="Mesh" setter="set_mesh" getter="get_mesh">
+			The input mesh whose surfaces will be tiled along the path.
+		</member>
+		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMesh3D.RelativeTransform" default="0">
+			Sets the overall transform of the generated mesh to either follow the PathMesh3D node's transform or the transform of the Path3D node.
+		</member>
+		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
+			The Path3D node that the input mesh will be tiled along.
+		</member>
+		<member name="total_triangle_count" type="int" setter="" getter="get_total_triangle_count" default="0">
+			A read-only value that stores the triangle count of the generated mesh.
+		</member>
+	</members>
+	<signals>
+		<signal name="curve_changed">
+			<description>
+				Emitted when the internal curve of the Path3D node is changed.
+			</description>
+		</signal>
+		<signal name="mesh_changed">
+			<description>
+				Emitted when the input mesh is changed.
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
+			When the [member mesh_transform] property is set to this value, the mesh is transformed using the PathMesh3D node's transform.
+		</constant>
+		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
+			When the [member mesh_transform] property is set to this value, the mesh is transformed using the Path3D node's transform.
+		</constant>
+		<constant name="COLLISION_MODE_NONE" value="0" enum="CollisionMode">
+			If [member collision_mode] is set to this value, no collision is generated.
+		</constant>
+		<constant name="COLLISION_MODE_TRIMESH" value="1" enum="CollisionMode">
+			If [member collision_mode] is set to this value, a ConcavePolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_CONVEX" value="2" enum="CollisionMode">
+			If [member collision_mode] is set to this value, a ConvexPolygonShape3D collision shape is generated.
+		</constant>
+		<constant name="COLLISION_MODE_MULTIPLE_CONVEX" value="3" enum="CollisionMode">
+			If [member collision_mode] is set to this value, multiple ConvexPolygonShape3D collision shapes are generated using convex decomposition.
+		</constant>
+		<constant name="DISTRIBUTE_BY_COUNT" value="1" enum="Distribution">
+			If [method set_distribution] is called with this value, that surface will be distributed by count.
+		</constant>
+		<constant name="DISTRIBUTE_BY_MODEL_LENGTH" value="0" enum="Distribution">
+			If [method set_distribution] is called with this value, that surface will be distributed by the length of the mesh's model (in the Z direction).
+		</constant>
+		<constant name="ALIGN_STRETCH" value="0" enum="Alignment">
+			If  the surface is distributed by [constant DISTRIBUTE_BY_MODEL_LENGTH] and [method set_alignment] is called with this value, that surface will be stretched along the path.
+		</constant>
+		<constant name="ALIGN_FROM_START" value="1" enum="Alignment">
+			If the surface is distributed by [constant DISTRIBUTE_BY_MODEL_LENGTH] and [method set_alignment] is called with this value, that surface will be aligned from the start of the path.
+		</constant>
+		<constant name="ALIGN_CENTERED" value="2" enum="Alignment">
+			If the surface is distributed by [constant DISTRIBUTE_BY_MODEL_LENGTH] and [method set_alignment] is called with this value, that surface will be centered along the path.
+		</constant>
+		<constant name="ALIGN_FROM_END" value="3" enum="Alignment">
+			If the surface is distributed by [constant DISTRIBUTE_BY_MODEL_LENGTH] and [method set_alignment] is called with this value, that surface will be aligned from the end of the path.
+		</constant>
+	</constants>
+</class>

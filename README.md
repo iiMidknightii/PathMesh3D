@@ -9,17 +9,11 @@
  ![](screenshots/PathMesh3D.gif)
 
 ## Installation
-### From Godot Asset Library in the Editor
-Click the `AssetLib` button at the top of the Godot editor and search for `PathMesh3D`.  When prompted where to install it, you can select only the folder named "addons".  If you wish to modify or recompile the addon, then you'll need to include the "godot-cpp" and "src" folders along with the "SConstruct" file from this repository.
-
- ### From Godot Asset Library Web
- Head over to [the PathMesh3D page on the asset library website](https://godotengine.org/asset-library/asset) and click the download button.  Unzip the download into a location of your choosing.  To put the addon in your project, just copy the "addons" folder into the project directory.
+### Just the addon
+You can get the addon zip file from either the `AssetLib` in the editor or the Asset Library online.  From the editor, click the `AssetLib` button at the top and search for `PathMesh3D`.  From the web, go over to [the PathMesh3D page on the asset library website](https://godotengine.org/asset-library/asset) and click the download button.  Unzip the download into your project.  If you make modifications to the source, or just need it compiled for a different platform, compiling is pretty easy.  First, you need to `git clone https://github.com/godotengine/godot-cpp.git` to a `godot-cpp` folder inside your project.  Then you need to create an SConstruct file at the root of your project with the line `SConscript('addons/PathMesh3D/SConstruct')`.  Calling `scons` will then build the addon in the `addons/PathMesh3D/bin` folder for you!
 
  ### From GitHub.com
- You can download the full repository for PathMesh3D [here](https://github.com/iiMidknightii/PathMesh3D).  You can clone this repository by doing `git clone https://github.com/iiMidknightii/PathMesh3D.git` in the directory of your choosing.  If you want to compile your own binaries this is the best option.  To put the addon in your project, just copy the "addons" folder into the project directory.
-
-## Compiling
-If you make modifications to the source, or just need it compiled for a different platform (sorry Mac users!), compiling is pretty easy.  First, you need to `git clone https://github.com/godotengine/godot-cpp.git` to a `godot-cpp` folder inside your project.  Then you need to create an SConstruct file at the root of your project with the line `SConscript('addons/PathMesh3D/SConstruct')`.  Calling `scons` will then build the addon in the `addons/PathMesh3D/bin` folder for you!
+ You can download the full repository for PathMesh3D [here](https://github.com/iiMidknightii/PathMesh3D).  You can clone this repository by doing `git clone https://github.com/iiMidknightii/PathMesh3D.git` in the directory of your choosing.  The repository does not come with pre-built binaries.  The base of the repository can act as a godot project that you can open in the editor.  From there, you can modify tests, generate documentation, etc.  If you want to compile your own binaries, run scons from the base folder.  To put the addon in your project, just copy the "addons" folder into the project directory.
 
 ## Tutorial
 > [!NOTE]
@@ -56,12 +50,12 @@ Similar to `PathStaticBody3D`, except it creates a physics area along the path. 
 
 ![](screenshots/PathExtrude3D_w_Path3DModifiers.gif)
 
-## Latest Release - v1.4.
-* Added the ability for `PathMesh3D` and `PathExtrude3D` to create a child static body internally, in case on-the-fly physics are desired
-* All path tools now generate their geometry before `_ready`
-* Added `PathModifier3D` to make sophisticated model and UV transformations easy
-* Added `PathStaticBody3D` and `PathArea3D` to generate simple physics geometry using built-in shapes
-* Restructured the source code so it included in the addon, allowing users to build it in their own project with a simple SConstruct file
+## Latest Release - v1.5.
+* Removed pre-built binaries from repository, now they are generated for Windows, Linux, and MacOS x86_64 by github actions!
+* Added mesh length offset to `PathMesh3D` (thanks, @AlmightyLaxz)
+* Fixed macOS build file names (thanks, @evgenykochetkov)
+* Fixed crashing when the node is being deleted
+* Added collision layers/masks to generated internal collision nodes
 
 ## Contributing
 Feel free to leave any feedback, suggestions, bug reports, and contributions to the repository at [https://github.com/iiMidknightii/PathMesh3D](https://github.com/iiMidknightii/PathMesh3D).

@@ -35,18 +35,21 @@ script = SubResource("GDScript_bfc6h")
 path_3d = NodePath("../Path3D")
 mesh = ExtResource("1_wgxgm")
 collision_mode = 1
+collision_layer = 1
+collision_mask = 1
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
 surface_0/distribution = 0
 surface_0/alignment = 0
 surface_0/warp_along_curve = true
+surface_0/mesh_length_offset = 0.0
 surface_0/sample_cubic = false
 surface_0/tilt = false
 surface_0/offset = Vector2(0, 0)
 surface_0/triangle_count = 853
 
 [node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D"]
-curve_offset_end = 17.5942
+curve_offset_end = 17.59416
 influence = SubResource("Curve_eedmf")
 
 [node name="Path3D" type="Path3D" parent="."]

@@ -440,6 +440,30 @@ public: \
     \
     _FORCE_INLINE_ void queue_rebuild_collision() { collision_dirty = true; } \
     \
+    _FORCE_INLINE_ void set_collision_layer(uint32_t p_layer) { \
+        if (collision_layer != p_layer && collision_node != nullptr) { \
+            PhysicsBody3D *body = cast_to<PhysicsBody3D>(collision_node); \
+            if (body != nullptr) { \
+                collision_layer = p_layer; \
+                body->set_collision_layer(collision_layer); \
+            } \
+        } \
+    } \
+    \
+    _FORCE_INLINE_ uint32_t get_collision_layer() const { return collision_layer; } \
+    \
+    _FORCE_INLINE_ void set_collision_mask(uint32_t p_mask) { \
+        if (collision_mask != p_mask && collision_node != nullptr) { \
+            PhysicsBody3D *body = cast_to<PhysicsBody3D>(collision_node); \
+            if (body != nullptr) { \
+                collision_mask = p_mask; \
+                body->set_collision_mask(collision_mask); \
+            } \
+        } \
+    } \
+    \
+    _FORCE_INLINE_ uint32_t get_collision_mask() const { return collision_mask; } \
+    \
     _FORCE_INLINE_ Node *create_trimesh_collision_node() { \
         return _setup_collision_node(m_generated_mesh->create_trimesh_shape()); \
     } \
@@ -485,6 +509,8 @@ protected: \
     void _validate_property(PropertyInfo &p_property) const { \
         if (p_property.name == StringName("convex_collision_clean") || p_property.name == StringName("convex_collision_simplify")) { \
             p_property.usage = collision_mode == COLLISION_MODE_CONVEX ? PROPERTY_USAGE_DEFAULT : PROPERTY_USAGE_NONE; \
+        } else if (p_property.name == StringName("collision_layer") || p_property.name == StringName("collision_mask")) { \
+            p_property.usage = collision_mode == COLLISION_MODE_NONE ? PROPERTY_USAGE_NONE : PROPERTY_USAGE_DEFAULT; \
         } \
     } \
     \
@@ -495,6 +521,8 @@ private: \
     bool collision_dirty = false; \
     Node *collision_node = nullptr; \
     MeshInstance3D *collision_debug = nullptr; \
+    uint32_t collision_layer = 1; \
+    uint32_t collision_mask = 1; \
     \
     _FORCE_INLINE_ Node *_setup_collision_node(const Ref<Shape3D> &shape) { \
         StaticBody3D *static_body = memnew(StaticBody3D); \
@@ -507,6 +535,11 @@ private: \
     _FORCE_INLINE_ void _add_child_collision_node(Node *p_node) { \
         if (p_node != nullptr) { \
             add_child(p_node, true); \
+            PhysicsBody3D *body = cast_to<PhysicsBody3D>(p_node); \
+            if (body != nullptr) { \
+                body->set_collision_layer(collision_layer); \
+                body->set_collision_mask(collision_mask); \
+            } \
             if (get_owner() != nullptr) { \
                 p_node->set_owner(get_owner()); \
                 for (int i = 0; i < p_node->get_child_count(); ++i) { \
@@ -571,6 +604,14 @@ private: \
     ClassDB::bind_method(D_METHOD("set_convex_collision_simplify", "simplify"), &m_class::set_convex_collision_simplify); \
     ClassDB::bind_method(D_METHOD("get_convex_collision_simplify"), &m_class::get_convex_collision_simplify); \
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "convex_collision_simplify"), "set_convex_collision_simplify", "get_convex_collision_simplify"); \
+    \
+    ClassDB::bind_method(D_METHOD("set_collision_layer", "layer"), &m_class::set_collision_layer); \
+    ClassDB::bind_method(D_METHOD("get_collision_layer"), &m_class::get_collision_layer); \
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_layer", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_layer", "get_collision_layer"); \
+    \
+    ClassDB::bind_method(D_METHOD("set_collision_mask", "mask"), &m_class::set_collision_mask); \
+    ClassDB::bind_method(D_METHOD("get_collision_mask"), &m_class::get_collision_mask); \
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_mask", "get_collision_mask"); \
     \
     ClassDB::bind_method(D_METHOD("create_trimesh_collision"), &m_class::create_trimesh_collision); \
     ClassDB::bind_method(D_METHOD("create_convex_collision", "clean", "simplify"), &m_class::create_convex_collision, DEFVAL(true), DEFVAL(false)); \

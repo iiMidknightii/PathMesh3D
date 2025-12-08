@@ -26,5 +26,4 @@ tmp.log
 .cache/*
 compile_commands.json
 
-doc_classes/
 addons/PathMesh3D/src/gen/

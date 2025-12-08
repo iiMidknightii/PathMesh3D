@@ -738,11 +738,9 @@ PathMesh3D::~PathMesh3D() {
         }
         path3d = nullptr;
     }
-    if (collision_node != nullptr) {
-        collision_node->queue_free();
-        collision_node = nullptr;
+    if (generated_mesh.is_valid()) {
+        generated_mesh->clear_surfaces();
+        generated_mesh.unref();
     }
-    generated_mesh->clear_surfaces();
-    generated_mesh.unref();
     surfaces.clear();
 }
