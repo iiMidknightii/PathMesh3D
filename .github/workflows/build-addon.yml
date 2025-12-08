@@ -142,6 +142,7 @@ jobs:
           cp -r addons/PathMesh3D/plugin.cfg package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/plugin.gd package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/path_mesh_3d.gdextension package/addons/PathMesh3D/
+          cp -r addons/PathMesh3D/SConstruct package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/icons package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/scenes package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/scripts package/addons/PathMesh3D/
@@ -174,5 +175,4 @@ jobs:
         with:
           files: addons.zip
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
