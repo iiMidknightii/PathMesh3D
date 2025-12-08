@@ -145,7 +145,6 @@ jobs:
           cp -r addons/PathMesh3D/scenes package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/scripts package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/src package/addons/PathMesh3D/
-          cp -r package/addons/PathMesh3D/src/gen package/addons/PathMesh3D/src
 
       - name: Clean up unwanted files
         run: |
