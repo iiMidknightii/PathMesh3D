@@ -74,7 +74,7 @@ jobs:
             arch: x86_64
           - os: macos-latest
             platform: macos
-            arch: x86_64
+            arch: universal
 
     steps:
       - uses: actions/checkout@v4
