@@ -29,14 +29,15 @@
 		<member name="distribution" type="int" setter="set_distribution" getter="get_distribution" enum="PathMultiMesh3D.Distribution" default="0">
 			Sets the method in which instances are spaced along the path.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMultiMesh3D.RelativeTransform" default="0">
-			Sets the transform of the generated mesh to be relative to the Path3D node or the transform of the PathMultiMesh3D node.
-		</member>
 		<member name="multi_mesh" type="MultiMesh" setter="set_multi_mesh" getter="get_multi_mesh">
 			The MultiMesh resource to instance along the path.
 		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
 			The Path3D node used to instance the MultiMesh.
+		</member>
+		<member name="relative_transform" type="int" setter="set_relative_transform" getter="get_relative_transform" enum="PathMultiMesh3D.RelativeTransform" default="0">
+			Determines how the instances are transformed relative to this node or the path node.
+			See [enum RelativeTransform] for more information.
 		</member>
 		<member name="rotation" type="Vector3" setter="set_rotation" getter="get_rotation" default="Vector3(0, 0, 0)">
 			The rotation applied to each instance along the path.  If [member rotation_mode] is set to [constant ROTATE_FIXED], this property is the Euler angle of all the instances relative to the PathMesh3D transform.  If [member rotation_mode] is set to [constant ROTATE_PATH], this property is the Euler angle of each instance relative to the path.  If [member rotation_mode] is set to [constant ROTATE_RANDOM], this property is ignored.
@@ -61,11 +62,11 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
-			When [member mesh_transform] is set to this value, the generated mesh is transformed relative to the PathMultiMesh3D node.
+		<constant name="TRANSFORM_LOCAL" value="0" enum="RelativeTransform">
+			The instances will be transformed relative to the PathMultiMesh3D node.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
-			When [member mesh_transform] is set to this value, the generated mesh is transformed relative to the Path3D node.
+		<constant name="TRANSFORM_PATH_NODE" value="1" enum="RelativeTransform">
+			The instances will be transformed relative to the Path3D node.
 		</constant>
 		<constant name="DISTRIBUTE_BY_COUNT" value="0" enum="Distribution">
 			When [member distribution] is set to this value, the instances are distributed by count.

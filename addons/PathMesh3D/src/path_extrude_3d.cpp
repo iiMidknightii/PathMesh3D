@@ -2,6 +2,9 @@
 #include <godot_cpp/classes/geometry2d.hpp>
 
 #include "path_extrude_3d.hpp"
+#include "godot_cpp/classes/array_mesh.hpp"
+#include "path_collision_tool_3d.hpp"
+#include "path_tool_3d.hpp"
 
 using namespace godot;
 
@@ -126,8 +129,6 @@ PathExtrude3D::PathExtrude3D() {
 }
 
 PathExtrude3D::~PathExtrude3D() {
-    PATH_TOOL_DESTRUCTOR(PathExtrude3D)
-    
     if (profile.is_valid()) {
         if (profile->is_connected("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed))) {
             profile->disconnect("changed", callable_mp(this, &PathExtrude3D::_on_profile_changed));
@@ -141,7 +142,8 @@ PathExtrude3D::~PathExtrude3D() {
 }
 
 void PathExtrude3D::_bind_methods() {
-    PATH_TOOL_BINDS(PathExtrude3D, mesh, MESH)
+    PathTool3D::_bind_path_tool_3d_methods();
+    PathCollisionTool3D::_bind_path_collision_tool_3d_methods();
 
     ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathExtrude3D::get_baked_mesh);
 
@@ -184,8 +186,6 @@ void PathExtrude3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_triangle_count"), &PathExtrude3D::get_triangle_count);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "triangle_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY), "", "get_triangle_count");
 
-    PATH_MESH_WITH_COLLISION_BINDS(PathExtrude3D)
-
     ADD_SIGNAL(MethodInfo("profile_changed"));
 
     BIND_BITFIELD_FLAG(END_CAPS_NONE);
@@ -195,31 +195,25 @@ void PathExtrude3D::_bind_methods() {
 }
 
 void PathExtrude3D::_notification(int p_what) {
-    switch (p_what) {
-        case NOTIFICATION_READY: {
-            set_process_internal(true);
-            _rebuild_mesh();
-        } break;
+    PathTool3D::_notification_path_tool_3d(p_what);
+    PathCollisionTool3D::_notification_path_collision_tool_3d(p_what);
+}
 
-        case NOTIFICATION_INTERNAL_PROCESS: {
-            if ((profile.is_valid() && profile->regen_if_dirty()) || _pop_is_dirty()) {
-                _rebuild_mesh();
-            } else if (collision_dirty) {
-                _rebuild_collision_node();
-            }
-        } break;
-    }
+void PathExtrude3D::_validate_property(PropertyInfo &p_property) const {
+    PathCollisionTool3D<PathExtrude3D>::_validate_path_collision_tool_3d_property(p_property);
+}
+
+bool PathExtrude3D::_pop_should_rebuild() {
+    return (profile.is_valid() && profile->regen_if_dirty()) || _pop_is_dirty();
 }
 
 void PathExtrude3D::_rebuild_mesh() {
     generated_mesh->clear_surfaces();
-    if (nullptr != collision_node) {
-        remove_child(collision_node);
-        collision_node->queue_free();
-        collision_node = nullptr;
-    }
     n_tris = 0;
 
+    _clear_collision_node();
+
+    Path3D *path3d = get_path_3d();
     if (profile.is_null() || path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree()) {
         return;
     }
@@ -291,8 +285,8 @@ void PathExtrude3D::_rebuild_mesh() {
         uv_transforms[idx_slice] = _sample_uv_modifiers_at(offset / baked_l);
     }
 
-    if (relative_transform == TRANSFORM_MESH_PATH_NODE) {
-        Transform3D transform = _get_relative_transform();
+    if (get_relative_transform() == TRANSFORM_PATH_NODE) {
+        Transform3D transform = _get_final_transform();
         for (uint64_t idx_slice = 0; idx_slice < n_slices; ++idx_slice) {
             transforms[idx_slice] = transform * transforms[idx_slice];
         }
@@ -646,4 +640,8 @@ void PathExtrude3D::_rebuild_mesh() {
 
 void PathExtrude3D::_on_profile_changed() {
     emit_signal("profile_changed");
+}
+
+Ref<ArrayMesh> PathExtrude3D::_get_mesh() const {
+    return generated_mesh;
 }

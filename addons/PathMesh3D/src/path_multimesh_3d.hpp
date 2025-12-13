@@ -3,13 +3,12 @@
 #include <godot_cpp/classes/geometry_instance3d.hpp>
 #include <godot_cpp/classes/multi_mesh.hpp>
 
-#include "path_tool.hpp"
+#include "path_tool_3d.hpp"
 
 namespace godot {
 
-class PathMultiMesh3D : public GeometryInstance3D {
+class PathMultiMesh3D : public GeometryInstance3D, public PathTool3D<PathMultiMesh3D> {
     GDCLASS(PathMultiMesh3D, GeometryInstance3D)
-    PATH_TOOL(PathMultiMesh3D, MESH)
 
 public:
     enum Distribution {
@@ -59,6 +58,9 @@ public:
 protected:
     static void _bind_methods();
     void _validate_property(PropertyInfo &property) const;
+    void _notification(int p_what);
+
+    virtual void _rebuild_mesh() override final;
 
 private:
     Ref<MultiMesh> multi_mesh;

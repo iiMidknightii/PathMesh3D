@@ -115,7 +115,7 @@ bool PathMultiMesh3D::get_sample_cubic() const {
 }
 
 void PathMultiMesh3D::_bind_methods() {
-    PATH_TOOL_BINDS(PathMultiMesh3D, mesh, MESH)
+    PathTool3D::_bind_path_tool_3d_methods();
 
     ClassDB::bind_method(D_METHOD("set_multi_mesh", "multi_mesh"), &PathMultiMesh3D::set_multi_mesh);
     ClassDB::bind_method(D_METHOD("get_multi_mesh"), &PathMultiMesh3D::get_multi_mesh);
@@ -165,18 +165,7 @@ void PathMultiMesh3D::_bind_methods() {
 }
 
 void PathMultiMesh3D::_notification(int p_what) {
-    switch (p_what) {
-        case NOTIFICATION_READY: {
-            set_process_internal(true);
-            _rebuild_mesh();
-        } break;
-
-        case NOTIFICATION_INTERNAL_PROCESS: {
-            if (_pop_is_dirty()) {
-                _rebuild_mesh();
-            }
-        } break;
-    }
+    PathTool3D::_notification_path_tool_3d(p_what);
 }
 
 void PathMultiMesh3D::_validate_property(PropertyInfo &property) const {
@@ -202,11 +191,12 @@ void PathMultiMesh3D::_rebuild_mesh() {
     }
     multi_mesh->set_instance_count(0);
 
+    Path3D *path3d = get_path_3d();
     if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree()) {
         return;
     }
 
-    Transform3D mod_transform = _get_relative_transform();
+    Transform3D mod_transform = _get_final_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -275,7 +265,7 @@ void PathMultiMesh3D::_rebuild_mesh() {
 
         transform *= _sample_3d_modifiers_at(offset / baked_l);
 
-        if (relative_transform == TRANSFORM_MESH_PATH_NODE) {
+        if (get_relative_transform() == TRANSFORM_PATH_NODE) {
             transform = mod_transform * transform;
         }
 
@@ -284,9 +274,7 @@ void PathMultiMesh3D::_rebuild_mesh() {
     }
 }
 
-PathMultiMesh3D::~PathMultiMesh3D() {
-    PATH_TOOL_DESTRUCTOR(PathMultiMesh3D)
-    
+PathMultiMesh3D::~PathMultiMesh3D() {    
     if (multi_mesh.is_valid()) {
         if (multi_mesh->is_connected("changed", callable_mp(this, &PathMultiMesh3D::_on_mesh_changed))) {
             multi_mesh->disconnect("changed", callable_mp(this, &PathMultiMesh3D::_on_mesh_changed));

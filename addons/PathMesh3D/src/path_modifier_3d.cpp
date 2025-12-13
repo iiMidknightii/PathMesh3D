@@ -1,6 +1,6 @@
 #include <godot_cpp/classes/curve3d.hpp>
 
-#include "path_tool.hpp"
+#include "path_tool_3d.hpp"
 #include "path_modifier_3d.hpp"
 #include "path_mesh_3d.hpp"
 #include "path_extrude_3d.hpp"

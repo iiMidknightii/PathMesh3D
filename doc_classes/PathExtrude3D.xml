@@ -75,9 +75,6 @@
 		<member name="material" type="Material" setter="set_material" getter="get_material">
 			The material used for the extrusion.  Similar to [CSGPolygon3D], the bttom left of the texture is applied to the starting end cap, and the bottom right of the texture is applied to the end cap.  The top half of the texture is applied to the extruded profile, with U increasing along the path length.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathExtrude3D.RelativeTransform" default="0">
-			Sets the overall transform of the generated mesh to either follow the PathExtrude3D node's transform or the transform of the Path3D node.
-		</member>
 		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
 			A spatial offset in the X any Y direction along the path.
 		</member>
@@ -89,6 +86,10 @@
 		</member>
 		<member name="profile" type="PathExtrudeProfileBase" setter="set_profile" getter="get_profile">
 			The 2D profile to extrude along the path.
+		</member>
+		<member name="relative_transform" type="int" setter="set_relative_transform" getter="get_relative_transform" enum="PathExtrude3D.RelativeTransform" default="0">
+			Determines how the cross-section is transformed relative to this node or the path node.
+			See [enum RelativeTransform] for more information.
 		</member>
 		<member name="sample_cubic" type="bool" setter="set_sample_cubic" getter="get_sample_cubic" default="false">
 			If [code]true[/code], the cross-section is sampled using cubic interpolation. If [code]false[/code], the cross-section is sampled using linear interpolation.
@@ -119,11 +120,11 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
-			When [member mesh_transform] is set to this value, the mesh is transformed using the PathExtrude3D node's transform.
+		<constant name="TRANSFORM_LOCAL" value="0" enum="RelativeTransform">
+			The cross-section is transformed relative to the PathExtrude3D node.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
-			When [member mesh_transform] is set to this value, the mesh is transformed using the Path3D node's transform.
+		<constant name="TRANSFORM_PATH_NODE" value="1" enum="RelativeTransform">
+			The cross-section is transformed relative to the Path3D node.
 		</constant>
 		<constant name="COLLISION_MODE_NONE" value="0" enum="CollisionMode">
 			When [member collision_mode] is set to this value, no collision is automatically generated.  [method create_trimesh_collision], [method create_convex_collision], or [method create_multiple_convex_collision] can be used to manually generate collision.

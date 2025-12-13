@@ -221,11 +221,12 @@
 		<member name="mesh" type="Mesh" setter="set_mesh" getter="get_mesh">
 			The input mesh whose surfaces will be tiled along the path.
 		</member>
-		<member name="mesh_transform" type="int" setter="set_mesh_transform" getter="get_mesh_transform" enum="PathMesh3D.RelativeTransform" default="0">
-			Sets the overall transform of the generated mesh to either follow the PathMesh3D node's transform or the transform of the Path3D node.
-		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
 			The Path3D node that the input mesh will be tiled along.
+		</member>
+		<member name="relative_transform" type="int" setter="set_relative_transform" getter="get_relative_transform" enum="PathMesh3D.RelativeTransform" default="0">
+			Determines how the mesh is transformed relative to this node or the path node.
+			See [enum RelativeTransform] for more information.
 		</member>
 		<member name="total_triangle_count" type="int" setter="" getter="get_total_triangle_count" default="0">
 			A read-only value that stores the triangle count of the generated mesh.
@@ -244,11 +245,11 @@
 		</signal>
 	</signals>
 	<constants>
-		<constant name="TRANSFORM_MESH_LOCAL" value="0" enum="RelativeTransform">
-			When the [member mesh_transform] property is set to this value, the mesh is transformed using the PathMesh3D node's transform.
+		<constant name="TRANSFORM_LOCAL" value="0" enum="RelativeTransform">
+			The mesh will be transformed relative to the PathMesh3D node.
 		</constant>
-		<constant name="TRANSFORM_MESH_PATH_NODE" value="1" enum="RelativeTransform">
-			When the [member mesh_transform] property is set to this value, the mesh is transformed using the Path3D node's transform.
+		<constant name="TRANSFORM_PATH_NODE" value="1" enum="RelativeTransform">
+			The mesh will be transformed relative to the Path3D node.
 		</constant>
 		<constant name="COLLISION_MODE_NONE" value="0" enum="CollisionMode">
 			If [member collision_mode] is set to this value, no collision is generated.

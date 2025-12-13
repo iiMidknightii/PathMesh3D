@@ -2,17 +2,26 @@
 
 #include <godot_cpp/classes/static_body3d.hpp>
 
-#include "path_tool.hpp"
-#include "path_collision_tool.hpp"
+#include "path_tool_3d.hpp"
+#include "path_physics_tool_3d.hpp"
 
 namespace godot {
 
 class MultiMeshInstance3D;
 
-class PathStaticBody3D : public StaticBody3D {
+class PathStaticBody3D : public StaticBody3D, public PathPhysicsTool3D<PathStaticBody3D> {
     GDCLASS(PathStaticBody3D, StaticBody3D)
-    PATH_TOOL(PathStaticBody3D, SHAPE)
-    PATH_COLLISION_TOOL_HEADER(PathStaticBody3D, StaticBody3D, static_body)
+
+public:
+    PathStaticBody3D *_bake_static_body() const {
+        return _bake();
+    }
+    
+protected:
+    static void _bind_methods();
+    void _notification(int p_what);
+    void _validate_property(PropertyInfo &p_property) const;
+    virtual void _rebuild_mesh() override final;
 };
 
 }

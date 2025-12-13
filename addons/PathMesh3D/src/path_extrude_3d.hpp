@@ -4,16 +4,14 @@
 #include <godot_cpp/classes/array_mesh.hpp>
 #include <godot_cpp/classes/material.hpp>
 
-#include "path_tool.hpp"
-#include "path_collision_tool.hpp"
+#include "path_tool_3d.hpp"
+#include "path_collision_tool_3d.hpp"
 #include "path_extrude_profile_base.hpp"
 
 namespace godot {
 
-class PathExtrude3D : public GeometryInstance3D {
+class PathExtrude3D : public GeometryInstance3D, public PathCollisionTool3D<PathExtrude3D> {
     GDCLASS(PathExtrude3D, GeometryInstance3D)
-    PATH_TOOL(PathExtrude3D, MESH)
-    PATH_MESH_WITH_COLLISION(generated_mesh)
 
 public:
     enum EndCaps {
@@ -58,6 +56,12 @@ public:
 
 protected:
     static void _bind_methods();
+    void _notification(int p_what);
+    void _validate_property(PropertyInfo &p_property) const;
+
+    virtual void _rebuild_mesh() override final;
+    virtual bool _pop_should_rebuild() override final;
+    virtual Ref<ArrayMesh> _get_mesh() const override final;
 
 private:
     Ref<PathExtrudeProfileBase> profile;
@@ -75,6 +79,7 @@ private:
 
     void _on_profile_changed();
 };
+
 }
 
 VARIANT_ENUM_CAST(PathExtrude3D::RelativeTransform)

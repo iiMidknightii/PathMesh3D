@@ -2,7 +2,8 @@
 #include <godot_cpp/classes/material.hpp>
 
 #include "path_mesh_3d.hpp"
-
+#include "path_collision_tool_3d.hpp"
+#include "path_tool_3d.hpp"
 
 using namespace godot;
 
@@ -206,7 +207,8 @@ uint64_t PathMesh3D::get_total_triangle_count() const {
 }
 
 void PathMesh3D::_bind_methods() {
-    PATH_TOOL_BINDS(PathMesh3D, mesh, MESH)
+    PathTool3D::_bind_path_tool_3d_methods();
+    PathCollisionTool3D::_bind_path_collision_tool_3d_methods();
 
     ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathMesh3D::get_baked_mesh);
 
@@ -237,8 +239,6 @@ void PathMesh3D::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_total_triangle_count"), &PathMesh3D::get_total_triangle_count);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "total_triangle_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY), "", "get_total_triangle_count");
-
-    PATH_MESH_WITH_COLLISION_BINDS(PathMesh3D)
     
     ADD_SIGNAL(MethodInfo("mesh_changed"));
 
@@ -251,20 +251,8 @@ void PathMesh3D::_bind_methods() {
 }
 
 void PathMesh3D::_notification(int p_what) {
-    switch (p_what) {
-        case NOTIFICATION_READY: {
-            set_process_internal(true);
-            _rebuild_mesh();
-        } break;
-
-        case NOTIFICATION_INTERNAL_PROCESS: {
-            if (_pop_is_dirty()) {
-                _rebuild_mesh();
-            } else if (collision_dirty) {
-                _rebuild_collision_node();
-            }
-        } break;
-    }
+    PathTool3D::_notification_path_tool_3d(p_what);
+    PathCollisionTool3D::_notification_path_collision_tool_3d(p_what);
 }
 
 void PathMesh3D::_get_property_list(List<PropertyInfo> *p_list) const {
@@ -419,22 +407,24 @@ bool PathMesh3D::_get(const StringName &p_name, Variant &r_property) const {
     return false;
 }
 
+void PathMesh3D::_validate_property(PropertyInfo &p_property) const {
+    PathCollisionTool3D<PathMesh3D>::_validate_path_collision_tool_3d_property(p_property);
+}
+
 void PathMesh3D::_rebuild_mesh() {
     generated_mesh->clear_surfaces();
     for (SurfaceData &surf : surfaces) {
         surf.n_tris = 0;
     }
-    if (collision_node != nullptr) {
-        remove_child(collision_node);
-        collision_node->queue_free();
-        collision_node = nullptr;
-    }
 
+    _clear_collision_node();
+
+    Path3D *path3d = get_path_3d();
     if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree() || source_mesh.is_null()) {
         return;
     }
 
-    Transform3D mod_transform = _get_relative_transform();
+    Transform3D mod_transform = _get_final_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
     ERR_FAIL_COND_MSG(curve->get_point_count() < 2, "Curve has < 2 points, cannot tesselate.");
@@ -591,7 +581,7 @@ void PathMesh3D::_rebuild_mesh() {
                     vertex = old_verts[idx_vert];
                 }
                 
-                Transform3D final_transform = relative_transform == TRANSFORM_MESH_PATH_NODE ? mod_transform * transform : transform;
+                Transform3D final_transform = get_relative_transform() == TRANSFORM_PATH_NODE ? mod_transform * transform : transform;
 
                 new_verts[k] = final_transform.xform(vertex);
                 if (has_column[Mesh::ARRAY_NORMAL]) {
@@ -699,6 +689,7 @@ double PathMesh3D::_get_mesh_length() const {
 }
 
 uint64_t PathMesh3D::_get_max_count() const {
+    Path3D *path3d = get_path_3d();
     if (source_mesh.is_valid() && path3d != nullptr && path3d->get_curve().is_valid()) {
         return path3d->get_curve()->get_baked_length() / _get_mesh_length();
     } else {
@@ -723,24 +714,19 @@ PathMesh3D::PathMesh3D() {
 }
 
 PathMesh3D::~PathMesh3D() {
-    PATH_TOOL_DESTRUCTOR(PathMesh3D)
-    
     if (source_mesh.is_valid()) {
         if (source_mesh->is_connected("changed", callable_mp(this, &PathMesh3D::_on_mesh_changed))) {
             source_mesh->disconnect("changed", callable_mp(this, &PathMesh3D::_on_mesh_changed));
         }
         source_mesh.unref();
     }
-    if (path3d != nullptr) {
-        if (UtilityFunctions::is_instance_id_valid(path3d->get_instance_id()) && 
-                path3d->is_connected("curve_changed", callable_mp(this, &PathMesh3D::_on_curve_changed))) {
-            path3d->disconnect("curve_changed", callable_mp(this, &PathMesh3D::_on_curve_changed));
-        }
-        path3d = nullptr;
-    }
     if (generated_mesh.is_valid()) {
         generated_mesh->clear_surfaces();
         generated_mesh.unref();
     }
     surfaces.clear();
+}
+
+Ref<ArrayMesh> PathMesh3D::_get_mesh() const {
+    return generated_mesh;
 }

@@ -3,13 +3,12 @@
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/packed_scene.hpp>
 
-#include "path_tool.hpp"
+#include "path_tool_3d.hpp"
 
 namespace godot {
 
-class PathScene3D : public Node3D {
+class PathScene3D : public Node3D, public PathTool3D<PathScene3D> {
     GDCLASS(PathScene3D, Node3D)
-    PATH_TOOL(PathScene3D, SCENE)
 
 public:
     enum Distribution {
@@ -63,6 +62,9 @@ public:
 protected:
     static void _bind_methods();
     void _validate_property(PropertyInfo &property) const;
+    void _notification(int p_what);
+
+    virtual void _rebuild_mesh() override final;
 
 private:
     Ref<PackedScene> scene;

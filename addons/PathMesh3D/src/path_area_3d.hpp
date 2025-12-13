@@ -2,17 +2,26 @@
 
 #include <godot_cpp/classes/area3d.hpp>
 
-#include "path_tool.hpp"
-#include "path_collision_tool.hpp"
+#include "path_tool_3d.hpp"
+#include "path_physics_tool_3d.hpp"
 
 namespace godot {
 
 class MultiMeshInstance3D;
 
-class PathArea3D : public Area3D {
+class PathArea3D : public Area3D, public PathPhysicsTool3D<PathArea3D> {
     GDCLASS(PathArea3D, Area3D)
-    PATH_TOOL(PathArea3D, SHAPE)
-    PATH_COLLISION_TOOL_HEADER(PathArea3D, Area3D, area)
+
+public:
+    PathArea3D *_bake_area() const {
+        return _bake();
+    }
+
+protected:
+    static void _bind_methods();
+    void _notification(int p_what);
+    void _validate_property(PropertyInfo &p_property) const;
+    virtual void _rebuild_mesh() override final;
 };
 
 } // namespace godot

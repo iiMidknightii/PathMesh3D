@@ -4,14 +4,12 @@
 #include <godot_cpp/templates/pair.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 
-#include "path_tool.hpp"
-#include "path_collision_tool.hpp"
+#include "path_tool_3d.hpp"
+#include "path_collision_tool_3d.hpp"
 
 namespace godot {
-class PathMesh3D : public GeometryInstance3D {
+class PathMesh3D : public GeometryInstance3D, public PathCollisionTool3D<PathMesh3D> {
     GDCLASS(PathMesh3D, GeometryInstance3D)
-    PATH_TOOL(PathMesh3D, MESH)
-    PATH_MESH_WITH_COLLISION(generated_mesh)
 
 public:
     enum Distribution {
@@ -75,6 +73,11 @@ protected:
 	bool _property_get_revert(const StringName &p_name, Variant &r_property) const;
     bool _set(const StringName &p_name, const Variant &p_property);
 	bool _get(const StringName &p_name, Variant &r_property) const;
+    void _notification(int p_what);
+    void _validate_property(PropertyInfo &p_property) const;
+
+    virtual void _rebuild_mesh() override final;
+    virtual Ref<ArrayMesh> _get_mesh() const override final;
 
 private:
     Ref<Mesh> source_mesh;

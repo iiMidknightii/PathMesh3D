@@ -116,7 +116,7 @@ TypedArray<Node3D> PathScene3D::bake_instances() {
 }
 
 void PathScene3D::_bind_methods() {
-    PATH_TOOL_BINDS(PathScene3D, scene, SCENE)
+    PathTool3D::_bind_path_tool_3d_methods();
 
     ClassDB::bind_method(D_METHOD("bake_instances"), &PathScene3D::bake_instances);
 
@@ -168,18 +168,7 @@ void PathScene3D::_bind_methods() {
 }
 
 void PathScene3D::_notification(int p_what) {
-    switch (p_what) {
-        case NOTIFICATION_READY: {
-            set_process_internal(true);
-            _rebuild_mesh();
-        } break;
-
-        case NOTIFICATION_INTERNAL_PROCESS: {
-            if (_pop_is_dirty()) {
-                _rebuild_mesh();
-            }
-        } break;
-    }
+    PathTool3D::_notification_path_tool_3d(p_what);
 }
 
 PackedStringArray PathScene3D::_get_configuration_warnings() const {
@@ -226,6 +215,7 @@ void PathScene3D::_rebuild_mesh() {
     }
     instances.clear();
 
+    Path3D *path3d = get_path_3d();
     if (path3d == nullptr || path3d->get_curve().is_null() || !path3d->is_inside_tree() || scene.is_null()) {
         return;
     }
@@ -239,7 +229,7 @@ void PathScene3D::_rebuild_mesh() {
     }
     tmp->queue_free();
 
-    Transform3D mod_transform = _get_relative_transform();
+    Transform3D mod_transform = _get_final_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
     if (curve->get_point_count() < 2) {
@@ -305,7 +295,7 @@ void PathScene3D::_rebuild_mesh() {
 
         transform *= _sample_3d_modifiers_at(offset / baked_l);
 
-        if (relative_transform == TRANSFORM_SCENE_PATH_NODE) {
+        if (get_relative_transform() == TRANSFORM_PATH_NODE) {
             transform = mod_transform * transform;
         }
 
@@ -328,8 +318,6 @@ PathScene3D::~PathScene3D() {
         }
         scene.unref();
     }
-
-    PATH_TOOL_DESTRUCTOR(PathScene3D);
     
     instances.clear();
 }

@@ -1,0 +1,5 @@
+CompileFlags:
+  Remove:
+    - "-fno-gnu-unique"
+  Add:
+    - "-std=c++17"
