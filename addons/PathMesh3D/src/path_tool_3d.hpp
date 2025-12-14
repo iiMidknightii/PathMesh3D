@@ -39,9 +39,8 @@ public:
             
             path3d_id = p_path->get_instance_id(); 
             
-            Path3D *new_node = get_path_3d(); 
-            if (new_node != nullptr && !new_node->is_connected("curve_changed", callable_mp(_self(), static_cast<void (T::*)()>(&PathTool3D<T>::_on_curve_changed)))) { 
-                new_node->connect("curve_changed", callable_mp(_self(), static_cast<void (T::*)()>(&PathTool3D<T>::_on_curve_changed))); 
+            if (p_path != nullptr && !p_path->is_connected("curve_changed", callable_mp(_self(), static_cast<void (T::*)()>(&PathTool3D<T>::_on_curve_changed)))) { 
+                p_path->connect("curve_changed", callable_mp(_self(), static_cast<void (T::*)()>(&PathTool3D<T>::_on_curve_changed))); 
             }
             
             _on_curve_changed();
@@ -87,7 +86,7 @@ protected:
 
         ClassDB::bind_method(D_METHOD("set_path_3d", "path"), static_cast<void (T::*)(Path3D *)>(&PathTool3D::set_path_3d));
         ClassDB::bind_method(D_METHOD("get_path_3d"), static_cast<Path3D *(T::*)() const>(&PathTool3D::get_path_3d));
-        ClassDB::add_property(T::get_class_static(), PropertyInfo(Variant::NODE_PATH, "path_3d", PROPERTY_HINT_NODE_TYPE, "Path3D"), "set_path_3d", "get_path_3d");
+        ClassDB::add_property(T::get_class_static(), PropertyInfo(Variant::OBJECT, "path_3d", PROPERTY_HINT_NODE_TYPE, "Path3D"), "set_path_3d", "get_path_3d");
         
         ClassDB::bind_method(D_METHOD("set_relative_transform", "transform"), static_cast<void (T::*)(RelativeTransform)>(&PathTool3D::set_relative_transform)); 
         ClassDB::bind_method(D_METHOD("get_relative_transform"), static_cast<RelativeTransform (T::*)() const>(&PathTool3D::get_relative_transform)); 
@@ -167,7 +166,7 @@ protected:
     }
     
 private:
-    uint32_t path3d_id = 0; 
+    uint64_t path3d_id = 0; 
     RelativeTransform relative_transform = TRANSFORM_LOCAL; 
     Transform3D self_transform; 
     Transform3D path_transform; 

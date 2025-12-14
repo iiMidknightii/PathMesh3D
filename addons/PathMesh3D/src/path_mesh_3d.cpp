@@ -427,14 +427,19 @@ void PathMesh3D::_rebuild_mesh() {
     Transform3D mod_transform = _get_final_transform();
 
     Ref<Curve3D> curve = path3d->get_curve();
-    ERR_FAIL_COND_MSG(curve->get_point_count() < 2, "Curve has < 2 points, cannot tesselate.");
+    if (curve->get_point_count() < 2) {
+        return;
+    }
 
     double baked_l = curve->get_baked_length();
-    ERR_FAIL_COND_MSG(baked_l == 0.0, "Curve has no length.");
+    if (baked_l == 0.0) {
+        return;
+    }
 
     double mesh_l = _get_mesh_length();
-    ERR_FAIL_COND_MSG(mesh_l == 0.0, "Provided mesh has no length in Z dimension.  Try rotating on X or Y to gain length.");
-    ERR_FAIL_COND_MSG(baked_l < mesh_l, "Curve length < mesh length, cannot tile.");
+    if (mesh_l == 0.0 || baked_l < mesh_l) {
+        return;
+    }
     
     for (uint64_t idx_surf = 0; idx_surf < source_mesh->get_surface_count(); ++idx_surf) {
         SurfaceData &surf = surfaces[idx_surf];

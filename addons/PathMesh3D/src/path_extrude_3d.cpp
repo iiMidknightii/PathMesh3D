@@ -225,18 +225,25 @@ void PathExtrude3D::_rebuild_mesh() {
 
     PackedVector3Array tessellated_points = curve->tessellate(tessellation_max_stages, tessellation_tolerance_degrees);
     uint64_t n_slices = tessellated_points.size();
-    ERR_FAIL_COND_MSG(n_slices < 2, "Not enough points on curve to tesselate.");
+    if (n_slices < 2) {
+        return;
+    }
 
     double baked_l = curve->get_baked_length();
-    ERR_FAIL_COND_MSG(baked_l == 0.0, "Curve has no length.");
+    if (baked_l == 0.0) {
+        return;
+    }
 
     Array arrays = profile->get_mesh_arrays();
-    ERR_FAIL_COND_MSG(arrays.size() == 0, "Mesh has no array data.");
-    ERR_FAIL_COND_MSG(arrays[0].get_type() != Variant::PACKED_VECTOR2_ARRAY, "First (and required) element of mesh array must be a PackedVector2Array.");
+    if (arrays.size() == 0 || arrays[0].get_type() != Variant::PACKED_VECTOR2_ARRAY) {
+        return;
+    }
 
     PackedVector2Array cross_section = arrays[0];
     uint64_t n_vertices = cross_section.size();
-    ERR_FAIL_COND_MSG(n_vertices < 2, "Number of vertices provided in cross section < 2.");
+    if (n_vertices < 2) {
+        return;
+    }
 
     LocalVector<bool> has_column;
     has_column.resize(Mesh::ARRAY_MAX);

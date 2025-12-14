@@ -68,6 +68,10 @@ public:
         return Object::cast_to<Node>(ObjectDB::get_instance(collision_node_id));
     }
 
+    _FORCE_INLINE_ Node *get_collision_debug_node() const {
+        return Object::cast_to<Node>(ObjectDB::get_instance(collision_debug_id));
+    }
+
     _FORCE_INLINE_ void queue_rebuild_collision() {
         collision_dirty = true;
     }
@@ -146,8 +150,8 @@ public:
 protected:
     static void _bind_path_collision_tool_3d_methods() {
         ClassDB::add_property_group(T::get_class_static(), "Collision", "");    
-            ClassDB::bind_method(D_METHOD("set_generate_collision", "mode"), static_cast<void (T::*)(CollisionMode)>(&PathCollisionTool3D::set_generate_collision));   
-            ClassDB::bind_method(D_METHOD("get_generate_collision"), static_cast<CollisionMode (T::*)() const>(&PathCollisionTool3D::get_generate_collision));   
+        ClassDB::bind_method(D_METHOD("set_generate_collision", "mode"), static_cast<void (T::*)(CollisionMode)>(&PathCollisionTool3D::set_generate_collision));   
+        ClassDB::bind_method(D_METHOD("get_generate_collision"), static_cast<CollisionMode (T::*)() const>(&PathCollisionTool3D::get_generate_collision));   
         ClassDB::add_property(T::get_class_static(), PropertyInfo(Variant::INT, "collision_mode", PROPERTY_HINT_ENUM, "None,Trimesh,Convex,Multiple Convex"), "set_generate_collision", "get_generate_collision");  
         
         ClassDB::bind_method(D_METHOD("set_convex_collision_clean", "clean"), static_cast<void (T::*)(bool)>(&PathCollisionTool3D::set_convex_collision_clean));  
@@ -209,25 +213,24 @@ protected:
 
     _FORCE_INLINE_ void _clear_collision_node() {
         Node *collision_node = get_collision_node();
-
         if (collision_node != nullptr) {
             _self()->remove_child(collision_node);
             collision_node->queue_free();
             collision_node = nullptr;
+            collision_node_id = 0;
+        }
+
+        Node *collision_debug = get_collision_debug_node();
+        if (collision_debug != nullptr) {
+            _self()->remove_child(collision_debug);
+            collision_debug->queue_free();
+            collision_debug = nullptr;
+            collision_debug_id = 0;
         }
     }
 
     _FORCE_INLINE_ void _rebuild_collision_node() {
         _clear_collision_node();
-
-        if (collision_debug_id != 0) {
-            MeshInstance3D *collision_debug = Object::cast_to<MeshInstance3D>(ObjectDB::get_instance(collision_debug_id));
-            if (collision_debug != nullptr) {
-                _self()->remove_child(collision_debug);
-                collision_debug->queue_free();
-            }
-            collision_debug_id = 0;
-        }
 
         Node *collision_node = nullptr;
 
@@ -250,11 +253,24 @@ protected:
 
             _self()->add_child(collision_node, false, _self()->INTERNAL_MODE_BACK);
 
-            if (Engine::get_singleton()->is_editor_hint() || _self()->get_tree()->is_debugging_collisions_hint()) {
+            if (_self()->get_tree()->is_debugging_collisions_hint()) {
                 MeshInstance3D *collision_debug = memnew(MeshInstance3D);
-                collision_debug->set_mesh(Object::cast_to<CollisionShape3D>(collision_node->get_child(0))->get_shape()->get_debug_mesh());
-                _self()->add_child(collision_debug, false, _self()->INTERNAL_MODE_BACK);
                 collision_debug_id = collision_debug->get_instance_id();
+
+                CollisionShape3D *cshape = Object::cast_to<CollisionShape3D>(collision_node->get_child(0));
+                if (cshape != nullptr) {
+                    Ref<Shape3D> shape = cshape->get_shape();
+                    if (shape.is_valid()) {
+                        collision_debug->set_mesh(shape->get_debug_mesh());
+                        _self()->add_child(collision_debug, false, _self()->INTERNAL_MODE_BACK);
+                    } else {
+                        collision_debug->queue_free();
+                        collision_debug_id = 0;
+                    }
+                } else {
+                    collision_debug->queue_free();
+                    collision_debug_id = 0;
+                }
             }
         }
     }
@@ -264,7 +280,7 @@ private:
     bool convex_collision_clean = true;
     bool convex_collision_simplify = false;
     bool collision_dirty = false;
-    uint32_t collision_node_id = 0;
+    uint64_t collision_node_id = 0;
     uint64_t collision_debug_id = 0;
     uint32_t collision_layer = 1;
     uint32_t collision_mask = 1;

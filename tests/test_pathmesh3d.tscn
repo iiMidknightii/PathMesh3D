@@ -23,7 +23,7 @@ point_count = 3
 
 [sub_resource type="Curve3D" id="Curve3D_jw5u5"]
 _data = {
-"points": PackedVector3Array(-0.992874, -0.672518, 2.01513, 0.993, 0, -2.015, 0, 0, 3, 0.481, 0, 0.862, -0.481, 0, -0.862, 0, 0, -3, 1.268, 0, -0.227, -1.268, 0, 0.227, -2.636, 0, -3.924, -3.83053, 1.01841, -2.45066, 3.83053, -1.01841, 2.45066, -2.84019, 0.0907836, 2.8903),
+"points": PackedVector3Array(-0.992874, -0.672518, 2.01513, 0.993, 0, -2.015, 0, 0, 3, 0.481, 0, 0.862, -0.481, 0, -0.862, 0, 0, -3, 1.268, 0, -0.227, -1.268, 0, 0.227, -2.636, 0, -3.924, -3.83053, 1.01841, -2.45066, 3.83053, -1.01841, 2.45066, -2.9785013, 0.023592472, 3.1116865),
 "tilts": PackedFloat32Array(0, 0, 0, -2.19921)
 }
 point_count = 4
@@ -33,10 +33,10 @@ script = SubResource("GDScript_bfc6h")
 
 [node name="PathMesh3D" type="PathMesh3D" parent="." node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
-mesh = ExtResource("1_wgxgm")
 collision_mode = 1
 collision_layer = 1
 collision_mask = 1
+mesh = ExtResource("1_wgxgm")
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
 surface_0/distribution = 0
@@ -49,7 +49,7 @@ surface_0/offset = Vector2(0, 0)
 surface_0/triangle_count = 853
 
 [node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D"]
-curve_offset_end = 17.59416
+curve_offset_end = 17.808922
 influence = SubResource("Curve_eedmf")
 
 [node name="Path3D" type="Path3D" parent="."]

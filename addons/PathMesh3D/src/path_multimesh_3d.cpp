@@ -204,7 +204,6 @@ void PathMultiMesh3D::_rebuild_mesh() {
     }
 
     double baked_l = curve->get_baked_length();
-
     if (baked_l == 0.0) {
         return;
     }

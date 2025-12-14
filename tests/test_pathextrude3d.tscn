@@ -2,9 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_jtvri"]
 
-[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_yx5hd"]
-radius = 0.52
-segments = 12
+[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_2g0eo"]
+radius = 0.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eywb8"]
 albedo_texture = ExtResource("1_jtvri")
@@ -27,7 +26,7 @@ func _process(delta: float) -> void:
 "
 
 [sub_resource type="Curve" id="Curve_2g0eo"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.753859, 0), -0.0378524, -0.0378524, 0, 0, Vector2(0.9494, 0.442167), 5.8086, 5.8086, 0, 0, Vector2(1, 1), 14.9377, 0.0, 0, 0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.753859, 0), -0.0378524, -0.0378524, 0, 0, Vector2(0.90853137, 0.17918497), 2.600726, 2.600726, 0, 0, Vector2(1, 1), 14.9377, 0.0, 0, 0]
 point_count = 4
 
 [sub_resource type="GDScript" id="GDScript_2g0eo"]
@@ -48,21 +47,20 @@ point_count = 3
 
 [node name="PathExtrude3D" type="PathExtrude3D" parent="." node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
-mesh_transform = 1
-profile = SubResource("PathExtrudeProfileCircle_yx5hd")
+profile = SubResource("PathExtrudeProfileCircle_2g0eo")
 tessellation_tolerance_degrees = 0.5
 material = SubResource("StandardMaterial3D_eywb8")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15287, -0.660449)
 script = SubResource("GDScript_x3lis")
 
 [node name="PathModifier3D" type="PathModifier3D" parent="PathExtrude3D"]
-curve_offset_end = 11.4352
+curve_offset_end = 11.435217
 influence = SubResource("Curve_2g0eo")
 scale_modifier = Vector3(0, 0, 0)
 
 [node name="PathModifier3D2" type="PathModifier3D" parent="PathExtrude3D"]
-curve_offset_end = 11.4352
-uv_offset_modifier = Vector2(50.1095, 0)
+curve_offset_end = 11.435217
+uv_offset_modifier = Vector2(66.195526, 0)
 script = SubResource("GDScript_2g0eo")
 
 [node name="Path3D" type="Path3D" parent="."]
