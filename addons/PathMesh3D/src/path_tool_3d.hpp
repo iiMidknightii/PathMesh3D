@@ -3,6 +3,7 @@
 #include <godot_cpp/classes/path3d.hpp>
 #include <godot_cpp/templates/local_vector.hpp>
 
+#include "godot_cpp/classes/curve3d.hpp"
 #include "godot_cpp/core/class_db.hpp"
 #include "godot_cpp/core/defs.hpp"
 #include "godot_cpp/core/error_macros.hpp"
@@ -10,8 +11,27 @@
 
 namespace godot {
 
+class PathToolInterface {
+
+public:
+    virtual void set_path_3d(Path3D *p_path) = 0;
+    virtual Path3D *get_path_3d() const = 0;
+
+    Ref<Curve3D> get_curve_3d() const {
+        Path3D *path3d_node = get_path_3d();
+        if (path3d_node != nullptr) {
+            return path3d_node->get_curve();
+        } else {
+            return Ref<Curve3D>();
+        }
+    }
+
+    virtual void register_modifier(PathModifier3D *p_modifier) = 0;
+    virtual void unregister_modifier(PathModifier3D *p_modifier) = 0;
+};
+
 template <typename T>
-class PathTool3D {
+class PathTool3D : public PathToolInterface {
 
 public:
     enum RelativeTransform { 
@@ -185,64 +205,6 @@ private:
     _FORCE_INLINE_ const T *_self() const {
         return static_cast<const T *>(this);
     }
-};
-
-}
-    
-
-namespace godot {
-
- /* HELPER CLASSES */
-class PathToolInterface {
-public:
-    virtual Path3D *get_path_3d() const = 0;
-    virtual Ref<Curve3D> get_curve_3d() const = 0;
-
-    virtual void register_modifier(PathModifier3D *p_modifier) = 0;
-    virtual void unregister_modifier(PathModifier3D *p_modifier) = 0;
-};
-
-template<typename T>
-class PathToolWrapper : public PathToolInterface {
-
-public:
-    PathToolWrapper(T* p_tool) : tool(p_tool) {
-    }
-    ~PathToolWrapper() {
-        tool = nullptr;
-    }
-
-    Path3D *get_path_3d() const override {
-        if (tool != nullptr) {
-            return tool->get_path_3d();
-        } else {
-            return nullptr;
-        }
-    }
-
-    Ref<Curve3D> get_curve_3d() const override {
-        Path3D *path3d_node = get_path_3d();
-        if (path3d_node != nullptr) {
-            return path3d_node->get_curve();
-        } else {
-            return nullptr;
-        }
-    }
-
-    void register_modifier(PathModifier3D *p_modifier) override {
-        if (tool != nullptr) {
-            tool->register_modifier(p_modifier);
-        }
-    }
-
-    void unregister_modifier(PathModifier3D *p_modifier) override {
-        if (tool != nullptr) {
-            tool->unregister_modifier(p_modifier);
-        }
-    }
-
-private:
-    T* tool = nullptr;
 };
 
 }

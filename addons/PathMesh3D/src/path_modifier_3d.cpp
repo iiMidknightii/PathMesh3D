@@ -1,15 +1,11 @@
 #include <godot_cpp/classes/curve3d.hpp>
 
 #include "path_tool_3d.hpp"
-#include "path_modifier_3d.hpp"
-#include "path_mesh_3d.hpp"
-#include "path_extrude_3d.hpp"
-#include "path_multimesh_3d.hpp"
-#include "path_scene_3d.hpp"
 
 using namespace godot;
 
 void PathModifier3D::set_curve_offset_start(real_t p_offset) {
+    PathToolInterface* tool = _get_tool();
     if (tool != nullptr) {
         const Ref<Curve3D> &path_curve = tool->get_curve_3d();
         if (path_curve.is_valid() && path_curve->get_baked_length() > 0.0) {
@@ -21,6 +17,7 @@ void PathModifier3D::set_curve_offset_start(real_t p_offset) {
 real_t PathModifier3D::get_curve_offset_start() const {
     real_t r_value = 0.0;
 
+    PathToolInterface* tool = _get_tool();
     if (tool != nullptr) {
         const Ref<Curve3D> &path_curve = tool->get_curve_3d();
         if (path_curve.is_valid()) {
@@ -32,6 +29,7 @@ real_t PathModifier3D::get_curve_offset_start() const {
 }
 
 void PathModifier3D::set_curve_offset_end(real_t p_offset) {
+    PathToolInterface* tool = _get_tool();
     if (tool != nullptr) {
         const Ref<Curve3D> &path_curve = tool->get_curve_3d();
         if (path_curve.is_valid() && path_curve->get_baked_length() > 0.0) {
@@ -43,6 +41,7 @@ void PathModifier3D::set_curve_offset_end(real_t p_offset) {
 real_t PathModifier3D::get_curve_offset_end() const {
     real_t r_value = 0.0;
     
+    PathToolInterface* tool = _get_tool();
     if (tool != nullptr) {
         const Ref<Curve3D> &path_curve = tool->get_curve_3d();
         if (path_curve.is_valid()) {
@@ -373,35 +372,16 @@ void PathModifier3D::_bind_methods() {
 void PathModifier3D::_notification(int p_what) {
     switch (p_what) {
         case NOTIFICATION_POST_ENTER_TREE: {
-            if (tool != nullptr) {
-                memfree(tool);
-                tool = nullptr;
-            }
-
-            #define WRAP_TOOL(m_type) \
-                m_type *tmp_##m_type = Object::cast_to<m_type>(parent); \
-                if (tmp_##m_type != nullptr) { \
-                    tool = memnew(PathToolWrapper<m_type>(tmp_##m_type)); \
-                    tool->register_modifier(this); \
-                    break; \
-                }
-
-            Node *parent = get_parent();
-            while (parent != nullptr) {
-                WRAP_TOOL(PathMesh3D)
-                WRAP_TOOL(PathExtrude3D)
-                WRAP_TOOL(PathMultiMesh3D)
-                WRAP_TOOL(PathScene3D)
-
-                parent = parent->get_parent();
+            if (dynamic_cast<PathToolInterface *>(get_parent()) != nullptr) {
+                tool_interface_id = get_parent()->get_instance_id();
+                _get_tool()->register_modifier(this);
             }
         } break;
 
         case NOTIFICATION_EXIT_TREE: {
-            if (tool != nullptr) {
-                tool->unregister_modifier(this);
-                memfree(tool);
-                tool = nullptr;
+            if (_get_tool() != nullptr) {
+                _get_tool()->unregister_modifier(this);
+                tool_interface_id = 0;
             }
         }
     }
@@ -430,6 +410,7 @@ bool PathModifier3D::_property_get_revert(const StringName &p_name, Variant &r_p
                 return false;
         }
     } else if (p_name == StringName("curve_offset_end")) {
+        PathToolInterface* tool = _get_tool();
         if (tool != nullptr) {
             const Ref<Curve3D> &path_curve = tool->get_curve_3d();
             if (path_curve.is_valid() && path_curve->get_baked_length() > 0.0) {
@@ -463,6 +444,10 @@ void PathModifier3D::_validate_property(PropertyInfo &p_property) const {
                 p_property.type = Variant::NIL;
         }
     }
+}
+
+PathToolInterface* PathModifier3D::_get_tool() const {
+    return dynamic_cast<PathToolInterface *>(ObjectDB::get_instance(tool_interface_id));
 }
 
 real_t PathModifier3D::_sample_influence(real_t p_offset_ratio) const {

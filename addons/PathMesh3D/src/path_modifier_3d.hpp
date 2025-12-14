@@ -99,8 +99,9 @@ private:
 
     bool dirty = true;
 
-    PathToolInterface *tool = nullptr;
+    uint64_t tool_interface_id = 0;
     
+    PathToolInterface* _get_tool() const;
     real_t _sample_influence(real_t p_offset_ratio) const;
     void _on_influence_changed();
 };
