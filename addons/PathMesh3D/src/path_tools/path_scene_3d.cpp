@@ -1,6 +1,6 @@
 #include <godot_cpp/classes/curve3d.hpp>
 
-#include "path_scene_3d.hpp"
+#include "path_tools/path_scene_3d.hpp"
 
 using namespace godot;
 

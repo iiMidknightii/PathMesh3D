@@ -23,7 +23,7 @@ env.CompilationDatabase('compile_database.json')
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
 
-sources = Glob("src/*.cpp") + Glob("src/extrude_profiles/*.cpp")
+sources = Glob("src/*.cpp") + Glob("src/extrude_profiles/*.cpp") + Glob("src/path_tools/*.cpp")
 
 if env["target"] in ["editor", "template_debug"]:
     try:

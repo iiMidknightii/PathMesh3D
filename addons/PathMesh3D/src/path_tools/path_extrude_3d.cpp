@@ -1,7 +1,7 @@
 #include <godot_cpp/classes/curve3d.hpp>
 #include <godot_cpp/classes/geometry2d.hpp>
 
-#include "path_extrude_3d.hpp"
+#include "path_tools/path_extrude_3d.hpp"
 #include "godot_cpp/classes/array_mesh.hpp"
 #include "path_collision_tool_3d.hpp"
 #include "path_tool_3d.hpp"
