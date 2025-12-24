@@ -17,7 +17,7 @@ env:
   GODOT_VERSION: ${{ github.event.inputs.godot_version || '4.5-stable' }}
 
 jobs:
-  generate-docs:
+  generate-artifacts:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,12 +48,6 @@ jobs:
       - name: Run initial scons
         run: scons
 
-      - name: Generate gdextension (CI non-dev)
-        run: |
-          # Generate a non-dev gdextension on the docs runner so CI artifacts
-          # reference release/debug template names (no .dev suffix).
-          scons target=template_debug platform=linux arch=x86_64 || true
-
       - name: Generate documentation
         run: |
           ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --doctool ./ --gdextension-docs
@@ -68,7 +62,7 @@ jobs:
           retention-days: 1
 
   build:
-    needs: generate-docs
+    needs: generate-artifacts
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -77,7 +71,7 @@ jobs:
           - os: windows-latest
             platform: windows
             arch: x86_64
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             platform: linux
             arch: x86_64
           - os: macos-latest
@@ -123,7 +117,6 @@ jobs:
           name: PathMesh3D-${{ matrix.platform }}-${{ matrix.arch }}
           path: |
             addons/PathMesh3D/bin/
-            addons/PathMesh3D/path_mesh_3d.gdextension
           retention-days: 7
 
   package:
