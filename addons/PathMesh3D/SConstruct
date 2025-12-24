@@ -43,4 +43,115 @@ else:
         source=sources,
     )
 
-Default(library)
+# Generate a .gdextension file at build time so the library path matches
+# the current scons invocation (platform, target, arch). This ensures
+# Godot will look for the exact filename produced by the build.
+def _write_gdextension(target, source, env):
+    out_path = str(target[0])
+    lib = "{}".format(lib_name)
+
+    # Build a dictionary of library paths for all supported platforms/targets/archs
+    base = "res://addons/PathMesh3D/bin/"
+    shlib = env.get("SHLIBSUFFIX", "")
+
+    def make_suffix(plat, targ, arch, dev):
+        s = ".{plat}.{targ}".format(plat=plat, targ=targ)
+        if dev:
+            s += ".dev"
+        s += ".{arch}".format(arch=arch)
+        return s
+
+    def lib_name_for(plat, targ, arch, dev=False, mac_ext=False, xcframework=False):
+        dev_part = ".dev" if dev else ""
+        if mac_ext:
+            return "lib{lib}.{plat}.{targ}{dev}.dylib".format(lib=lib, plat=plat, targ=targ, dev=dev_part)
+        if xcframework:
+            return "{lib}.{plat}.{targ}{dev}.xcframework".format(lib=lib, plat=plat, targ=targ, dev=dev_part)
+
+        # Platform-specific formatting to match original .gdextension
+        # Linux and macOS use a `lib` prefix for shared libraries.
+        # Windows uses .dll and no `lib` prefix. Android uses .so without `lib`.
+        suffix = make_suffix(plat, targ, arch, dev)
+        if plat == "windows":
+            # include .dev in the filename when applicable
+            dev_mid = ".dev" if dev else ""
+            return "{lib}.windows.{targ}{dev}.{arch}.dll".format(lib=lib, targ=targ, dev=dev_mid, arch=arch)
+        if plat == "linux":
+            return "lib{lib}{suf}.so".format(lib=lib, suf=suffix)
+        if plat == "android":
+            return "{lib}{suf}.so".format(lib=lib, suf=suffix)
+
+        # Fallback: use SHLIBSUFFIX if set
+        return "{lib}{suf}{sh}".format(lib=lib, suf=suffix, sh=shlib)
+
+    dev_flag = env.get("dev_build", False)
+    libs = {
+        "macos.debug": base + lib_name_for("macos", "template_debug", "", dev=dev_flag, mac_ext=True),
+        "macos.release": base + lib_name_for("macos", "template_release", "", dev=False, mac_ext=True),
+        "ios.debug": base + lib_name_for("ios", "template_debug", "", dev=dev_flag, xcframework=True),
+        "ios.release": base + lib_name_for("ios", "template_release", "", dev=False, xcframework=True),
+
+        "windows.debug.x86_32": base + lib_name_for("windows", "template_debug", "x86_32", dev=dev_flag),
+        "windows.release.x86_32": base + lib_name_for("windows", "template_release", "x86_32", dev=False),
+        "windows.debug.x86_64": base + lib_name_for("windows", "template_debug", "x86_64", dev=dev_flag),
+        "windows.release.x86_64": base + lib_name_for("windows", "template_release", "x86_64", dev=False),
+
+        "linux.debug.x86_64": base + lib_name_for("linux", "template_debug", "x86_64", dev=dev_flag),
+        "linux.release.x86_64": base + lib_name_for("linux", "template_release", "x86_64", dev=False),
+        "linux.debug.arm64": base + lib_name_for("linux", "template_debug", "arm64", dev=dev_flag),
+        "linux.release.arm64": base + lib_name_for("linux", "template_release", "arm64", dev=False),
+        "linux.debug.rv64": base + lib_name_for("linux", "template_debug", "rv64", dev=dev_flag),
+        "linux.release.rv64": base + lib_name_for("linux", "template_release", "rv64", dev=False),
+
+        "android.debug.x86_64": base + lib_name_for("android", "template_debug", "x86_64", dev=dev_flag),
+        "android.release.x86_64": base + lib_name_for("android", "template_release", "x86_64", dev=False),
+        "android.debug.arm64": base + lib_name_for("android", "template_debug", "arm64", dev=dev_flag),
+        "android.release.arm64": base + lib_name_for("android", "template_release", "arm64", dev=False),
+    }
+
+    content = []
+    content.append("[configuration]\n")
+    content.append("entry_symbol = \"path_mesh_3d_init\"\n")
+    content.append("compatibility_minimum = \"4.3\"\n")
+    content.append("reloadable = true\n\n")
+    content.append("[libraries]\n")
+
+    # Write the entries in a stable order
+    for key in [
+        "macos.debug", "macos.release",
+        "ios.debug", "ios.release",
+        "windows.debug.x86_32", "windows.release.x86_32",
+        "windows.debug.x86_64", "windows.release.x86_64",
+        "linux.debug.x86_64", "linux.release.x86_64",
+        "linux.debug.arm64", "linux.release.arm64",
+        "linux.debug.rv64", "linux.release.rv64",
+        "android.debug.x86_64", "android.release.x86_64",
+        "android.debug.arm64", "android.release.arm64",
+    ]:
+        content.append("{k} = \"{p}\"\n".format(k=key, p=libs[key]))
+
+    # Keep iOS dependency mapping (if relevant)
+    content.append("\n[dependencies]\n")
+    content.append("ios.debug = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_debug.xcframework\": \"\"\n}\n")
+    content.append("ios.release = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_release.xcframework\": \"\"\n}\n\n")
+
+    # Icons (preserve the same names as the original static file)
+    content.append("[icons]\n")
+    content.append("PathMesh3D = \"res://addons/PathMesh3D/icons/PathMesh3D.svg\"\n")
+    content.append("PathExtrude3D = \"res://addons/PathMesh3D/icons/PathExtrude3D.svg\"\n")
+    content.append("PathMultiMesh3D = \"res://addons/PathMesh3D/icons/PathMultiMesh3D.svg\"\n")
+    content.append("PathScene3D = \"res://addons/PathMesh3D/icons/PathScene3D.svg\"\n")
+    content.append("PathModifier3D = \"res://addons/PathMesh3D/icons/PathModifier3D.svg\"\n")
+    content.append("PathStaticBody3D = \"res://addons/PathMesh3D/icons/PathStaticBody3D.svg\"\n")
+    content.append("PathArea3D = \"res://addons/PathMesh3D/icons/PathArea3D.svg\"\n")
+
+    with open(out_path, "w") as f:
+        f.writelines(content)
+
+
+# Create the gdextension file as a build target in this directory. It will
+# be rewritten by each scons invocation to point at the filenames produced
+# by that invocation (e.g. debug vs release, platform, arch).
+gdext = env.Command("path_mesh_3d.gdextension", [], _write_gdextension)
+
+Default(library, gdext)

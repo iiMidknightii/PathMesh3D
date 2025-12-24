@@ -48,6 +48,12 @@ jobs:
       - name: Run initial scons
         run: scons
 
+      - name: Generate gdextension (CI non-dev)
+        run: |
+          # Generate a non-dev gdextension on the docs runner so CI artifacts
+          # reference release/debug template names (no .dev suffix).
+          scons target=template_debug platform=linux arch=x86_64 || true
+
       - name: Generate documentation
         run: |
           ./godot_bin/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64 --doctool ./ --gdextension-docs
@@ -56,7 +62,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-files
-          path: addons/PathMesh3D/src/gen/
+          path: |
+            addons/PathMesh3D/src/gen/
+            addons/PathMesh3D/path_mesh_3d.gdextension
           retention-days: 1
 
   build:
@@ -85,7 +93,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: generated-files
-          path: addons/PathMesh3D/src/gen/
+          path: addons/PathMesh3D/
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
@@ -113,7 +121,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: PathMesh3D-${{ matrix.platform }}-${{ matrix.arch }}
-          path: addons/PathMesh3D/bin/
+          path: |
+            addons/PathMesh3D/bin/
+            addons/PathMesh3D/path_mesh_3d.gdextension
           retention-days: 7
 
   package:
