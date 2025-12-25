@@ -140,11 +140,16 @@ jobs:
             cp -r "$dir"* package/addons/PathMesh3D/bin/ || true
           done
 
+      - name: Download generated files
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-files
+          path: package/addons/PathMesh3D/
+
       - name: Copy addon files
         run: |
           cp -r addons/PathMesh3D/plugin.cfg package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/plugin.gd package/addons/PathMesh3D/
-          cp -r addons/PathMesh3D/path_mesh_3d.gdextension package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/SConstruct package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/icons package/addons/PathMesh3D/
           cp -r addons/PathMesh3D/scenes package/addons/PathMesh3D/

@@ -25,6 +25,7 @@ tmp.log
 *template_debug.dev.*
 .cache/*
 compile_commands.json
+.artifacts
 
 addons/PathMesh3D/src/gen/
 addons/PathMesh3D/bin/
