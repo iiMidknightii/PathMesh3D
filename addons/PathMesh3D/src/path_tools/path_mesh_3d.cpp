@@ -440,6 +440,10 @@ void PathMesh3D::_rebuild_mesh() {
     if (mesh_l == 0.0 || baked_l < mesh_l) {
         return;
     }
+
+    ERR_FAIL_COND_EDMSG(source_mesh->get_surface_count() != surfaces.size(),
+                          "The number of surfaces in the source mesh does not "
+                          "match the number of configured surfaces.");
     
     for (uint64_t idx_surf = 0; idx_surf < source_mesh->get_surface_count(); ++idx_surf) {
         SurfaceData &surf = surfaces[idx_surf];
@@ -669,6 +673,12 @@ double PathMesh3D::_get_mesh_length() const {
         double min_z = 0;
         double max_z = 0;
         real_t mesh_length_offset = 0.0;
+
+        ERR_FAIL_COND_V_EDMSG(source_mesh->get_surface_count() != surfaces.size(),
+                          0.0,
+                          "The number of surfaces in the source mesh does not "
+                          "match the number of configured surfaces.");
+
         for (uint64_t idx_surf = 0; idx_surf < source_mesh->get_surface_count(); ++idx_surf) {
             SurfaceData surf = surfaces[idx_surf];
 
