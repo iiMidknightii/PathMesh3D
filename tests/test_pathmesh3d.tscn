@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bpo0gwnewgno0"]
+[gd_scene format=3 uid="uid://bpo0gwnewgno0"]
 
 [ext_resource type="ArrayMesh" uid="uid://ddobn51ge646b" path="res://tests/railroad-straight.res" id="1_wgxgm"]
 
@@ -28,10 +28,10 @@ _data = {
 }
 point_count = 4
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=482015604]
 script = SubResource("GDScript_bfc6h")
 
-[node name="PathMesh3D" type="PathMesh3D" parent="." node_paths=PackedStringArray("path_3d")]
+[node name="PathMesh3D" type="PathMesh3D" parent="." unique_id=793452852 node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
 collision_mode = 1
 collision_layer = 1
@@ -39,18 +39,19 @@ collision_mask = 1
 mesh = ExtResource("1_wgxgm")
 surface_0/tile_rotation = Vector3(0, 0, 0)
 surface_0/tile_rotation_order = 2
-surface_0/distribution = 0
-surface_0/alignment = 0
+surface_0/distribution = 1
+surface_0/alignment = 2
+surface_0/count = 1
 surface_0/warp_along_curve = true
-surface_0/mesh_length_offset = 0.0
-surface_0/sample_cubic = false
-surface_0/tilt = false
+surface_0/mesh_length_offset = -5.52
+surface_0/sample_cubic = true
+surface_0/tilt = true
 surface_0/offset = Vector2(0, 0)
-surface_0/triangle_count = 853
+surface_0/triangle_count = 213
 
-[node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D"]
+[node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D" unique_id=1414183368]
 curve_offset_end = 17.808922
 influence = SubResource("Curve_eedmf")
 
-[node name="Path3D" type="Path3D" parent="."]
+[node name="Path3D" type="Path3D" parent="." unique_id=1104019177]
 curve = SubResource("Curve3D_jw5u5")

@@ -62,6 +62,8 @@ public:
 
     uint64_t get_triangle_count(uint64_t p_surface_idx) const;
     uint64_t get_total_triangle_count() const;
+    
+    PackedStringArray _get_configuration_warnings() const override;
 
     PathMesh3D();
     ~PathMesh3D() override;

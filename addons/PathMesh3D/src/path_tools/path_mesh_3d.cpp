@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <godot_cpp/classes/curve3d.hpp>
 #include <godot_cpp/classes/material.hpp>
 
@@ -73,11 +74,12 @@ auto PathMesh3D::get_alignment(uint64_t p_surface_idx) const -> Alignment {
 
 void PathMesh3D::set_count(uint64_t p_surface_idx, uint64_t p_count) {
     CHECK_SURFACE_IDX(p_surface_idx);
-    p_count = Math::clamp(p_count, uint64_t(2), _get_max_count());
+    p_count = Math::max(p_count, uint64_t(1));
 
     if (surfaces[p_surface_idx].count != p_count) {
         surfaces[p_surface_idx].count = p_count;
         if (surfaces[p_surface_idx].distribution == DISTRIBUTE_BY_COUNT) {
+            update_configuration_warnings();
             queue_rebuild();
         }
     }
@@ -255,6 +257,18 @@ void PathMesh3D::_notification(int p_what) {
     PathCollisionTool3D::_notification_path_collision_tool_3d(p_what);
 }
 
+PackedStringArray PathMesh3D::_get_configuration_warnings() const {
+    PackedStringArray warnings;
+    uint64_t max_count = _get_max_count();
+    for (uint64_t idx = 0; idx < surfaces.size(); ++idx) {
+        const SurfaceData &surf = surfaces[idx];
+        if (surf.distribution == Distribution::DISTRIBUTE_BY_COUNT && surf.count > max_count) {
+            warnings.push_back("Surface " + itos(idx) + ": Count is greater than the maximum " + itos(max_count) + " for the current path length.  The mesh is being squished.");
+        }
+    }
+    return warnings;
+}
+
 void PathMesh3D::_get_property_list(List<PropertyInfo> *p_list) const {
     for (uint64_t idx = 0; idx < surfaces.size(); ++idx) {
         const SurfaceData &surf = surfaces[idx];
@@ -273,7 +287,7 @@ void PathMesh3D::_get_property_list(List<PropertyInfo> *p_list) const {
         p_list->push_back(PropertyInfo(
                 Variant::INT, surf_name + "/alignment", PROPERTY_HINT_ENUM, "Stretch,From Start,Center,From End", usage));
         if (surf.distribution == Distribution::DISTRIBUTE_BY_COUNT) {
-            String hint_str = "2," + itos(_get_max_count()) + ",1,or_greater";
+            String hint_str = "1," + itos(_get_max_count()) + ",1,or_greater";
             p_list->push_back(PropertyInfo(
                     Variant::INT, surf_name + "/count", PROPERTY_HINT_RANGE, hint_str, usage));
         }
@@ -320,7 +334,7 @@ bool PathMesh3D::_property_get_revert(const StringName &p_name, Variant &r_prope
         } else if (sub_name == "alignment") {
             r_property = Alignment::ALIGN_STRETCH;
         } else if (sub_name == "count") {
-            r_property = 2;
+            r_property = 1;
         } else if (sub_name == "warp_along_curve") {
             r_property = true;
         } else if (sub_name == "mesh_length_offset") {
@@ -504,52 +518,89 @@ void PathMesh3D::_rebuild_mesh() {
                 pos_z = vert.z;
             }
         }
+        if (pos_z == -INFINITY) {
+            pos_z = 0.0;
+        }
 
-        uint64_t count = 2;
         uint64_t max_count = _get_max_count();
+        uint64_t count = 2;
+        double real_l = mesh_l * double(count);
+        double z_stretch = 1.0;
+        double z = 0.0;
         switch (surf.distribution) {
+            // ---------------------------------------------------------------------------------------------------------
             case Distribution::DISTRIBUTE_BY_COUNT: {
-                count = Math::clamp(surf.count, uint64_t(2), max_count);
+                count = surf.count;
+                real_l = mesh_l * double(count);
+
+                switch (surf.alignment) {
+                    case Alignment::ALIGN_STRETCH: {
+                        z_stretch = baked_l / real_l;
+                        z = pos_z * z_stretch;
+                    } break;
+
+                    case Alignment::ALIGN_FROM_START: {
+                        if (real_l > baked_l) {
+                            z_stretch = baked_l / real_l;
+                        }
+                        z = pos_z * z_stretch;
+                    } break;
+
+                    case Alignment::ALIGN_CENTERED: {
+                        if (real_l > baked_l) {
+                            z_stretch = baked_l / real_l;
+                        }
+                        real_l *= z_stretch;
+                        z = (baked_l - real_l) / 2.0 + pos_z * z_stretch;
+                    } break;
+
+                    case Alignment::ALIGN_FROM_END: {
+                        if (real_l > baked_l) {
+                            z_stretch = baked_l / real_l;
+                        }
+                        real_l *= z_stretch;
+                        z = baked_l - real_l + pos_z * z_stretch;
+                    } break;
+
+                    default:
+                        UtilityFunctions::push_error("Alignment type is incorrect.");
+                        continue;
+                }
             } break;
+
+            // ---------------------------------------------------------------------------------------------------------
             case Distribution::DISTRIBUTE_BY_MODEL_LENGTH: {
                 count = max_count;
+                real_l = mesh_l * double(count);
+
+                switch (surf.alignment) {
+                    case Alignment::ALIGN_STRETCH: {
+                        z_stretch = baked_l / real_l;
+                        z = pos_z * z_stretch;
+                    } break;
+
+                    case Alignment::ALIGN_FROM_START: {
+                        z = pos_z;
+                    } break;
+
+                    case Alignment::ALIGN_CENTERED: {
+                        z = (baked_l - real_l) / 2.0 + pos_z;
+                    } break;
+
+                    case Alignment::ALIGN_FROM_END: {
+                        z = baked_l - real_l + pos_z;
+                    } break;
+
+                    default:
+                        UtilityFunctions::push_error("Alignment type is incorrect.");
+                        continue;
+                }
             } break;
+
             default:
                 UtilityFunctions::push_error("Distribution type is incorrect.");
                 continue;
         }
-
-        double z_stretch = 1.0;
-        double z = 0.0;
-        switch (surf.alignment) {
-            case Alignment::ALIGN_STRETCH: {
-                if (surf.distribution == DISTRIBUTE_BY_MODEL_LENGTH) {
-                    double real_l = mesh_l * count;
-                    z_stretch = baked_l / real_l;
-                } else {
-                    z_stretch = baked_l / mesh_l / (count - 1);
-                }
-                z = pos_z * z_stretch;
-            } break;
-            case Alignment::ALIGN_FROM_START: {
-                z_stretch = 1.0;
-                z = pos_z;
-            } break;
-            case Alignment::ALIGN_CENTERED: {
-                z_stretch = 1.0;
-                double real_l = mesh_l * count;
-                z = (baked_l - real_l) / 2.0 + pos_z;
-            } break;
-            case Alignment::ALIGN_FROM_END: {
-                z_stretch = 1.0;
-                double real_l = mesh_l * count;
-                z = baked_l - real_l + pos_z;
-            } break;
-            default:
-                UtilityFunctions::push_error("Alignment type is incorrect.");
-                continue;
-        }
-        z_stretch = Math::max(z_stretch, 1.0);
         z = Math::clamp(z, 0.0, baked_l);
 
         uint64_t new_size = count * old_verts.size();
@@ -708,7 +759,7 @@ uint64_t PathMesh3D::_get_max_count() const {
     if (source_mesh.is_valid() && path3d != nullptr && path3d->get_curve().is_valid()) {
         return path3d->get_curve()->get_baked_length() / _get_mesh_length();
     } else {
-        return 100;
+        return 1;
     }
 }
 

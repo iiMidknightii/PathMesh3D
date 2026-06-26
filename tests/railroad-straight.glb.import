@@ -15,9 +15,11 @@ dest_files=["res://.godot/imported/railroad-straight.glb-73672a98cade7567d7ef4ae
 
 nodes/root_type=""
 nodes/root_name=""
+nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
 meshes/generate_lods=true
@@ -32,6 +34,9 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
 _subresources={
 "meshes": {
 "railroad-straight_railroad-straight": {
@@ -40,7 +45,8 @@ _subresources={
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 60.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://tests/railroad-straight.res"
+"save_to_file/fallback_path": "res://tests/railroad-straight.res",
+"save_to_file/path": "uid://ddobn51ge646b"
 }
 }
 }
