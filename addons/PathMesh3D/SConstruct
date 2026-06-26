@@ -1,157 +1,195 @@
 #!/usr/bin/env python
 import os
 import sys
+import subprocess
+from pathlib import Path
+from shutil import copy2
 
-env = SConscript("../../godot-cpp/SConstruct")
+try:
+    from SCons.Script import ARGUMENTS
+except Exception:
+    ARGUMENTS = {}
 
+target = ARGUMENTS.get("target", os.environ.get("TARGET", "template_debug"))
+debug_targets = {"template_debug", "editor", "debug"}
+profile = "debug" if target in debug_targets else "release"
 
-# For reference:
-# - CCFLAGS are compilation flags shared between C and C++
-# - CFLAGS are for C-specific compilation flags
-# - CXXFLAGS are for C++-specific compilation flags
-# - CPPFLAGS are for pre-processor flags
-# - CPPDEFINES are for pre-processor defines
-# - LINKFLAGS are for linking flags
-
-plugin = "PathMesh3D"
-lib_name = "path_mesh_3d"
-bin_folder = "bin/"
-
-env.Tool('compilation_db')
-env.CompilationDatabase('compile_database.json')
-
-# tweak this if you want to use different folders, or more folders, to store your source code in.
-env.Append(CPPPATH=["src/"])
-
-sources = Glob("src/*.cpp") + Glob("src/extrude_profiles/*.cpp") + Glob("src/path_tools/*.cpp")
-
-if env["target"] in ["editor", "template_debug"]:
-    try:
-        doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("../../doc_classes/*.xml"))
-        sources.append(doc_data)
-    except AttributeError:
-        print("Not including class reference as we're targeting a pre-4.3 baseline.")
-
-if env["platform"] == "macos":
-    library = env.SharedLibrary(
-        bin_folder + "{}.{}.{}.dylib".format(lib_name, env["platform"], env["target"]),
-        source=sources,
-    )
+if "__file__" in globals():
+    here = Path(os.path.dirname(__file__))
 else:
-    library = env.SharedLibrary(
-        bin_folder + "{}{}{}".format(lib_name, env["suffix"], env["SHLIBSUFFIX"]),
-        source=sources,
-    )
+    cwd = Path(os.getcwd())
+    if cwd.match("*/addons/PathMesh3D"):
+        here = cwd
+    else:
+        here = cwd / "addons" / "PathMesh3D"
 
-# Generate a .gdextension file at build time so the library path matches
-# the current scons invocation (platform, target, arch). This ensures
-# Godot will look for the exact filename produced by the build.
-def _write_gdextension(target, source, env):
-    out_path = str(target[0])
-    lib = "{}".format(lib_name)
+cargo_manifest = here / "Cargo.toml"
+if not cargo_manifest.exists():
+    sys.exit(1)
 
-    # Build a dictionary of library paths for all supported platforms/targets/archs
-    base = "res://addons/PathMesh3D/bin/"
-    shlib = env.get("SHLIBSUFFIX", "")
+cmd = [
+    "cargo",
+    "build",
+    "--manifest-path",
+    str(cargo_manifest),
+    "--target-dir",
+    str(here / "target"),
+]
+if profile == "release":
+    cmd.append("--release")
 
-    def make_suffix(plat, targ, arch, dev):
-        s = ".{plat}.{targ}".format(plat=plat, targ=targ)
-        if dev:
-            s += ".dev"
-        s += ".{arch}".format(arch=arch)
-        return s
+subprocess.run(cmd, check=True)
 
-    def lib_name_for(plat, targ, arch, dev=False, mac_ext=False, xcframework=False):
-        dev_part = ".dev" if dev else ""
-        if mac_ext:
-            return "lib{lib}.{plat}.{targ}{dev}.dylib".format(lib=lib, plat=plat, targ=targ, dev=dev_part)
-        if xcframework:
-            return "{lib}.{plat}.{targ}{dev}.xcframework".format(lib=lib, plat=plat, targ=targ, dev=dev_part)
+lib_name = "path_mesh_3d"
+artifact_dir = here / "target" / ("release" if profile == "release" else "debug")
+so_name = f"lib{lib_name}.so"
+artifact_path = artifact_dir / so_name
+if not artifact_path.exists():
+    candidates = list(artifact_dir.glob(f"*{lib_name}*"))
+    if candidates:
+        artifact_path = candidates[0]
+    else:
+        sys.exit(1)
 
-        # Platform-specific formatting to match original .gdextension
-        # Linux and macOS use a `lib` prefix for shared libraries.
-        # Windows uses .dll and no `lib` prefix. Android uses .so without `lib`.
-        suffix = make_suffix(plat, targ, arch, dev)
-        if plat == "windows":
-            # include .dev in the filename when applicable
-            dev_mid = ".dev" if dev else ""
-            return "{lib}.windows.{targ}{dev}.{arch}.dll".format(lib=lib, targ=targ, dev=dev_mid, arch=arch)
-        if plat == "linux":
-            return "lib{lib}{suf}.so".format(lib=lib, suf=suffix)
-        if plat == "android":
-            return "{lib}{suf}.so".format(lib=lib, suf=suffix)
+gdext_path = here / "path_mesh_3d.gdextension"
+base = "res://addons/PathMesh3D/bin/"
 
-        # Fallback: use SHLIBSUFFIX if set
-        return "{lib}{suf}{sh}".format(lib=lib, suf=suffix, sh=shlib)
+def make_suffix(plat, targ, arch, dev):
+    s = ".{plat}.{targ}".format(plat=plat, targ=targ)
+    s += ".{arch}".format(arch=arch)
+    return s
 
-    dev_flag = env.get("dev_build", False)
-    libs = {
-        "macos.debug": base + lib_name_for("macos", "template_debug", "", dev=dev_flag, mac_ext=True),
-        "macos.release": base + lib_name_for("macos", "template_release", "", dev=False, mac_ext=True),
-        "ios.debug": base + lib_name_for("ios", "template_debug", "", dev=dev_flag, xcframework=True),
-        "ios.release": base + lib_name_for("ios", "template_release", "", dev=False, xcframework=True),
+def lib_name_for(plat, targ, arch, dev=False, mac_ext=False, xcframework=False):
+    if mac_ext:
+        return "lib{lib}.{plat}.{targ}.dylib".format(lib=lib_name, plat=plat, targ=targ)
+    if xcframework:
+        return "{lib}.{plat}.{targ}.xcframework".format(lib=lib_name, plat=plat, targ=targ)
 
-        "windows.debug.x86_32": base + lib_name_for("windows", "template_debug", "x86_32", dev=dev_flag),
-        "windows.release.x86_32": base + lib_name_for("windows", "template_release", "x86_32", dev=False),
-        "windows.debug.x86_64": base + lib_name_for("windows", "template_debug", "x86_64", dev=dev_flag),
-        "windows.release.x86_64": base + lib_name_for("windows", "template_release", "x86_64", dev=False),
+    suffix = make_suffix(plat, targ, arch, dev)
+    if plat == "windows":
+        return "{lib}.windows.{targ}.{arch}.dll".format(lib=lib_name, targ=targ, arch=arch)
+    if plat == "linux":
+        return "lib{lib}{suf}.so".format(lib=lib_name, suf=suffix)
+    if plat == "android":
+        return "{lib}{suf}.so".format(lib=lib_name, suf=suffix)
 
-        "linux.debug.x86_64": base + lib_name_for("linux", "template_debug", "x86_64", dev=dev_flag),
-        "linux.release.x86_64": base + lib_name_for("linux", "template_release", "x86_64", dev=False),
-        "linux.debug.arm64": base + lib_name_for("linux", "template_debug", "arm64", dev=dev_flag),
-        "linux.release.arm64": base + lib_name_for("linux", "template_release", "arm64", dev=False),
-        "linux.debug.rv64": base + lib_name_for("linux", "template_debug", "rv64", dev=dev_flag),
-        "linux.release.rv64": base + lib_name_for("linux", "template_release", "rv64", dev=False),
+    return "{lib}{suf}".format(lib=lib_name, suf=suffix)
 
-        "android.debug.x86_64": base + lib_name_for("android", "template_debug", "x86_64", dev=dev_flag),
-        "android.release.x86_64": base + lib_name_for("android", "template_release", "x86_64", dev=False),
-        "android.debug.arm64": base + lib_name_for("android", "template_debug", "arm64", dev=dev_flag),
-        "android.release.arm64": base + lib_name_for("android", "template_release", "arm64", dev=False),
-    }
+dev_flag_raw = ARGUMENTS.get("dev_build", os.environ.get("dev_build", "false"))
+dev_flag = str(dev_flag_raw).lower() in ("1", "true", "yes")
 
-    content = []
-    content.append("[configuration]\n")
-    content.append("entry_symbol = \"path_mesh_3d_init\"\n")
-    content.append("compatibility_minimum = \"4.3\"\n")
-    content.append("reloadable = true\n\n")
-    content.append("[libraries]\n")
+libs = {
+    "macos.debug": base + lib_name_for("macos", "template_debug", "", dev=dev_flag, mac_ext=True),
+    "macos.release": base + lib_name_for("macos", "template_release", "", dev=False, mac_ext=True),
+    "ios.debug": base + lib_name_for("ios", "template_debug", "", dev=dev_flag, xcframework=True),
+    "ios.release": base + lib_name_for("ios", "template_release", "", dev=False, xcframework=True),
 
-    # Write the entries in a stable order
-    for key in [
-        "macos.debug", "macos.release",
-        "ios.debug", "ios.release",
-        "windows.debug.x86_32", "windows.release.x86_32",
-        "windows.debug.x86_64", "windows.release.x86_64",
-        "linux.debug.x86_64", "linux.release.x86_64",
-        "linux.debug.arm64", "linux.release.arm64",
-        "linux.debug.rv64", "linux.release.rv64",
-        "android.debug.x86_64", "android.release.x86_64",
-        "android.debug.arm64", "android.release.arm64",
-    ]:
-        content.append("{k} = \"{p}\"\n".format(k=key, p=libs[key]))
+    "windows.debug.x86_32": base + lib_name_for("windows", "template_debug", "x86_32", dev=dev_flag),
+    "windows.release.x86_32": base + lib_name_for("windows", "template_release", "x86_32", dev=False),
+    "windows.debug.x86_64": base + lib_name_for("windows", "template_debug", "x86_64", dev=dev_flag),
+    "windows.release.x86_64": base + lib_name_for("windows", "template_release", "x86_64", dev=False),
 
-    # Keep iOS dependency mapping (if relevant)
-    content.append("\n[dependencies]\n")
-    content.append("ios.debug = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_debug.xcframework\": \"\"\n}\n")
-    content.append("ios.release = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_release.xcframework\": \"\"\n}\n\n")
+    "linux.debug.x86_64": base + lib_name_for("linux", "template_debug", "x86_64", dev=dev_flag),
+    "linux.release.x86_64": base + lib_name_for("linux", "template_release", "x86_64", dev=False),
+    "linux.debug.arm64": base + lib_name_for("linux", "template_debug", "arm64", dev=dev_flag),
+    "linux.release.arm64": base + lib_name_for("linux", "template_release", "arm64", dev=False),
+    "linux.debug.rv64": base + lib_name_for("linux", "template_debug", "rv64", dev=dev_flag),
+    "linux.release.rv64": base + lib_name_for("linux", "template_release", "rv64", dev=False),
 
-    # Icons (preserve the same names as the original static file)
-    content.append("[icons]\n")
-    content.append("PathMesh3D = \"res://addons/PathMesh3D/icons/PathMesh3D.svg\"\n")
-    content.append("PathExtrude3D = \"res://addons/PathMesh3D/icons/PathExtrude3D.svg\"\n")
-    content.append("PathMultiMesh3D = \"res://addons/PathMesh3D/icons/PathMultiMesh3D.svg\"\n")
-    content.append("PathScene3D = \"res://addons/PathMesh3D/icons/PathScene3D.svg\"\n")
-    content.append("PathModifier3D = \"res://addons/PathMesh3D/icons/PathModifier3D.svg\"\n")
-    content.append("PathStaticBody3D = \"res://addons/PathMesh3D/icons/PathStaticBody3D.svg\"\n")
-    content.append("PathArea3D = \"res://addons/PathMesh3D/icons/PathArea3D.svg\"\n")
+    "android.debug.x86_64": base + lib_name_for("android", "template_debug", "x86_64", dev=dev_flag),
+    "android.release.x86_64": base + lib_name_for("android", "template_release", "x86_64", dev=False),
+    "android.debug.arm64": base + lib_name_for("android", "template_debug", "arm64", dev=dev_flag),
+    "android.release.arm64": base + lib_name_for("android", "template_release", "arm64", dev=False),
+}
 
-    with open(out_path, "w") as f:
-        f.writelines(content)
+content = []
+content.append("[configuration]\n")
+content.append("entry_symbol = \"path_mesh_3d_init\"\n")
+content.append("compatibility_minimum = \"4.3\"\n")
+content.append("reloadable = true\n\n")
+content.append("[libraries]\n")
 
+for key in [
+    "macos.debug", "macos.release",
+    "ios.debug", "ios.release",
+    "windows.debug.x86_32", "windows.release.x86_32",
+    "windows.debug.x86_64", "windows.release.x86_64",
+    "linux.debug.x86_64", "linux.release.x86_64",
+    "linux.debug.arm64", "linux.release.arm64",
+    "linux.debug.rv64", "linux.release.rv64",
+    "android.debug.x86_64", "android.release.x86_64",
+    "android.debug.arm64", "android.release.arm64",
+]:
+    content.append(f"{key} = \"{libs[key]}\"\n")
 
-# Create the gdextension file as a build target in this directory. It will
-# be rewritten by each scons invocation to point at the filenames produced
-# by that invocation (e.g. debug vs release, platform, arch).
-gdext = env.Command("path_mesh_3d.gdextension", [], _write_gdextension)
+content.append("\n[dependencies]\n")
+content.append("ios.debug = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_debug.xcframework\": \"\"\n}\n")
+content.append("ios.release = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_release.xcframework\": \"\"\n}\n\n")
 
-Default(library, gdext)
+content.append("[icons]\n")
+content.append("PathMesh3D = \"res://addons/PathMesh3D/icons/PathMesh3D.svg\"\n")
+content.append("PathExtrude3D = \"res://addons/PathMesh3D/icons/PathExtrude3D.svg\"\n")
+content.append("PathMultiMesh3D = \"res://addons/PathMesh3D/icons/PathMultiMesh3D.svg\"\n")
+content.append("PathScene3D = \"res://addons/PathMesh3D/icons/PathScene3D.svg\"\n")
+content.append("PathModifier3D = \"res://addons/PathMesh3D/icons/PathModifier3D.svg\"\n")
+content.append("PathStaticBody3D = \"res://addons/PathMesh3D/icons/PathStaticBody3D.svg\"\n")
+content.append("PathArea3D = \"res://addons/PathMesh3D/icons/PathArea3D.svg\"\n")
+
+with open(gdext_path, "w", encoding="utf-8") as f:
+    f.writelines(content)
+
+bin_dir = here / "bin"
+bin_dir.mkdir(parents=True, exist_ok=True)
+
+import platform
+
+host_copy_keys = []
+sys_plat = platform.system().lower()
+machine = platform.machine().lower()
+arch = "x86_64"
+if "arm" in machine or "aarch64" in machine:
+    arch = "arm64"
+if "riscv" in machine:
+    arch = "rv64"
+
+if sys_plat.startswith("linux"):
+    host_copy_keys.append(f"linux.{profile}.{arch}")
+elif sys_plat.startswith("windows"):
+    host_copy_keys.append(f"windows.{profile}.{arch}")
+elif sys_plat.startswith("darwin") or sys_plat.startswith("mac"):
+    host_copy_keys.append(f"macos.{profile}")
+else:
+    host_copy_keys.append(f"linux.{profile}.{arch}")
+
+for key in host_copy_keys:
+    if key not in libs:
+        continue
+    target_path = libs[key].replace("res://addons/PathMesh3D/", "")
+    dest = here / target_path
+    if not artifact_path.exists():
+        candidates = []
+        if sys_plat.startswith("linux"):
+            candidates = list(artifact_dir.glob(f"*{lib_name}*.so"))
+        elif sys_plat.startswith("windows"):
+            candidates = list(artifact_dir.glob(f"*{lib_name}*.dll"))
+        elif sys_plat.startswith("darwin") or sys_plat.startswith("mac"):
+            candidates = list(artifact_dir.glob(f"*{lib_name}*.dylib"))
+        if candidates:
+            artifact = candidates[0]
+        else:
+            artifact = None
+    else:
+        artifact = artifact_path
+
+    if artifact is not None:
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            copy2(artifact, dest)
+        except Exception:
+            pass
+
+print("Built artifact:", artifact_path)
+print("Wrote:", gdext_path)
+
+# Exit successfully
+sys.exit(0)

@@ -26,6 +26,8 @@ tmp.log
 .cache/*
 compile_commands.json
 .artifacts
+target
 
 addons/PathMesh3D/src/gen/
 addons/PathMesh3D/bin/
+addons/PathMesh3D/target
