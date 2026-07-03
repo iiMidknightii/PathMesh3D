@@ -50,12 +50,5 @@ Similar to `PathStaticBody3D`, except it creates a physics area along the path. 
 
 ![](screenshots/PathExtrude3D_w_Path3DModifiers.gif)
 
-## Latest Release - v1.5.
-* Removed pre-built binaries from repository, now they are generated for Windows, Linux, and MacOS x86_64 by github actions!
-* Added mesh length offset to `PathMesh3D` (thanks, @AlmightyLaxz)
-* Fixed macOS build file names (thanks, @evgenykochetkov)
-* Fixed crashing when the node is being deleted
-* Added collision layers/masks to generated internal collision nodes
-
 ## Contributing
 Feel free to leave any feedback, suggestions, bug reports, and contributions to the repository at [https://github.com/iiMidknightii/PathMesh3D](https://github.com/iiMidknightii/PathMesh3D).

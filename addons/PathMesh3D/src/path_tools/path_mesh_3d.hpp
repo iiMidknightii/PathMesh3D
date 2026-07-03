@@ -15,6 +15,7 @@ public:
     enum Distribution {
         DISTRIBUTE_BY_MODEL_LENGTH,
         DISTRIBUTE_BY_COUNT,
+        DISTRIBUTE_MANUAL,
         DISTRIBUTE_MAX
     };
     enum Alignment {
@@ -28,39 +29,42 @@ public:
     void set_mesh(const Ref<Mesh> &p_mesh);
     Ref<Mesh> get_mesh() const;
 
-    void set_tile_rotation(uint64_t p_surface_idx, Vector3 p_rotation);
-    Vector3 get_tile_rotation(uint64_t p_surface_idx) const;
+    void set_surface_offset(uint64_t p_surface_idx, Vector2 p_offset);
+    Vector2 get_surface_offset(uint64_t p_surface_idx) const;
 
-    void set_tile_rotation_order(uint64_t p_surface_idx, EulerOrder p_order);
-    EulerOrder get_tile_rotation_order(uint64_t p_surface_idx) const;
+    void set_surface_rotation(uint64_t p_surface_idx, Vector3 p_rotation);
+    Vector3 get_surface_rotation(uint64_t p_surface_idx) const;
 
-    void set_distribution(uint64_t p_surface_idx, Distribution p_distribution);
-    Distribution get_distribution(uint64_t p_surface_idx) const;
+    void set_surface_rotation_order(uint64_t p_surface_idx, EulerOrder p_order);
+    EulerOrder get_surface_rotation_order(uint64_t p_surface_idx) const;
 
-    void set_alignment(uint64_t p_surface_idx, Alignment p_alignment);
-    Alignment get_alignment(uint64_t p_surface_idx) const;
+    void set_surface_distribution(uint64_t p_surface_idx, Distribution p_distribution);
+    Distribution get_surface_distribution(uint64_t p_surface_idx) const;
 
-    void set_count(uint64_t p_surface_idx, uint64_t p_count);
-    uint64_t get_count(uint64_t p_surface_idx) const;
+    void set_surface_alignment(uint64_t p_surface_idx, Alignment p_alignment);
+    Alignment get_surface_alignment(uint64_t p_surface_idx) const;
 
-    void set_warp_along_curve(uint64_t p_surface_idx, bool p_warp);
-    bool get_warp_along_curve(uint64_t p_surface_idx) const;
+    void set_surface_count(uint64_t p_surface_idx, uint64_t p_count);
+    uint64_t get_surface_count(uint64_t p_surface_idx) const;
 
-    void set_mesh_length_offset(uint64_t p_surface_idx, real_t p_mesh_length_offset);
-    real_t get_mesh_length_offset(uint64_t p_surface_idx) const;
+    void set_surface_warp_along_curve(uint64_t p_surface_idx, bool p_warp);
+    bool get_surface_warp_along_curve(uint64_t p_surface_idx) const;
 
-    void set_sample_cubic(uint64_t p_surface_idx, bool p_cubic);
-    bool get_sample_cubic(uint64_t p_surface_idx) const;
+    void set_surface_mesh_length_override(uint64_t p_surface_idx, real_t p_mesh_length_override);
+    real_t get_surface_mesh_length_override(uint64_t p_surface_idx) const;
 
-    void set_tilt(uint64_t p_surface_idx, bool p_tilt);
-    bool get_tilt(uint64_t p_surface_idx) const;
+    void set_surface_sample_cubic(uint64_t p_surface_idx, bool p_cubic);
+    bool get_surface_sample_cubic(uint64_t p_surface_idx) const;
 
-    void set_offset(uint64_t p_surface_idx, Vector2 p_offset);
-    Vector2 get_offset(uint64_t p_surface_idx) const;
+    void set_surface_tilt(uint64_t p_surface_idx, bool p_tilt);
+    bool get_surface_tilt(uint64_t p_surface_idx) const;
+
+    void set_surface_positions(uint64_t p_surface_idx, const TypedArray<real_t> &p_positions);
+    TypedArray<real_t> get_surface_positions(uint64_t p_surface_idx) const;
     
     Ref<ArrayMesh> get_baked_mesh() const;
 
-    uint64_t get_triangle_count(uint64_t p_surface_idx) const;
+    uint64_t get_surface_triangle_count(uint64_t p_surface_idx) const;
     uint64_t get_total_triangle_count() const;
     
     PackedStringArray _get_configuration_warnings() const override;
@@ -85,23 +89,26 @@ private:
     Ref<Mesh> source_mesh;
     Ref<ArrayMesh> generated_mesh;
     struct SurfaceData {
-        Vector3 tile_rotation = Vector3();
-        EulerOrder tile_rotation_order = EulerOrder::EULER_ORDER_YXZ;
+        Vector2 offset = Vector2();
+        Vector3 rotation = Vector3();
+        EulerOrder rotation_order = EulerOrder::EULER_ORDER_YXZ;
+        real_t mesh_length_override = 0.0;
         Distribution distribution = Distribution::DISTRIBUTE_BY_MODEL_LENGTH;
         Alignment alignment = Alignment::ALIGN_STRETCH;
         uint64_t count = 2;
+        Vector<double> positions;
         bool warp_along_curve = true;
         bool cubic = false;
         bool tilt = true;
-        Vector2 offset = Vector2();
         uint64_t n_tris = 0;
-        real_t mesh_length_offset = 0.0;
     };
     LocalVector<SurfaceData> surfaces;
 
     Pair<uint64_t, String> _decode_dynamic_propname(const StringName &p_name) const;
+    double _get_surf_length(uint64_t p_surface_idx) const;
     double _get_mesh_length() const;
-    uint64_t _get_max_count() const;
+    uint64_t _get_max_count(uint64_t p_surface_idx) const;
+    double _get_path_length() const;
     void _on_mesh_changed();
 };
 
