@@ -88,25 +88,12 @@ def _write_gdextension(target, source, env):
     libs = {
         "macos.debug": base + lib_name_for("macos", "template_debug", "", dev=dev_flag, mac_ext=True),
         "macos.release": base + lib_name_for("macos", "template_release", "", dev=False, mac_ext=True),
-        "ios.debug": base + lib_name_for("ios", "template_debug", "", dev=dev_flag, xcframework=True),
-        "ios.release": base + lib_name_for("ios", "template_release", "", dev=False, xcframework=True),
 
-        "windows.debug.x86_32": base + lib_name_for("windows", "template_debug", "x86_32", dev=dev_flag),
-        "windows.release.x86_32": base + lib_name_for("windows", "template_release", "x86_32", dev=False),
         "windows.debug.x86_64": base + lib_name_for("windows", "template_debug", "x86_64", dev=dev_flag),
         "windows.release.x86_64": base + lib_name_for("windows", "template_release", "x86_64", dev=False),
 
         "linux.debug.x86_64": base + lib_name_for("linux", "template_debug", "x86_64", dev=dev_flag),
         "linux.release.x86_64": base + lib_name_for("linux", "template_release", "x86_64", dev=False),
-        "linux.debug.arm64": base + lib_name_for("linux", "template_debug", "arm64", dev=dev_flag),
-        "linux.release.arm64": base + lib_name_for("linux", "template_release", "arm64", dev=False),
-        "linux.debug.rv64": base + lib_name_for("linux", "template_debug", "rv64", dev=dev_flag),
-        "linux.release.rv64": base + lib_name_for("linux", "template_release", "rv64", dev=False),
-
-        "android.debug.x86_64": base + lib_name_for("android", "template_debug", "x86_64", dev=dev_flag),
-        "android.release.x86_64": base + lib_name_for("android", "template_release", "x86_64", dev=False),
-        "android.debug.arm64": base + lib_name_for("android", "template_debug", "arm64", dev=dev_flag),
-        "android.release.arm64": base + lib_name_for("android", "template_release", "arm64", dev=False),
     }
 
     content = []
@@ -119,21 +106,10 @@ def _write_gdextension(target, source, env):
     # Write the entries in a stable order
     for key in [
         "macos.debug", "macos.release",
-        "ios.debug", "ios.release",
-        "windows.debug.x86_32", "windows.release.x86_32",
         "windows.debug.x86_64", "windows.release.x86_64",
         "linux.debug.x86_64", "linux.release.x86_64",
-        "linux.debug.arm64", "linux.release.arm64",
-        "linux.debug.rv64", "linux.release.rv64",
-        "android.debug.x86_64", "android.release.x86_64",
-        "android.debug.arm64", "android.release.arm64",
     ]:
         content.append("{k} = \"{p}\"\n".format(k=key, p=libs[key]))
-
-    # Keep iOS dependency mapping (if relevant)
-    content.append("\n[dependencies]\n")
-    content.append("ios.debug = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_debug.xcframework\": \"\"\n}\n")
-    content.append("ios.release = {\n    \"res://addons/PathMesh3D/bin/libgodot-cpp.ios.template_release.xcframework\": \"\"\n}\n\n")
 
     # Icons (preserve the same names as the original static file)
     content.append("[icons]\n")
