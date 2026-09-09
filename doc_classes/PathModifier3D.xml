@@ -9,11 +9,41 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="_sample_3d_modifier_at" qualifiers="virtual const">
+			<return type="Transform3D" />
+			<param index="0" name="offset_ratio" type="float" />
+			<description>
+				Returns the 3D transform of the modifier at the specified offset ratio along the path. Override this method to provide a custom 3D modifier.
+			</description>
+		</method>
+		<method name="_sample_offset_modifier_at" qualifiers="virtual const">
+			<return type="float" />
+			<param index="0" name="offset_ratio" type="float" />
+			<param index="1" name="mesh_length" type="float" />
+			<description>
+				Returns the offset modifier value at the specified offset ratio along the path. Override this method to provide a custom offset modifier.
+			</description>
+		</method>
+		<method name="_sample_uv_modifier_at" qualifiers="virtual const">
+			<return type="Transform2D" />
+			<param index="0" name="offset_ratio" type="float" />
+			<description>
+				Returns the 2D transform of the UV modifier at the specified offset ratio along the path. Override this method to provide a custom UV modifier.
+			</description>
+		</method>
 		<method name="sample_3d_modifier_at" qualifiers="const">
 			<return type="Transform3D" />
 			<param index="0" name="offset_ratio" type="float" />
 			<description>
 				Returns the 3D transform of the modifier at the specified offset ratio along the path.
+			</description>
+		</method>
+		<method name="sample_offset_modifier_at" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="offset_ratio" type="float" />
+			<param index="1" name="mesh_length" type="float" />
+			<description>
+				Returns the offset modifier value at the specified offset ratio along the path.
 			</description>
 		</method>
 		<method name="sample_uv_modifier_at" qualifiers="const">
@@ -39,6 +69,16 @@
 		</member>
 		<member name="influence" type="Curve" setter="set_influence" getter="get_influence">
 			A curve that controls the strength of the modifier along the path.  The curve's X-axis represents the offset ratio along the path, and the Y-axis represents the influence strength (0.0 to 1.0).
+		</member>
+		<member name="offset_mode" type="int" setter="set_offset_mode" getter="get_offset_mode" enum="PathModifier3D.OffsetMode" default="0">
+			Determines whether the offset modifier is applied in absolute or relative mode.
+			See [enum OffsetMode] for more information.
+		</member>
+		<member name="offset_modifier" type="float" setter="set_offset_modifier" getter="get_offset_modifier" default="0.0">
+			The offset modifier applied to the generated mesh(es).
+		</member>
+		<member name="offset_randomness" type="float" setter="set_offset_randomness" getter="get_offset_randomness" default="0.0">
+			The offset randomness applied to the generated mesh(es).
 		</member>
 		<member name="position_modifier" type="Vector3" setter="set_position_modifier" getter="get_position_modifier" default="Vector3(0, 0, 0)">
 			The position offset modifier applied to the generated mesh(es).
@@ -72,6 +112,12 @@
 		</member>
 	</members>
 	<constants>
+		<constant name="OFFSET_MODE_ABSOLUTE" value="0" enum="OffsetMode">
+			Specifies that the offset modifier is based on the actual offset used to sample the curve along the path.
+		</constant>
+		<constant name="OFFSET_MODE_RELATIVE" value="1" enum="OffsetMode">
+			Specifies that the offset modifier is relative to the total length of the curve.
+		</constant>
 		<constant name="ROTATION_EDIT_MODE_EULER" value="0" enum="RotationEditMode">
 			Used by the editor to specify that the rotation modifier is in Euler angles format.
 		</constant>

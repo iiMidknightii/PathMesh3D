@@ -224,9 +224,13 @@ void PathScene3D::_rebuild_mesh() {
         return;
     }
     Node *tmp = scene->instantiate();
-    if (Object::cast_to<Node3D>(tmp) == nullptr) {
+    Node3D *tmp_3d = Object::cast_to<Node3D>(tmp);
+    if (tmp_3d == nullptr) {
         return;
     }
+    bool has_geometry = false;
+    AABB scene_aabb = _get_scene_aabb(tmp_3d, has_geometry);
+    double scene_l = has_geometry ? scene_aabb.size.z : 0.0;
     tmp->queue_free();
 
     Transform3D mod_transform = _get_final_transform();
@@ -239,6 +243,9 @@ void PathScene3D::_rebuild_mesh() {
     double baked_l = curve->get_baked_length();
     if (baked_l == 0.0) {
         return;
+    }
+    if (scene_l == 0.0) {
+        scene_l = baked_l;
     }
 
     uint64_t n_instances = 0;
@@ -276,24 +283,25 @@ void PathScene3D::_rebuild_mesh() {
     instances.resize(n_instances);
     for (uint64_t i = 0; i < n_instances; ++i) {
         Transform3D transform;
+        real_t offset_mod = offset + _sample_offset_modifiers_at(offset / baked_l, scene_l);
         switch (rotation_mode) {
             case ROTATE_FIXED: {
-                transform.origin = curve->sample_baked(offset, sample_cubic);
+                transform.origin = curve->sample_baked(offset_mod, sample_cubic);
                 transform.basis = Basis::from_euler(rotation);
             } break;
             case ROTATE_PATH: {
-                transform = curve->sample_baked_with_rotation(offset, sample_cubic, true);
+                transform = curve->sample_baked_with_rotation(offset_mod, sample_cubic, true);
                 transform.basis.rotate(rotation);
             } break;
             case ROTATE_RANDOM: {
-                transform = curve->sample_baked_with_rotation(offset, sample_cubic, true);
+                transform = curve->sample_baked_with_rotation(offset_mod, sample_cubic, true);
                 transform.basis.rotate(Vector3(0.0, 1.0, 0.0), UtilityFunctions::randf_range(0.0, Math_TAU));
             } break;
             default:
                 ERR_FAIL();
         }
 
-        transform *= _sample_3d_modifiers_at(offset / baked_l);
+        transform *= _sample_3d_modifiers_at(offset_mod / baked_l);
 
         if (get_relative_transform() == TRANSFORM_PATH_NODE) {
             transform = mod_transform * transform;
@@ -309,6 +317,48 @@ void PathScene3D::_rebuild_mesh() {
 
         offset += separation;
     }
+}
+
+AABB PathScene3D::_get_scene_aabb(Node3D *p_root, bool &r_has_geometry) const {
+    AABB scene_aabb;
+
+    GeometryInstance3D *root_geometry = Object::cast_to<GeometryInstance3D>(p_root);
+    if (root_geometry != nullptr) {
+        scene_aabb = root_geometry->get_aabb();
+        r_has_geometry = true;
+    }
+
+    for (int i = 0; i < p_root->get_child_count(); ++i) {
+        Node3D *child = Object::cast_to<Node3D>(p_root->get_child(i));
+        if (child == nullptr) {
+            continue;
+        }
+
+        GeometryInstance3D *geometry = Object::cast_to<GeometryInstance3D>(child);
+        if (geometry != nullptr) {
+            AABB child_aabb = child->get_transform().xform(geometry->get_aabb());
+            if (!r_has_geometry) {
+                scene_aabb = child_aabb;
+                r_has_geometry = true;
+            } else {
+                scene_aabb = scene_aabb.merge(child_aabb);
+            }
+        }
+
+        bool child_has_geometry = false;
+        AABB child_aabb = _get_scene_aabb(child, child_has_geometry);
+        if (child_has_geometry) {
+            child_aabb = child->get_transform().xform(child_aabb);
+            if (!r_has_geometry) {
+                scene_aabb = child_aabb;
+                r_has_geometry = true;
+            } else {
+                scene_aabb = scene_aabb.merge(child_aabb);
+            }
+        }
+    }
+
+    return scene_aabb;
 }
 
 PathScene3D::~PathScene3D() {

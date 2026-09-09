@@ -245,24 +245,25 @@ void PathMultiMesh3D::_rebuild_mesh() {
 
     for (uint64_t i = 0; i < n_instances; ++i) {
         Transform3D transform;
+        real_t offset_mod = offset + _sample_offset_modifiers_at(offset / baked_l, multi_mesh->get_aabb().size.z);
         switch (rotation_mode) {
             case ROTATE_FIXED: {
-                transform.origin = curve->sample_baked(offset, sample_cubic);
+                transform.origin = curve->sample_baked(offset_mod, sample_cubic);
                 transform.basis = Basis::from_euler(rotation);
             } break;
             case ROTATE_PATH: {
-                transform = curve->sample_baked_with_rotation(offset, sample_cubic, true);
+                transform = curve->sample_baked_with_rotation(offset_mod, sample_cubic, true);
                 transform.basis.rotate(rotation);
             } break;
             case ROTATE_RANDOM: {
-                transform = curve->sample_baked_with_rotation(offset, sample_cubic, true);
+                transform = curve->sample_baked_with_rotation(offset_mod, sample_cubic, true);
                 transform.basis.rotate(Vector3(0.0, 1.0, 0.0), UtilityFunctions::randf_range(0.0, Math_TAU));
             } break;
             default:
                 ERR_FAIL();
         }
 
-        transform *= _sample_3d_modifiers_at(offset / baked_l);
+        transform *= _sample_3d_modifiers_at(offset_mod / baked_l);
 
         if (get_relative_transform() == TRANSFORM_PATH_NODE) {
             transform = mod_transform * transform;

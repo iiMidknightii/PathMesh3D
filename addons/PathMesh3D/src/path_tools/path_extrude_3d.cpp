@@ -143,7 +143,6 @@ PathExtrude3D::~PathExtrude3D() {
 
 void PathExtrude3D::_bind_methods() {
     PathTool3D::_bind_path_tool_3d_methods();
-    PathCollisionTool3D::_bind_path_collision_tool_3d_methods();
 
     ClassDB::bind_method(D_METHOD("get_baked_mesh"), &PathExtrude3D::get_baked_mesh);
 
@@ -185,6 +184,8 @@ void PathExtrude3D::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_triangle_count"), &PathExtrude3D::get_triangle_count);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "triangle_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY), "", "get_triangle_count");
+
+    PathCollisionTool3D::_bind_path_collision_tool_3d_methods();
 
     ADD_SIGNAL(MethodInfo("profile_changed"));
 
@@ -286,6 +287,7 @@ void PathExtrude3D::_rebuild_mesh() {
     uv_transforms.resize(n_slices);
     for (uint64_t idx_slice = 0; idx_slice < n_slices; ++idx_slice) {
         float offset = curve->get_closest_offset(tessellated_points[idx_slice]);
+        offset += _sample_offset_modifiers_at(offset / baked_l, baked_l);
         transforms[idx_slice] = curve->sample_baked_with_rotation(offset, sample_cubic, tilt) *
             _sample_3d_modifiers_at(offset / baked_l);
 
@@ -455,168 +457,57 @@ void PathExtrude3D::_rebuild_mesh() {
     }
 
     if (end_cap_mode != END_CAPS_NONE) {
-        PackedInt32Array cap = Geometry2D::get_singleton()->triangulate_polygon(cross_section);
-        Vector2 ll = Vector2(INFINITY, INFINITY);
-        Vector2 ur = Vector2(-INFINITY, -INFINITY);
-        for (const int32_t &i : cap) {
-            Vector2 vec = cross_section[i];
-            ll.x = Math::min(ll.x, vec.x);
-            ll.y = Math::min(ll.y, vec.y);
-            ur.x = Math::max(ur.x, vec.x);
-            ur.y = Math::max(ur.y, vec.y);
-        }
-        PackedVector2Array cap_uv; cap_uv.resize(cap.size());
-        for (uint64_t idx = 0; idx < cap.size(); ++idx) {
-            const int32_t i = cap[idx];
-            Vector2 vec = cross_section[i];
-            cap_uv[i] = Vector2(Math::inverse_lerp(ll.x, ur.x, vec.x), Math::inverse_lerp(ll.y, ur.y, vec.y));
-        }
-        Vector3 cap_normal = Vector3(0.0, 0.0, 1.0);
-        if (profile->get_flip_normals()) {
-            cap_normal = -cap_normal;
-        } else {
-            cap.reverse();
-        }
+        Array cap_arrays = profile->get_end_cap_arrays();
+        PackedVector3Array cap_vertices = cap_arrays.size() > Mesh::ARRAY_VERTEX && cap_arrays[Mesh::ARRAY_VERTEX].get_type() == Variant::PACKED_VECTOR3_ARRAY ? PackedVector3Array(cap_arrays[Mesh::ARRAY_VERTEX]) : PackedVector3Array();
+        PackedVector3Array cap_normals = cap_arrays.size() > Mesh::ARRAY_NORMAL && cap_arrays[Mesh::ARRAY_NORMAL].get_type() == Variant::PACKED_VECTOR3_ARRAY ? PackedVector3Array(cap_arrays[Mesh::ARRAY_NORMAL]) : PackedVector3Array();
+        PackedVector2Array cap_uvs = cap_arrays.size() > Mesh::ARRAY_TEX_UV && cap_arrays[Mesh::ARRAY_TEX_UV].get_type() == Variant::PACKED_VECTOR2_ARRAY ? PackedVector2Array(cap_arrays[Mesh::ARRAY_TEX_UV]) : PackedVector2Array();
 
-        if (end_cap_mode & END_CAPS_START) {
-            const Transform3D &this_transform = transforms[0];
-            new_vertices.resize(new_vertices.size() + cap.size());
-            uint64_t tmp_k = k;
-            for (const int &i : cap) {
-                new_vertices[tmp_k] = this_transform.xform(Vector3(cross_section[i].x, cross_section[i].y, 0.0));
-                tmp_k++;
-            }
-
+        if (!cap_vertices.is_empty()) {
+            new_vertices.resize(k);
             if (has_column[Mesh::ARRAY_NORMAL]) {
-                new_normals.resize(new_normals.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_normals[tmp_k] = this_transform.basis.xform(cap_normal);
-                    tmp_k++;
-                }
+                new_normals.resize(k);
             }
-
-            if (has_column[Mesh::ARRAY_TANGENT]) {
-                new_tangents.resize(new_tangents.size() + cap.size() * 4);
-                uint64_t tmp_k = k * 4;
-                for (const int &i : cap) {
-                    Vector3 tang = this_transform.basis.xform(Vector3(old_tang[4*i], old_tang[4*i + 1], old_tang[4*i + 2]));
-                    new_tangents[tmp_k] = tang.x;
-                    new_tangents[tmp_k + 1] = tang.y;
-                    new_tangents[tmp_k + 2] = tang.z;
-                    new_tangents[tmp_k + 3] = old_tang[4*i + 3];
-                    tmp_k += 4;
-                }
-            }
-
             if (has_column[Mesh::ARRAY_TEX_UV]) {
-                new_uv1.resize(new_uv1.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_uv1[tmp_k] = cap_uv[i] / 2.0 + Vector2(0.0, 0.5); // start cap covers bottom left of UV space
-                    tmp_k++;
-                }
+                new_uv1.resize(k);
             }
 
-            if (has_column[Mesh::ARRAY_TEX_UV2]) {
-                new_uv1.resize(new_uv2.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_uv2[tmp_k] = cap_uv[i] / 2.0 + Vector2(0.0, 0.5); // start cap covers bottom left of UV space
-                    tmp_k++;
+            auto append_cap = [&](const Transform3D &p_transform, const Transform2D &p_uv_transform, bool p_flip) {
+                const uint64_t triangle_count = cap_vertices.size() / 3;
+                for (uint64_t idx_triangle = 0; idx_triangle < triangle_count; ++idx_triangle) {
+                    const uint64_t triangle_start = idx_triangle * 3;
+                    const uint64_t first = triangle_start;
+                    const uint64_t second = p_flip ? triangle_start + 1 : triangle_start + 2;
+                    const uint64_t third = p_flip ? triangle_start + 2 : triangle_start + 1;
+                    const uint64_t indices[3] = { first, second, third };
+
+                    for (uint64_t idx = 0; idx < 3; ++idx) {
+                        const uint64_t cap_idx = indices[idx];
+                        Vector3 vertex = cap_vertices[cap_idx];
+                        Vector3 normal = cap_normals.size() == cap_vertices.size() ? cap_normals[cap_idx] : Vector3(0.0, 0.0, p_flip ? -1.0 : 1.0);
+                        if (p_flip) {
+                            vertex.z = -vertex.z;
+                            normal.z = -normal.z;
+                        }
+
+                        new_vertices.push_back(p_transform.xform(vertex));
+                        if (has_column[Mesh::ARRAY_NORMAL]) {
+                            new_normals.push_back(p_transform.basis.xform(normal));
+                        }
+                        if (has_column[Mesh::ARRAY_TEX_UV]) {
+                            Vector2 uv = cap_uvs.size() == cap_vertices.size() ? cap_uvs[cap_idx] : Vector2();
+                            uv = uv * 0.5 + Vector2(p_flip ? 0.5 : 0.0, 0.5);
+                            new_uv1.push_back(p_uv_transform.xform(uv));
+                        }
+                    }
                 }
+            };
+
+            if (end_cap_mode & END_CAPS_START) {
+                append_cap(transforms[0], uv_transforms[0], false);
             }
-
-            #define ADD_CAP_ARRAY(m_new, m_old, m_idx) \
-                if (has_column[m_idx]) { \
-                    m_new.resize(m_new.size() + cap.size()); \
-                    uint64_t tmp_k = k; \
-                    for (const int &i : cap) { \
-                        m_new[tmp_k] = m_old[i]; \
-                        tmp_k++; \
-                    } \
-                }
-            ADD_CAP_ARRAY(new_colors, old_colors, Mesh::ARRAY_COLOR);
-            ADD_CAP_ARRAY(new_custom0, old_custom0, Mesh::ARRAY_CUSTOM0);
-            ADD_CAP_ARRAY(new_custom1, old_custom1, Mesh::ARRAY_CUSTOM1);
-            ADD_CAP_ARRAY(new_custom2, old_custom2, Mesh::ARRAY_CUSTOM2);
-            ADD_CAP_ARRAY(new_custom3, old_custom3, Mesh::ARRAY_CUSTOM3);
-            ADD_CAP_ARRAY(new_bones, old_bones, Mesh::ARRAY_BONES);
-            ADD_CAP_ARRAY(new_weights, old_weights, Mesh::ARRAY_WEIGHTS);
-            #undef ADD_CAP_ARRAY
-            k += cap.size();
-        }
-
-        if (end_cap_mode & END_CAPS_END) {
-            cap.reverse();
-            cap_normal = -cap_normal;
-            const Transform3D &this_transform = transforms[transforms.size() - 1];
-
-            new_vertices.resize(new_vertices.size() + cap.size());
-            uint64_t tmp_k = k;
-            for (const int &i : cap) {
-                new_vertices[tmp_k] = this_transform.xform(Vector3(cross_section[i].x, cross_section[i].y, 0.0));
-                tmp_k++;
+            if (end_cap_mode & END_CAPS_END) {
+                append_cap(transforms[transforms.size() - 1], uv_transforms[uv_transforms.size() - 1], true);
             }
-
-            if (has_column[Mesh::ARRAY_NORMAL]) {
-                new_normals.resize(new_normals.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_normals[tmp_k] = this_transform.basis.xform(cap_normal);
-                    tmp_k++;
-                }
-            }
-
-            if (has_column[Mesh::ARRAY_TANGENT]) {
-                new_tangents.resize(new_tangents.size() + cap.size() * 4);
-                uint64_t tmp_k = k * 4;
-                for (const int &i : cap) {
-                    Vector3 tang = this_transform.basis.xform(Vector3(old_tang[4*i], old_tang[4*i + 1], old_tang[4*i + 2]));
-                    new_tangents[tmp_k] = tang.x;
-                    new_tangents[tmp_k + 1] = tang.y;
-                    new_tangents[tmp_k + 2] = tang.z;
-                    new_tangents[tmp_k + 3] = old_tang[4*i + 3];
-                    tmp_k += 4;
-                }
-            }
-
-            if (has_column[Mesh::ARRAY_TEX_UV]) {
-                new_uv1.resize(new_uv1.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_uv1[tmp_k] = cap_uv[i] / 2.0 + Vector2(0.5, 0.5); // end cap covers bottom right of UV space
-                    tmp_k++;
-                }
-            }
-
-            if (has_column[Mesh::ARRAY_TEX_UV2]) {
-                new_uv1.resize(new_uv2.size() + cap.size());
-                uint64_t tmp_k = k;
-                for (const int &i : cap) {
-                    new_uv2[tmp_k] = cap_uv[i] / 2.0 + Vector2(0.5, 0.5); // end cap covers bottom right of UV space
-                    tmp_k++;
-                }
-            }
-
-            #define ADD_CAP_ARRAY(m_new, m_old, m_idx) \
-                if (has_column[m_idx]) { \
-                    m_new.resize(m_new.size() + cap.size()); \
-                    uint64_t tmp_k = k; \
-                    for (const int &i : cap) { \
-                        m_new[tmp_k] = m_old[i]; \
-                        tmp_k++; \
-                    } \
-                }
-            ADD_CAP_ARRAY(new_colors, old_colors, Mesh::ARRAY_COLOR);
-            ADD_CAP_ARRAY(new_custom0, old_custom0, Mesh::ARRAY_CUSTOM0);
-            ADD_CAP_ARRAY(new_custom1, old_custom1, Mesh::ARRAY_CUSTOM1);
-            ADD_CAP_ARRAY(new_custom2, old_custom2, Mesh::ARRAY_CUSTOM2);
-            ADD_CAP_ARRAY(new_custom3, old_custom3, Mesh::ARRAY_CUSTOM3);
-            ADD_CAP_ARRAY(new_bones, old_bones, Mesh::ARRAY_BONES);
-            ADD_CAP_ARRAY(new_weights, old_weights, Mesh::ARRAY_WEIGHTS);
-            #undef ADD_CAP_ARRAY
-            k += cap.size();
         }
     }
 

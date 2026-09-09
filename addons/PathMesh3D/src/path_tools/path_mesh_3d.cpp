@@ -493,6 +493,8 @@ void PathMesh3D::_rebuild_mesh() {
     ERR_FAIL_COND_EDMSG(source_mesh->get_surface_count() != surfaces.size(),
                           "The number of surfaces in the source mesh does not "
                           "match the number of configured surfaces.");
+
+    const double object_length = source_mesh->get_aabb().size.z;
     
     for (uint64_t idx_surf = 0; idx_surf < source_mesh->get_surface_count(); ++idx_surf) {
         SurfaceData &surf = surfaces[idx_surf];
@@ -672,15 +674,17 @@ void PathMesh3D::_rebuild_mesh() {
 
         for (uint64_t idx_count = 0; idx_count < count; ++idx_count) {
             Transform3D transform;
+
+            real_t z_mod = z + _sample_offset_modifiers_at(z / baked_l, object_length);
             if (!surf.warp_along_curve) {
-                transform = curve->sample_baked_with_rotation(z, surf.cubic, surf.tilt) * 
-                        _sample_3d_modifiers_at(z / baked_l);
+                transform = curve->sample_baked_with_rotation(z_mod, surf.cubic, surf.tilt) * 
+                        _sample_3d_modifiers_at(z_mod / baked_l);
             }
 
             for (uint64_t idx_vert = 0; idx_vert < old_verts.size(); ++idx_vert) {
                 Vector3 vertex;
                 if (surf.warp_along_curve) {
-                    double z_offset = z - z_stretch * old_verts[idx_vert].z;
+                    double z_offset = z_mod - z_stretch * old_verts[idx_vert].z;
                     transform = curve->sample_baked_with_rotation(z_offset, surf.cubic, surf.tilt) * 
                             _sample_3d_modifiers_at(z_offset / baked_l);
                     
@@ -782,35 +786,10 @@ double PathMesh3D::_get_surf_length(uint64_t p_surface_idx) const {
 
 double PathMesh3D::_get_mesh_length() const {
     if (source_mesh.is_valid()) {
-        double min_z = 0;
-        double max_z = 0;
-
-        ERR_FAIL_COND_V_EDMSG(source_mesh->get_surface_count() != surfaces.size(),
-                          0.0,
-                          "The number of surfaces in the source mesh does not "
-                          "match the number of configured surfaces.");
-
-        for (uint64_t idx_surf = 0; idx_surf < source_mesh->get_surface_count(); ++idx_surf) {
-            SurfaceData surf = surfaces[idx_surf];
-
-            Array mesh_array = source_mesh->surface_get_arrays(idx_surf);
-            PackedVector3Array verts = mesh_array[Mesh::ARRAY_VERTEX];
-        
-            for (uint64_t idx = 0; idx < verts.size(); ++idx) {
-                Vector3 vert = verts[idx];
-                Basis rot = Basis::from_euler(surf.rotation, surf.rotation_order);
-                vert = rot.xform(vert);
-                if (vert.z < min_z) {
-                    min_z = vert.z;
-                } else if (vert.z > max_z) {
-                    max_z = vert.z;
-                }
-            }
-        }
-        return Math::absd(max_z - min_z);
-    } else {
-        return 0.0;
+        return source_mesh->get_aabb().size.z;
     }
+
+    return 0.0;
 }
 
 uint64_t PathMesh3D::_get_max_count(uint64_t p_surface_idx) const {

@@ -2,6 +2,7 @@
 
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/packed_scene.hpp>
+#include <godot_cpp/classes/geometry_instance3d.hpp>
 
 #include "path_tool_3d.hpp"
 
@@ -79,6 +80,7 @@ private:
     LocalVector<Node3D *> instances;
 
     void _on_scene_changed();
+    AABB _get_scene_aabb(Node3D *p_root, bool &r_has_geometry) const;
 
 };
 

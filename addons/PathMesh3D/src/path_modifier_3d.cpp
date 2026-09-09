@@ -98,6 +98,17 @@ Ref<Curve> PathModifier3D::get_influence() const {
     return influence;
 }
 
+void PathModifier3D::set_offset_mode(OffsetMode p_mode) {
+    if (p_mode != offset_mode) {
+        offset_mode = p_mode;
+        queue_rebuild();
+    }
+}
+
+auto PathModifier3D::get_offset_mode() const -> OffsetMode {
+    return offset_mode;
+}
+
 void PathModifier3D::set_position_modifier(Vector3 p_modifier) {
     if (p_modifier != position_modifier) {
         position_modifier = p_modifier;
@@ -118,6 +129,28 @@ void PathModifier3D::set_position_randomness(Vector3 p_randomness) {
 
 Vector3 PathModifier3D::get_position_randomness() const {
     return position_randomness;
+}
+
+void PathModifier3D::set_offset_modifier(real_t p_modifier) {
+    if (p_modifier != offset_modifier) {
+        offset_modifier = p_modifier;
+        queue_rebuild();
+    }
+}
+
+real_t PathModifier3D::get_offset_modifier() const {
+    return offset_modifier;
+}
+
+void PathModifier3D::set_offset_randomness(real_t p_randomness) {
+    if (p_randomness != offset_randomness) {
+        offset_randomness = p_randomness;
+        queue_rebuild();
+    }
+}
+
+real_t PathModifier3D::get_offset_randomness() const {
+    return offset_randomness;
 }
 
 void PathModifier3D::set_rotation_modifier_mode(RotationEditMode p_mode) {
@@ -261,17 +294,44 @@ Vector2 PathModifier3D::get_uv_scale_randomness() const {
     return uv_scale_randomness;
 }
 
+real_t PathModifier3D::sample_offset_modifier_at(real_t p_offset_ratio, real_t mesh_l) const {
+    real_t y = _sample_influence(p_offset_ratio);
+    if (y == 0.0) {
+        return 0.0;
+    }
+
+    real_t randomness = UtilityFunctions::randf_range(-1.0, 1.0) * offset_randomness;
+    real_t user_value = 0.0;
+    GDVIRTUAL_CALL(_sample_offset_modifier_at, p_offset_ratio, mesh_l, user_value);
+
+    switch (offset_mode) {
+        case OFFSET_MODE_ABSOLUTE: {
+            return offset_modifier + randomness + user_value;
+        } break;
+
+        case OFFSET_MODE_RELATIVE: {
+            return mesh_l * (offset_modifier + randomness + user_value);
+        } break;
+
+        default:
+            ERR_FAIL_V_MSG(0.0, "Invalid offset mode.");
+    }
+}
+
 Transform3D PathModifier3D::sample_3d_modifier_at(real_t p_offset_ratio) const {
     real_t y = _sample_influence(p_offset_ratio);
     if (y == 0.0) {
         return Transform3D();
     }
 
+    Transform3D user_value;
+    GDVIRTUAL_CALL(_sample_3d_modifier_at, p_offset_ratio, user_value);
+
     Vector3 position = Vector3(0.0, 0.0, 0.0).lerp((position_modifier + UtilityFunctions::randf_range(-1.0, 1.0) * position_randomness), y);
     Quaternion rotation = Quaternion().slerpni(rotation_modifier * Quaternion().slerpni(rotation_randomness, UtilityFunctions::randf()), y);
     Vector3 scale = Vector3(1.0, 1.0, 1.0).lerp(scale_modifier + UtilityFunctions::randf() * scale_randomness, y);
 
-    return Transform3D(Basis(rotation).scaled(scale), position);
+    return Transform3D(Basis(rotation).scaled(scale), position) * user_value;
 }
 
 Transform2D PathModifier3D::sample_uv_modifier_at(real_t p_offset_ratio) const {
@@ -280,10 +340,12 @@ Transform2D PathModifier3D::sample_uv_modifier_at(real_t p_offset_ratio) const {
         return Transform2D();
     }
 
+    Transform2D user_value;
+    GDVIRTUAL_CALL(_sample_uv_modifier_at, p_offset_ratio, user_value);
     Vector2 offset = Vector2(0.0, 0.0).lerp(uv_offset_modifier + UtilityFunctions::randf_range(-1.0, 1.0) * uv_offset_randomness, y);
     Vector2 scale = Vector2(1.0, 1.0).lerp(uv_scale_modifier + UtilityFunctions::randf_range(-1.0, 1.0) * uv_scale_randomness, y);
 
-    return Transform2D(0.0, scale, 0.0, offset);
+    return Transform2D(0.0, scale, 0.0, offset) * user_value;
 }
 
 void PathModifier3D::queue_rebuild() {
@@ -317,13 +379,25 @@ void PathModifier3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_influence"), &PathModifier3D::get_influence);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "influence", PROPERTY_HINT_RESOURCE_TYPE, "Curve"), "set_influence", "get_influence");
 
+    ClassDB::bind_method(D_METHOD("set_offset_mode", "mode"), &PathModifier3D::set_offset_mode);
+    ClassDB::bind_method(D_METHOD("get_offset_mode"), &PathModifier3D::get_offset_mode);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "offset_mode", PROPERTY_HINT_ENUM, "Absolute,Relative"), "set_offset_mode", "get_offset_mode");
+
+    ClassDB::bind_method(D_METHOD("set_offset_modifier", "modifier"), &PathModifier3D::set_offset_modifier);
+    ClassDB::bind_method(D_METHOD("get_offset_modifier"), &PathModifier3D::get_offset_modifier);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "offset_modifier"), "set_offset_modifier", "get_offset_modifier");
+
+    ClassDB::bind_method(D_METHOD("set_offset_randomness", "randomness"), &PathModifier3D::set_offset_randomness);
+    ClassDB::bind_method(D_METHOD("get_offset_randomness"), &PathModifier3D::get_offset_randomness);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "offset_randomness"), "set_offset_randomness", "get_offset_randomness");
+
     ClassDB::bind_method(D_METHOD("set_position_modifier", "modifier"), &PathModifier3D::set_position_modifier);
     ClassDB::bind_method(D_METHOD("get_position_modifier"), &PathModifier3D::get_position_modifier);
-    ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "position_modifier"), "set_position_modifier", "get_position_modifier");
+    ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "position_modifier"), "set_position_modifier", "get_position_modifier");
     
     ClassDB::bind_method(D_METHOD("set_position_randomness", "randomness"), &PathModifier3D::set_position_randomness);
     ClassDB::bind_method(D_METHOD("get_position_randomness"), &PathModifier3D::get_position_randomness);
-    ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "position_randomness"), "set_position_randomness", "get_position_randomness");
+    ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "position_randomness"), "set_position_randomness", "get_position_randomness");
 
     ClassDB::bind_method(D_METHOD("_set_rotation_modifier_mode", "modifier"), &PathModifier3D::set_rotation_modifier_mode);
     ClassDB::bind_method(D_METHOD("_get_rotation_modifier_mode"), &PathModifier3D::get_rotation_modifier_mode);
@@ -361,9 +435,16 @@ void PathModifier3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_uv_scale_randomness"), &PathModifier3D::get_uv_scale_randomness);
     ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "uv_scale_randomness", PROPERTY_HINT_LINK), "set_uv_scale_randomness", "get_uv_scale_randomness");
 
+    ClassDB::bind_method(D_METHOD("sample_offset_modifier_at", "offset_ratio", "mesh_length"), &PathModifier3D::sample_offset_modifier_at);
     ClassDB::bind_method(D_METHOD("sample_3d_modifier_at", "offset_ratio"), &PathModifier3D::sample_3d_modifier_at);
     ClassDB::bind_method(D_METHOD("sample_uv_modifier_at", "offset_ratio"), &PathModifier3D::sample_uv_modifier_at);
 
+    GDVIRTUAL_BIND(_sample_offset_modifier_at, "offset_ratio", "mesh_length");
+    GDVIRTUAL_BIND(_sample_3d_modifier_at, "offset_ratio");
+    GDVIRTUAL_BIND(_sample_uv_modifier_at, "offset_ratio");
+
+    BIND_ENUM_CONSTANT(OFFSET_MODE_ABSOLUTE);
+    BIND_ENUM_CONSTANT(OFFSET_MODE_RELATIVE);
     BIND_ENUM_CONSTANT(ROTATION_EDIT_MODE_EULER);
     BIND_ENUM_CONSTANT(ROTATION_EDIT_MODE_QUATERNION);
     BIND_ENUM_CONSTANT(ROTATION_EDIT_MODE_BASIS);

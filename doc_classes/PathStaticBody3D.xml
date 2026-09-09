@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="PathStaticBody3D" inherits="StaticBody3D" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
-		PathStaticBody3D creats a static physics body by duplicating the input shape along a [Path3D].
+		PathStaticBody3D creates a static physics body by duplicating the input shape along a [Path3D].
 	</brief_description>
 	<description>
 		This node takes the input shape and duplicates it along a [Path3D] with specified parameters.  It is meant to quickly create simple static physics geometry along a path, such as fences, walls, or roads.  The shape can be transformed to be relative to the path node or local to the PathStaticBody3D node.

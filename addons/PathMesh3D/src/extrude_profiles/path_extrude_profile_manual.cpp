@@ -1,5 +1,6 @@
 #include "path_extrude_profile_manual.hpp"
 
+#include <godot_cpp/classes/geometry2d.hpp>
 #include <godot_cpp/classes/mesh.hpp>
 
 using namespace godot;
@@ -93,6 +94,79 @@ Array PathExtrudeProfileManual::_generate_cross_section()  {
     out[Mesh::ARRAY_VERTEX] = cs;
     out[Mesh::ARRAY_NORMAL] = norms;
     out[Mesh::ARRAY_TEX_UV] = _generate_v(cs);
+    return out;
+}
+
+Array PathExtrudeProfileManual::_generate_end_cap() {
+    Array out;
+    out.resize(Mesh::ARRAY_MAX);
+
+    if (!closed || manual_cross_section.size() < 3) {
+        return out;
+    }
+
+    PackedVector2Array polygon = manual_cross_section;
+    if (polygon.size() > 1 && polygon[0].distance_squared_to(polygon[polygon.size() - 1]) < 1.0e-6) {
+        polygon.resize(polygon.size() - 1);
+    }
+    if (polygon.size() < 3) {
+        return out;
+    }
+
+    // Ensure counter-clockwise winding so the generated face points toward +Z.
+    real_t area = 0.0;
+    for (int i = 0; i < polygon.size(); ++i) {
+        const Vector2 &a = polygon[i];
+        const Vector2 &b = polygon[(i + 1) % polygon.size()];
+        area += a.x * b.y - b.x * a.y;
+    }
+    if (area < 0.0) {
+        PackedVector2Array reversed;
+        reversed.resize(polygon.size());
+        for (int i = 0; i < polygon.size(); ++i) {
+            reversed[i] = polygon[polygon.size() - 1 - i];
+        }
+        polygon = reversed;
+    }
+
+    PackedInt32Array indices = Geometry2D::get_singleton()->triangulate_polygon(polygon);
+    if (indices.is_empty()) {
+        return out;
+    }
+
+    PackedVector3Array vertices;
+    PackedVector3Array normals;
+    vertices.resize(polygon.size());
+    normals.resize(polygon.size());
+    for (int i = 0; i < polygon.size(); ++i) {
+        vertices[i] = Vector3(polygon[i].x, polygon[i].y, 0.0);
+        // End caps are planar regardless of the side normal setting.
+        normals[i] = Vector3(0.0, 0.0, 1.0);
+    }
+
+    Vector2 bounds_min = polygon[0];
+    Vector2 bounds_max = polygon[0];
+    for (int i = 1; i < polygon.size(); ++i) {
+        bounds_min.x = MIN(bounds_min.x, polygon[i].x);
+        bounds_min.y = MIN(bounds_min.y, polygon[i].y);
+        bounds_max.x = MAX(bounds_max.x, polygon[i].x);
+        bounds_max.y = MAX(bounds_max.y, polygon[i].y);
+    }
+
+    const real_t width = bounds_max.x - bounds_min.x;
+    const real_t height = bounds_max.y - bounds_min.y;
+    PackedVector2Array cap_uvs;
+    cap_uvs.resize(polygon.size());
+    for (int i = 0; i < polygon.size(); ++i) {
+        cap_uvs[i] = Vector2(
+                width > 0.0 ? (polygon[i].x - bounds_min.x) / width : 0.0,
+                height > 0.0 ? (polygon[i].y - bounds_min.y) / height : 0.0);
+    }
+
+    out[Mesh::ARRAY_VERTEX] = vertices;
+    out[Mesh::ARRAY_NORMAL] = normals;
+    out[Mesh::ARRAY_TEX_UV] = cap_uvs;
+    out[Mesh::ARRAY_INDEX] = indices;
     return out;
 }
 

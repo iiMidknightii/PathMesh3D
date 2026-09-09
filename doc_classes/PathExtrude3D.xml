@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		The PathExtrude3D node is used to create a 3D mesh by extruding a 2D shape along a 3D path. 
-		This can be useful for creating simple 3D models such as pipes, cables, or any other object that follows has a uniform cross section along specific path in 3D space.
+		This can be useful for creating simple 3D models such as pipes, cables, or any other object with a uniform cross section that follows a 3D path.
 		The cross section of the extruded object is determined by a [PathExtrudeProfileBase] object in [param profile].
 	</description>
 	<tutorials>
@@ -27,7 +27,7 @@
 			<return type="void" />
 			<param index="0" name="settings" type="MeshConvexDecompositionSettings" default="null" />
 			<description>
-				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
+				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extruded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with the optional settings resource.
 			</description>
 		</method>
 		<method name="create_trimesh_collision">
@@ -73,13 +73,13 @@
 			See [enum EndCaps] for more information.
 		</member>
 		<member name="material" type="Material" setter="set_material" getter="get_material">
-			The material used for the extrusion.  Similar to [CSGPolygon3D], the bttom left of the texture is applied to the starting end cap, and the bottom right of the texture is applied to the end cap.  The top half of the texture is applied to the extruded profile, with U increasing along the path length.
+			The material used for the extrusion. Similar to [CSGPolygon3D], the bottom-left quarter of the texture is applied to the starting end cap and the bottom-right quarter to the ending end cap. The top half is applied to the extruded profile, with U increasing along the path length.
 		</member>
 		<member name="offset" type="Vector2" setter="set_offset" getter="get_offset" default="Vector2(0, 0)">
 			A spatial offset in the X any Y direction along the path.
 		</member>
 		<member name="offset_angle" type="float" setter="set_offset_angle" getter="get_offset_angle" default="0.0">
-			The angle to rotate the cross-section around the path's tangeant.
+			The angle to rotate the cross-section around the path's tangent.
 		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
 			The 3D path along which the cross-section is extruded.

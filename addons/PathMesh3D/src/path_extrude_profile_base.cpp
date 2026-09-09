@@ -10,8 +10,16 @@ Array PathExtrudeProfileBase::get_mesh_arrays() const {
     return mesh_array.duplicate();
 }
 
+Array PathExtrudeProfileBase::get_end_cap_arrays() const {
+    return end_cap_array.duplicate();
+}
+
 PackedVector2Array PathExtrudeProfileBase::get_cross_section() const {
-    return mesh_array[Mesh::ARRAY_VERTEX];
+    return mesh_array[Mesh::ARRAY_VERTEX].duplicate();
+}
+
+PackedVector3Array PathExtrudeProfileBase::get_end_cap() const {
+    return end_cap_array[Mesh::ARRAY_VERTEX].duplicate();
 }
 
 void PathExtrudeProfileBase::set_flip_normals(bool p_flip_normals) {
@@ -33,80 +41,106 @@ void PathExtrudeProfileBase::queue_update() {
 bool PathExtrudeProfileBase::regen_if_dirty() {
     bool r_value = dirty;
     
-    if (dirty) {
-        dirty = false;
-        Array new_mesh_array = _generate_cross_section();
-        if (new_mesh_array == mesh_array) {
-            return false;
-        }
-
-        LocalVector<bool> has_column;
-        has_column.resize(Mesh::ARRAY_MAX);
-        for (int idx_type = 0; idx_type < Mesh::ARRAY_MAX; ++idx_type) {
-            has_column[idx_type] = new_mesh_array.size() > idx_type && new_mesh_array[idx_type].get_type() != Variant::NIL;
-        }
-        
-        PackedVector2Array vertices = new_mesh_array[Mesh::ARRAY_VERTEX];
-
-        #define MAKE_ARRAY(m_type, m_name, m_index) \
-            m_type m_name = has_column[m_index] ? m_type(new_mesh_array[m_index]) : m_type()
-        MAKE_ARRAY(PackedVector2Array, normals, Mesh::ARRAY_NORMAL);
-        MAKE_ARRAY(PackedFloat32Array, tangents, Mesh::ARRAY_TANGENT);
-        MAKE_ARRAY(PackedFloat64Array, v1, Mesh::ARRAY_TEX_UV);
-        MAKE_ARRAY(PackedFloat64Array, v2, Mesh::ARRAY_TEX_UV2);
-        MAKE_ARRAY(PackedColorArray, colors, Mesh::ARRAY_COLOR);
-        MAKE_ARRAY(PackedColorArray, custom0, Mesh::ARRAY_CUSTOM0);
-        MAKE_ARRAY(PackedByteArray, custom1, Mesh::ARRAY_CUSTOM1);
-        MAKE_ARRAY(PackedByteArray, custom2, Mesh::ARRAY_CUSTOM2);
-        MAKE_ARRAY(PackedByteArray, custom3, Mesh::ARRAY_CUSTOM3);
-        MAKE_ARRAY(PackedInt32Array, bones, Mesh::ARRAY_BONES);
-        MAKE_ARRAY(PackedFloat32Array, weights, Mesh::ARRAY_WEIGHTS);
-        #undef MAKE_ARRAY
-        
-        if (flip_normals) {
-            vertices.reverse();
-            if (has_column[Mesh::ARRAY_NORMAL]) {
-                for (uint64_t idx = 0; idx < normals.size(); ++idx) {
-                    normals[idx] = -normals[idx];
-                }
-            }
-            normals.reverse();
-            if (has_column[Mesh::ARRAY_TANGENT]) {
-                for (uint64_t idx = 0; idx < tangents.size(); idx += 4) {
-                    tangents[idx + 3] = -tangents[idx + 3];
-                }
-            }
-            tangents.reverse();
-            v1.reverse();
-            v2.reverse();
-            colors.reverse();
-            custom0.reverse();
-            custom1.reverse();
-            custom2.reverse();
-            custom3.reverse();
-            bones.reverse();
-            weights.reverse();
-        }
-
-        new_mesh_array.resize(Mesh::ARRAY_MAX);
-        new_mesh_array.fill(Variant());
-        new_mesh_array[Mesh::ARRAY_VERTEX] = vertices;
-        #define MAKE_NEW_ARRAY(m_index, m_name) new_mesh_array[m_index] = m_name.is_empty() ? Variant() : Variant(m_name)
-        MAKE_NEW_ARRAY(Mesh::ARRAY_NORMAL, normals);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_TANGENT, tangents);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV, v1);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_TEX_UV2, v2);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_COLOR, colors);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM0, custom0);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM1, custom1);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM2, custom2);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_CUSTOM3, custom3);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_BONES, bones);
-        MAKE_NEW_ARRAY(Mesh::ARRAY_WEIGHTS, weights);
-        #undef MAKE_NEW_ARRAY
-        
-        mesh_array = new_mesh_array;
+    if (!dirty) {
+        return r_value;
     }
+
+    dirty = false;
+    Array new_mesh_array = _generate_cross_section();
+    Array new_end_cap_array = _generate_end_cap();
+
+    auto do_flip = [&](Array &p_array, bool p_is_3d) {
+        auto reverse_array = [&](int p_index) {
+            if (p_array.size() <= p_index || p_array[p_index].get_type() == Variant::NIL) {
+                return;
+            }
+
+            switch (p_array[p_index].get_type()) {
+                case Variant::PACKED_VECTOR2_ARRAY: {
+                    PackedVector2Array values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_VECTOR3_ARRAY: {
+                    PackedVector3Array values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_FLOAT32_ARRAY: {
+                    PackedFloat32Array values = p_array[p_index];
+                    if (p_index == Mesh::ARRAY_TANGENT && values.size() % 4 == 0) {
+                        for (uint64_t idx = 0; idx < values.size(); idx += 4) {
+                            values[idx + 3] = -values[idx + 3];
+                        }
+                        for (uint64_t idx = 0; idx < values.size() / 2; idx += 4) {
+                            const uint64_t other = values.size() - idx - 4;
+                            for (uint64_t component = 0; component < 4; ++component) {
+                                float value = values[idx + component];
+                                values[idx + component] = values[other + component];
+                                values[other + component] = value;
+                            }
+                        }
+                    } else {
+                        values.reverse();
+                    }
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_FLOAT64_ARRAY: {
+                    PackedFloat64Array values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_COLOR_ARRAY: {
+                    PackedColorArray values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_BYTE_ARRAY: {
+                    PackedByteArray values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                case Variant::PACKED_INT32_ARRAY: {
+                    PackedInt32Array values = p_array[p_index];
+                    values.reverse();
+                    p_array[p_index] = values;
+                } break;
+                default:
+                    break;
+            }
+        };
+
+        if (p_array.size() > Mesh::ARRAY_VERTEX) {
+            reverse_array(Mesh::ARRAY_VERTEX);
+        }
+        if (p_array.size() > Mesh::ARRAY_NORMAL) {
+            if (p_is_3d && p_array[Mesh::ARRAY_NORMAL].get_type() == Variant::PACKED_VECTOR3_ARRAY) {
+                PackedVector3Array normals = p_array[Mesh::ARRAY_NORMAL];
+                for (Vector3 &normal : normals) {
+                    normal = -normal;
+                }
+                p_array[Mesh::ARRAY_NORMAL] = normals;
+            } else if (!p_is_3d && p_array[Mesh::ARRAY_NORMAL].get_type() == Variant::PACKED_VECTOR2_ARRAY) {
+                PackedVector2Array normals = p_array[Mesh::ARRAY_NORMAL];
+                for (Vector2 &normal : normals) {
+                    normal = -normal;
+                }
+                p_array[Mesh::ARRAY_NORMAL] = normals;
+            }
+            reverse_array(Mesh::ARRAY_NORMAL);
+        }
+        for (int idx_type = Mesh::ARRAY_TANGENT; idx_type < Mesh::ARRAY_MAX; ++idx_type) {
+            reverse_array(idx_type);
+        }
+    };
+
+    if (flip_normals) {
+        do_flip(new_mesh_array, false);
+        do_flip(new_end_cap_array, true);
+    }
+
+    mesh_array = new_mesh_array;
+    end_cap_array = new_end_cap_array;
 
     return r_value;
 }
@@ -142,8 +176,20 @@ Array PathExtrudeProfileBase::_generate_cross_section() {
     return out;
 }
 
+Array PathExtrudeProfileBase::_generate_end_cap() {
+    Array out;
+    GDVIRTUAL_CALL(_generate_end_cap, out);
+    // must have at least an empty array of vertices
+    if (out.size() < Mesh::ARRAY_VERTEX) {
+        out.resize(Mesh::ARRAY_VERTEX + 1);
+        out[Mesh::ARRAY_VERTEX] = PackedVector3Array();
+    }
+    return out;
+}
+
 void PathExtrudeProfileBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_cross_section"), &PathExtrudeProfileBase::get_cross_section);
+    ClassDB::bind_method(D_METHOD("get_end_cap_arrays"), &PathExtrudeProfileBase::get_end_cap_arrays);
     ClassDB::bind_method(D_METHOD("queue_update"), &PathExtrudeProfileBase::queue_update);
 
     ClassDB::bind_method(D_METHOD("set_flip_normals", "flip_normals"), &PathExtrudeProfileBase::set_flip_normals);
@@ -151,4 +197,5 @@ void PathExtrudeProfileBase::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_normals"), "set_flip_normals", "get_flip_normals");
 
     GDVIRTUAL_BIND(_generate_cross_section)
+    GDVIRTUAL_BIND(_generate_end_cap)
 }

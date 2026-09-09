@@ -283,36 +283,44 @@ protected:
                     ERR_FAIL(); 
             } 
         } 
+
+        double shape_length = baked_l;
+        Ref<ArrayMesh> debug_mesh = shape->get_debug_mesh();
+        if (debug_mesh.is_valid()) {
+            shape_length = debug_mesh->get_aabb().size.z;
+        }
         
         bool debugging = Engine::get_singleton()->is_editor_hint() || _self()->get_tree()->is_debugging_collisions_hint(); 
-        
+
+    
         if (debugging) { 
             MultiMeshInstance3D *collision_debug = memnew(MultiMeshInstance3D); 
             collision_debug_id = collision_debug->get_instance_id(); 
             collision_debug->set_multimesh(memnew(MultiMesh)); 
             collision_debug->get_multimesh()->set_transform_format(MultiMesh::TRANSFORM_3D); 
             collision_debug->get_multimesh()->set_instance_count(n_instances); 
-            collision_debug->get_multimesh()->set_mesh(shape->get_debug_mesh()); 
+            collision_debug->get_multimesh()->set_mesh(debug_mesh); 
             _self()->add_child(collision_debug, false, _self()->INTERNAL_MODE_BACK); 
-        } 
+        }
         
         owners.resize(n_instances); 
         for (uint64_t i = 0; i < n_instances; ++i) { 
-            Transform3D transform; 
+            Transform3D transform;
+            real_t offset_mod = offset + _self()->_sample_offset_modifiers_at(offset / baked_l, shape_length);
             switch (rotation_mode) { 
                 case ROTATE_FIXED: { 
-                    transform.origin = curve->sample_baked(offset, sample_cubic); 
+                    transform.origin = curve->sample_baked(offset_mod, sample_cubic); 
                     transform.basis = Basis::from_euler(rotation); 
                 } break; 
                 case ROTATE_PATH: { 
-                    transform = curve->sample_baked_with_rotation(offset, sample_cubic, true); 
+                    transform = curve->sample_baked_with_rotation(offset_mod, sample_cubic, true); 
                     transform.basis.rotate(rotation); 
                 } break; 
                 default: 
                     ERR_FAIL(); 
             } 
             
-            transform *= _self()->_sample_3d_modifiers_at(offset / baked_l); 
+            transform *= _self()->_sample_3d_modifiers_at(offset_mod / baked_l); 
             
             if (_self()->_get_relative_transform() == _self()->TRANSFORM_PATH_NODE) { 
                 transform = mod_transform * transform; 

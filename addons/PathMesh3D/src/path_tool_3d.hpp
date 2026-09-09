@@ -167,7 +167,15 @@ protected:
     
     _FORCE_INLINE_ Transform3D _get_final_transform() const { 
         return self_transform.affine_inverse() * path_transform; 
-    } 
+    }
+
+    _FORCE_INLINE_ real_t _sample_offset_modifiers_at(real_t p_offset_ratio, real_t baked_l) const { 
+        real_t out = 0.0; 
+        for (PathModifier3D *modifier : modifiers) { 
+            out += modifier->sample_offset_modifier_at(p_offset_ratio, baked_l); 
+        } 
+        return out;
+    }
     
     _FORCE_INLINE_ Transform3D _sample_3d_modifiers_at(real_t p_offset_ratio) const { 
         Transform3D out; 

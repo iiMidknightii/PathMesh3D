@@ -2,10 +2,10 @@
 	"header": {
 		"version_major": 4,
 		"version_minor": 7,
-		"version_patch": 0,
+		"version_patch": 2,
 		"version_status": "stable",
-		"version_build": "official",
-		"version_full_name": "Godot Engine v4.7.stable.official",
+		"version_build": "fedora",
+		"version_full_name": "Godot Engine v4.7.2.stable.fedora",
 		"precision": "single"
 	},
 	"builtin_class_sizes": [
@@ -206806,178 +206806,6 @@
 					}
 				},
 				{
-					"name": "set_generate_collision",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3485714412,
-					"arguments": [
-						{
-							"name": "mode",
-							"type": "enum::PathExtrude3D.CollisionMode"
-						}
-					]
-				},
-				{
-					"name": "get_generate_collision",
-					"is_const": true,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3729450456,
-					"return_value": {
-						"type": "enum::PathExtrude3D.CollisionMode"
-					}
-				},
-				{
-					"name": "set_convex_collision_clean",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 2586408642,
-					"arguments": [
-						{
-							"name": "clean",
-							"type": "bool"
-						}
-					]
-				},
-				{
-					"name": "get_convex_collision_clean",
-					"is_const": true,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 36873697,
-					"return_value": {
-						"type": "bool"
-					}
-				},
-				{
-					"name": "set_convex_collision_simplify",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 2586408642,
-					"arguments": [
-						{
-							"name": "simplify",
-							"type": "bool"
-						}
-					]
-				},
-				{
-					"name": "get_convex_collision_simplify",
-					"is_const": true,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 36873697,
-					"return_value": {
-						"type": "bool"
-					}
-				},
-				{
-					"name": "set_collision_layer",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 1286410249,
-					"arguments": [
-						{
-							"name": "layer",
-							"type": "int",
-							"meta": "uint32"
-						}
-					]
-				},
-				{
-					"name": "get_collision_layer",
-					"is_const": true,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3905245786,
-					"return_value": {
-						"type": "int",
-						"meta": "uint32"
-					}
-				},
-				{
-					"name": "set_collision_mask",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 1286410249,
-					"arguments": [
-						{
-							"name": "mask",
-							"type": "int",
-							"meta": "uint32"
-						}
-					]
-				},
-				{
-					"name": "get_collision_mask",
-					"is_const": true,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3905245786,
-					"return_value": {
-						"type": "int",
-						"meta": "uint32"
-					}
-				},
-				{
-					"name": "create_trimesh_collision",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3218959716
-				},
-				{
-					"name": "create_convex_collision",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 2751962654,
-					"arguments": [
-						{
-							"name": "clean",
-							"type": "bool",
-							"default_value": "true"
-						},
-						{
-							"name": "simplify",
-							"type": "bool",
-							"default_value": "false"
-						}
-					]
-				},
-				{
-					"name": "create_multiple_convex_collision",
-					"is_const": false,
-					"is_vararg": false,
-					"is_static": false,
-					"is_virtual": false,
-					"hash": 3217660252,
-					"arguments": [
-						{
-							"name": "settings",
-							"type": "MeshConvexDecompositionSettings",
-							"default_value": "null"
-						}
-					]
-				},
-				{
 					"name": "get_baked_mesh",
 					"is_const": true,
 					"is_vararg": false,
@@ -207230,6 +207058,178 @@
 						"type": "int",
 						"meta": "uint64"
 					}
+				},
+				{
+					"name": "set_generate_collision",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3485714412,
+					"arguments": [
+						{
+							"name": "mode",
+							"type": "enum::PathExtrude3D.CollisionMode"
+						}
+					]
+				},
+				{
+					"name": "get_generate_collision",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3729450456,
+					"return_value": {
+						"type": "enum::PathExtrude3D.CollisionMode"
+					}
+				},
+				{
+					"name": "set_convex_collision_clean",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 2586408642,
+					"arguments": [
+						{
+							"name": "clean",
+							"type": "bool"
+						}
+					]
+				},
+				{
+					"name": "get_convex_collision_clean",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 36873697,
+					"return_value": {
+						"type": "bool"
+					}
+				},
+				{
+					"name": "set_convex_collision_simplify",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 2586408642,
+					"arguments": [
+						{
+							"name": "simplify",
+							"type": "bool"
+						}
+					]
+				},
+				{
+					"name": "get_convex_collision_simplify",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 36873697,
+					"return_value": {
+						"type": "bool"
+					}
+				},
+				{
+					"name": "set_collision_layer",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1286410249,
+					"arguments": [
+						{
+							"name": "layer",
+							"type": "int",
+							"meta": "uint32"
+						}
+					]
+				},
+				{
+					"name": "get_collision_layer",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3905245786,
+					"return_value": {
+						"type": "int",
+						"meta": "uint32"
+					}
+				},
+				{
+					"name": "set_collision_mask",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1286410249,
+					"arguments": [
+						{
+							"name": "mask",
+							"type": "int",
+							"meta": "uint32"
+						}
+					]
+				},
+				{
+					"name": "get_collision_mask",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3905245786,
+					"return_value": {
+						"type": "int",
+						"meta": "uint32"
+					}
+				},
+				{
+					"name": "create_trimesh_collision",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3218959716
+				},
+				{
+					"name": "create_convex_collision",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 2751962654,
+					"arguments": [
+						{
+							"name": "clean",
+							"type": "bool",
+							"default_value": "true"
+						},
+						{
+							"name": "simplify",
+							"type": "bool",
+							"default_value": "false"
+						}
+					]
+				},
+				{
+					"name": "create_multiple_convex_collision",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3217660252,
+					"arguments": [
+						{
+							"name": "settings",
+							"type": "MeshConvexDecompositionSettings",
+							"default_value": "null"
+						}
+					]
 				}
 			],
 			"signals": [
@@ -207252,36 +207252,6 @@
 					"name": "relative_transform",
 					"setter": "set_relative_transform",
 					"getter": "get_relative_transform"
-				},
-				{
-					"type": "int",
-					"name": "collision_mode",
-					"setter": "set_generate_collision",
-					"getter": "get_generate_collision"
-				},
-				{
-					"type": "bool",
-					"name": "convex_collision_clean",
-					"setter": "set_convex_collision_clean",
-					"getter": "get_convex_collision_clean"
-				},
-				{
-					"type": "bool",
-					"name": "convex_collision_simplify",
-					"setter": "set_convex_collision_simplify",
-					"getter": "get_convex_collision_simplify"
-				},
-				{
-					"type": "int",
-					"name": "collision_layer",
-					"setter": "set_collision_layer",
-					"getter": "get_collision_layer"
-				},
-				{
-					"type": "int",
-					"name": "collision_mask",
-					"setter": "set_collision_mask",
-					"getter": "get_collision_mask"
 				},
 				{
 					"type": "PathExtrudeProfileBase",
@@ -207341,6 +207311,36 @@
 					"type": "int",
 					"name": "triangle_count",
 					"getter": "get_triangle_count"
+				},
+				{
+					"type": "int",
+					"name": "collision_mode",
+					"setter": "set_generate_collision",
+					"getter": "get_generate_collision"
+				},
+				{
+					"type": "bool",
+					"name": "convex_collision_clean",
+					"setter": "set_convex_collision_clean",
+					"getter": "get_convex_collision_clean"
+				},
+				{
+					"type": "bool",
+					"name": "convex_collision_simplify",
+					"setter": "set_convex_collision_simplify",
+					"getter": "get_convex_collision_simplify"
+				},
+				{
+					"type": "int",
+					"name": "collision_layer",
+					"setter": "set_collision_layer",
+					"getter": "get_collision_layer"
+				},
+				{
+					"type": "int",
+					"name": "collision_mask",
+					"setter": "set_collision_mask",
+					"getter": "get_collision_mask"
 				}
 			]
 		},
@@ -207364,6 +207364,18 @@
 					}
 				},
 				{
+					"name": "_generate_end_cap",
+					"is_const": false,
+					"is_static": false,
+					"is_required": false,
+					"is_vararg": false,
+					"is_virtual": true,
+					"hash": 2915620761,
+					"return_value": {
+						"type": "Array"
+					}
+				},
+				{
 					"name": "get_cross_section",
 					"is_const": true,
 					"is_vararg": false,
@@ -207372,6 +207384,17 @@
 					"hash": 2961356807,
 					"return_value": {
 						"type": "PackedVector2Array"
+					}
+				},
+				{
+					"name": "get_end_cap_arrays",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3995934104,
+					"return_value": {
+						"type": "Array"
 					}
 				},
 				{
@@ -207423,6 +207446,22 @@
 			"is_instantiable": true,
 			"inherits": "PathExtrudeProfileBase",
 			"api_type": "extension",
+			"enums": [
+				{
+					"name": "EndCapMode",
+					"is_bitfield": false,
+					"values": [
+						{
+							"name": "END_CAP_SPHERICAL",
+							"value": 0
+						},
+						{
+							"name": "END_CAP_ARROW",
+							"value": 1
+						}
+					]
+				}
+			],
 			"methods": [
 				{
 					"name": "set_radius",
@@ -207581,6 +207620,193 @@
 					"return_value": {
 						"type": "bool"
 					}
+				},
+				{
+					"name": "set_end_cap_mode",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3235867406,
+					"arguments": [
+						{
+							"name": "mode",
+							"type": "enum::PathExtrudeProfileCircle.EndCapMode"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_mode",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 4112135506,
+					"return_value": {
+						"type": "enum::PathExtrudeProfileCircle.EndCapMode"
+					}
+				},
+				{
+					"name": "set_end_cap_length",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "height",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_length",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_segments",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1286410249,
+					"arguments": [
+						{
+							"name": "segments",
+							"type": "int",
+							"meta": "uint64"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_segments",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 3905245786,
+					"return_value": {
+						"type": "int",
+						"meta": "uint64"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_flare_radius",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "radius",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_flare_radius",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_flare_length",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "depth",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_flare_length",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_tip_radius",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "radius",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_tip_radius",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_tip_length",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "depth",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_tip_length",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
 				}
 			],
 			"properties": [
@@ -207619,6 +207845,48 @@
 					"name": "smooth_normals",
 					"setter": "set_smooth_normals",
 					"getter": "get_smooth_normals"
+				},
+				{
+					"type": "int",
+					"name": "end_cap_mode",
+					"setter": "set_end_cap_mode",
+					"getter": "get_end_cap_mode"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_length",
+					"setter": "set_end_cap_length",
+					"getter": "get_end_cap_length"
+				},
+				{
+					"type": "int",
+					"name": "end_cap_segments",
+					"setter": "set_end_cap_segments",
+					"getter": "get_end_cap_segments"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_flare_radius",
+					"setter": "set_end_cap_arrow_flare_radius",
+					"getter": "get_end_cap_arrow_flare_radius"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_flare_length",
+					"setter": "set_end_cap_arrow_flare_length",
+					"getter": "get_end_cap_arrow_flare_length"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_tip_radius",
+					"setter": "set_end_cap_arrow_tip_radius",
+					"getter": "get_end_cap_arrow_tip_radius"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_tip_length",
+					"setter": "set_end_cap_arrow_tip_length",
+					"getter": "get_end_cap_arrow_tip_length"
 				}
 			]
 		},
@@ -207732,6 +208000,22 @@
 			"is_instantiable": true,
 			"inherits": "PathExtrudeProfileBase",
 			"api_type": "extension",
+			"enums": [
+				{
+					"name": "EndCapMode",
+					"is_bitfield": false,
+					"values": [
+						{
+							"name": "END_CAP_FLAT",
+							"value": 0
+						},
+						{
+							"name": "END_CAP_ARROW",
+							"value": 1
+						}
+					]
+				}
+			],
 			"methods": [
 				{
 					"name": "set_rect",
@@ -207807,6 +208091,193 @@
 					"return_value": {
 						"type": "bool"
 					}
+				},
+				{
+					"name": "set_end_cap_mode",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1082380191,
+					"arguments": [
+						{
+							"name": "mode",
+							"type": "enum::PathExtrudeProfileRect.EndCapMode"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_mode",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 566639252,
+					"return_value": {
+						"type": "enum::PathExtrudeProfileRect.EndCapMode"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_flare_width",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "width",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_flare_width",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_flare_height",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "height",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_flare_height",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_flare_length",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "depth",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_flare_length",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_tip_width",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "width",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_tip_width",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_tip_height",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "height",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_tip_height",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
+				},
+				{
+					"name": "set_end_cap_arrow_tip_length",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "depth",
+							"type": "float",
+							"meta": "double"
+						}
+					]
+				},
+				{
+					"name": "get_end_cap_arrow_tip_length",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "double"
+					}
 				}
 			],
 			"properties": [
@@ -207827,6 +208298,48 @@
 					"name": "smooth_normals",
 					"setter": "set_smooth_normals",
 					"getter": "get_smooth_normals"
+				},
+				{
+					"type": "int",
+					"name": "end_cap_mode",
+					"setter": "set_end_cap_mode",
+					"getter": "get_end_cap_mode"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_flare_width",
+					"setter": "set_end_cap_arrow_flare_width",
+					"getter": "get_end_cap_arrow_flare_width"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_flare_height",
+					"setter": "set_end_cap_arrow_flare_height",
+					"getter": "get_end_cap_arrow_flare_height"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_flare_length",
+					"setter": "set_end_cap_arrow_flare_length",
+					"getter": "get_end_cap_arrow_flare_length"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_tip_width",
+					"setter": "set_end_cap_arrow_tip_width",
+					"getter": "get_end_cap_arrow_tip_width"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_tip_height",
+					"setter": "set_end_cap_arrow_tip_height",
+					"getter": "get_end_cap_arrow_tip_height"
+				},
+				{
+					"type": "float",
+					"name": "end_cap_arrow_tip_length",
+					"setter": "set_end_cap_arrow_tip_length",
+					"getter": "get_end_cap_arrow_tip_length"
 				}
 			]
 		},
@@ -209260,6 +209773,20 @@
 			"api_type": "extension",
 			"enums": [
 				{
+					"name": "OffsetMode",
+					"is_bitfield": false,
+					"values": [
+						{
+							"name": "OFFSET_MODE_ABSOLUTE",
+							"value": 0
+						},
+						{
+							"name": "OFFSET_MODE_RELATIVE",
+							"value": 1
+						}
+					]
+				},
+				{
 					"name": "RotationEditMode",
 					"is_bitfield": false,
 					"values": [
@@ -209279,6 +209806,69 @@
 				}
 			],
 			"methods": [
+				{
+					"name": "_sample_offset_modifier_at",
+					"is_const": true,
+					"is_static": false,
+					"is_required": false,
+					"is_vararg": false,
+					"is_virtual": true,
+					"hash": 2753205203,
+					"return_value": {
+						"type": "float",
+						"meta": "float"
+					},
+					"arguments": [
+						{
+							"name": "offset_ratio",
+							"type": "float",
+							"meta": "float"
+						},
+						{
+							"name": "mesh_length",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
+				{
+					"name": "_sample_3d_modifier_at",
+					"is_const": true,
+					"is_static": false,
+					"is_required": false,
+					"is_vararg": false,
+					"is_virtual": true,
+					"hash": 1481077097,
+					"return_value": {
+						"type": "Transform3D"
+					},
+					"arguments": [
+						{
+							"name": "offset_ratio",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
+				{
+					"name": "_sample_uv_modifier_at",
+					"is_const": true,
+					"is_static": false,
+					"is_required": false,
+					"is_vararg": false,
+					"is_virtual": true,
+					"hash": 1237697725,
+					"return_value": {
+						"type": "Transform2D"
+					},
+					"arguments": [
+						{
+							"name": "offset_ratio",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
 				{
 					"name": "set_curve_offset_start",
 					"is_const": false,
@@ -209410,6 +210000,85 @@
 					"hash": 2460114913,
 					"return_value": {
 						"type": "Curve"
+					}
+				},
+				{
+					"name": "set_offset_mode",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 2747549479,
+					"arguments": [
+						{
+							"name": "mode",
+							"type": "enum::PathModifier3D.OffsetMode"
+						}
+					]
+				},
+				{
+					"name": "get_offset_mode",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 659356806,
+					"return_value": {
+						"type": "enum::PathModifier3D.OffsetMode"
+					}
+				},
+				{
+					"name": "set_offset_modifier",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "modifier",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
+				{
+					"name": "get_offset_modifier",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "float"
+					}
+				},
+				{
+					"name": "set_offset_randomness",
+					"is_const": false,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 373806689,
+					"arguments": [
+						{
+							"name": "randomness",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
+				{
+					"name": "get_offset_randomness",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 1740695150,
+					"return_value": {
+						"type": "float",
+						"meta": "float"
 					}
 				},
 				{
@@ -209663,6 +210332,30 @@
 					}
 				},
 				{
+					"name": "sample_offset_modifier_at",
+					"is_const": true,
+					"is_vararg": false,
+					"is_static": false,
+					"is_virtual": false,
+					"hash": 2753205203,
+					"return_value": {
+						"type": "float",
+						"meta": "float"
+					},
+					"arguments": [
+						{
+							"name": "offset_ratio",
+							"type": "float",
+							"meta": "float"
+						},
+						{
+							"name": "mesh_length",
+							"type": "float",
+							"meta": "float"
+						}
+					]
+				},
+				{
 					"name": "sample_3d_modifier_at",
 					"is_const": true,
 					"is_vararg": false,
@@ -209731,13 +210424,31 @@
 					"getter": "get_influence"
 				},
 				{
-					"type": "Vector2",
+					"type": "int",
+					"name": "offset_mode",
+					"setter": "set_offset_mode",
+					"getter": "get_offset_mode"
+				},
+				{
+					"type": "float",
+					"name": "offset_modifier",
+					"setter": "set_offset_modifier",
+					"getter": "get_offset_modifier"
+				},
+				{
+					"type": "float",
+					"name": "offset_randomness",
+					"setter": "set_offset_randomness",
+					"getter": "get_offset_randomness"
+				},
+				{
+					"type": "Vector3",
 					"name": "position_modifier",
 					"setter": "set_position_modifier",
 					"getter": "get_position_modifier"
 				},
 				{
-					"type": "Vector2",
+					"type": "Vector3",
 					"name": "position_randomness",
 					"setter": "set_position_randomness",
 					"getter": "get_position_randomness"

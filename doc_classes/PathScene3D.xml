@@ -36,7 +36,7 @@
 			Sets the method in which instances are spaced along the path.
 		</member>
 		<member name="path_3d" type="Path3D" setter="set_path_3d" getter="get_path_3d">
-			The Path3D node used to instance the MultiMesh.
+			The Path3D node used to instance the PackedScene.
 		</member>
 		<member name="relative_transform" type="int" setter="set_relative_transform" getter="get_relative_transform" enum="PathScene3D.RelativeTransform" default="0">
 			Determines how the instances are transformed relative to this node or the path node.

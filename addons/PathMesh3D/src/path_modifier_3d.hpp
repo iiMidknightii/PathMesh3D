@@ -2,6 +2,7 @@
 
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/curve.hpp>
+#include <godot_cpp/core/gdvirtual.gen.inc>
 
 namespace godot {
 
@@ -11,6 +12,8 @@ class PathModifier3D : public Node3D {
     GDCLASS(PathModifier3D, Node3D)
 
 public:
+    enum OffsetMode { OFFSET_MODE_ABSOLUTE, OFFSET_MODE_RELATIVE, OFFSET_MODE_MAX };
+
     void set_curve_offset_start(real_t p_offset);
     real_t get_curve_offset_start() const;
 
@@ -25,6 +28,15 @@ public:
 
     void set_influence(const Ref<Curve> &p_curve);
     Ref<Curve> get_influence() const;
+
+    void set_offset_mode(OffsetMode p_mode);
+    OffsetMode get_offset_mode() const;
+
+    void set_offset_modifier(real_t p_modifier);
+    real_t get_offset_modifier() const;
+
+    void set_offset_randomness(real_t p_randomness);
+    real_t get_offset_randomness() const;
 
     void set_position_modifier(Vector3 p_modifier);
     Vector3 get_position_modifier() const;
@@ -65,12 +77,17 @@ public:
     void set_uv_scale_randomness(Vector2 p_randomness);
     Vector2 get_uv_scale_randomness() const;
 
+    real_t sample_offset_modifier_at(real_t p_offset_ratio, real_t mesh_l) const;
     Transform3D sample_3d_modifier_at(real_t p_offset_ratio) const;
     Transform2D sample_uv_modifier_at(real_t p_offset_ratio) const;
 
     void queue_rebuild();
 
     bool pop_is_dirty();
+
+    GDVIRTUAL2RC(real_t, _sample_offset_modifier_at, real_t, real_t);
+    GDVIRTUAL1RC(Transform3D, _sample_3d_modifier_at, real_t);
+    GDVIRTUAL1RC(Transform2D, _sample_uv_modifier_at, real_t);
 
 protected:
     static void _bind_methods();
@@ -85,6 +102,9 @@ private:
 
     Ref<Curve> influence;
     
+    OffsetMode offset_mode = OFFSET_MODE_ABSOLUTE;
+    real_t offset_modifier = 0.0;
+    real_t offset_randomness = 0.0;
     Vector3 position_modifier = { 0.0, 0.0, 0.0 };
     Vector3 position_randomness = { 0.0, 0.0, 0.0 };
     RotationEditMode rotation_modifier_mode = ROTATION_EDIT_MODE_EULER;
@@ -161,3 +181,5 @@ template<> inline Vector3 PathModifier3D::get_rotation_randomness_t<Vector3>() c
 }
 
 }
+
+VARIANT_ENUM_CAST(PathModifier3D::OffsetMode)

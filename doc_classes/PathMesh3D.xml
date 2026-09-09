@@ -27,7 +27,7 @@
 			<return type="void" />
 			<param index="0" name="settings" type="MeshConvexDecompositionSettings" default="null" />
 			<description>
-				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the extrueded mesh geometry via convex decomposition. The convex decomposition operation can be controlled with parameters from the optional settings.
+				This helper creates a StaticBody3D child node with multiple ConvexPolygonShape3D collision shapes calculated from the deformed mesh geometry via convex decomposition. The convex decomposition operation can be controlled with the optional settings resource.
 			</description>
 		</method>
 		<method name="create_trimesh_collision">

@@ -10,7 +10,6 @@ windows.debug.x86_64 = "res://addons/PathMesh3D/bin/path_mesh_3d.windows.templat
 windows.release.x86_64 = "res://addons/PathMesh3D/bin/path_mesh_3d.windows.template_release.x86_64.dll"
 linux.debug.x86_64 = "res://addons/PathMesh3D/bin/libpath_mesh_3d.linux.template_debug.dev.x86_64.so"
 linux.release.x86_64 = "res://addons/PathMesh3D/bin/libpath_mesh_3d.linux.template_release.x86_64.so"
-
 [icons]
 PathMesh3D = "res://addons/PathMesh3D/icons/PathMesh3D.svg"
 PathExtrude3D = "res://addons/PathMesh3D/icons/PathExtrude3D.svg"

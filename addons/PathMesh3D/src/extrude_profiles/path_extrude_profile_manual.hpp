@@ -19,6 +19,7 @@ public:
 
 protected:
     Array _generate_cross_section() override;
+    Array _generate_end_cap() override;
 
     static void _bind_methods();
 

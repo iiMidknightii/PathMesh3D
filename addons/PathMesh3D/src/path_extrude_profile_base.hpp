@@ -10,7 +10,9 @@ class PathExtrudeProfileBase : public Resource {
 
 public:
     Array get_mesh_arrays() const;
+    Array get_end_cap_arrays() const;
     PackedVector2Array get_cross_section() const;
+    PackedVector3Array get_end_cap() const;
 
     void set_flip_normals(const bool p_flip_normals);
     bool get_flip_normals() const;
@@ -19,9 +21,11 @@ public:
     bool regen_if_dirty();
 
     GDVIRTUAL0R(Array, _generate_cross_section)
+    GDVIRTUAL0R(Array, _generate_end_cap);
 
 protected:
     virtual Array _generate_cross_section();
+    virtual Array _generate_end_cap();
 
     static void _bind_methods();
 
@@ -31,6 +35,7 @@ private:
     bool dirty = true;
     bool flip_normals = false;
     Array mesh_array {PackedVector2Array()};
+    Array end_cap_array {PackedVector3Array()};
 };
 
 }

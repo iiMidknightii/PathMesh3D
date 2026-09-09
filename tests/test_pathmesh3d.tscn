@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bpo0gwnewgno0"]
 
 [ext_resource type="ArrayMesh" uid="uid://ddobn51ge646b" path="res://tests/railroad-straight.res" id="1_wgxgm"]
+[ext_resource type="Script" uid="uid://1hm1tckvcm5h" path="res://tests/path_modifier_3d.gd" id="2_3uapm"]
 
 [sub_resource type="GDScript" id="GDScript_bfc6h"]
 script/source = "extends Node3D
@@ -17,9 +18,9 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 "
 
-[sub_resource type="Curve" id="Curve_eedmf"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.498285, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 3
+[sub_resource type="Curve" id="Curve_17hwd"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0]
+point_count = 1
 
 [sub_resource type="Curve3D" id="Curve3D_jw5u5"]
 _data = {
@@ -50,7 +51,8 @@ surface_0/triangle_count = 853
 
 [node name="PathModifier3D" type="PathModifier3D" parent="PathMesh3D" unique_id=1414183368]
 curve_offset_end = 17.808922
-influence = SubResource("Curve_eedmf")
+influence = SubResource("Curve_17hwd")
+script = ExtResource("2_3uapm")
 
 [node name="Path3D" type="Path3D" parent="." unique_id=1104019177]
 curve = SubResource("Curve3D_jw5u5")

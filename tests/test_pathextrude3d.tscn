@@ -1,13 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://b8gswamttwis8"]
+[gd_scene format=3 uid="uid://b8gswamttwis8"]
 
-[ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_jtvri"]
+[ext_resource type="Texture2D" uid="uid://bxldv7ij0s6uw" path="res://tests/test_uv.png" id="1_2g0eo"]
 
-[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_2g0eo"]
-radius = 0.5
+[sub_resource type="PathExtrudeProfileCircle" id="PathExtrudeProfileCircle_5cjix"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eywb8"]
-albedo_texture = ExtResource("1_jtvri")
-texture_filter = 0
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_64j8u"]
+albedo_texture = ExtResource("1_2g0eo")
 
 [sub_resource type="GDScript" id="GDScript_x3lis"]
 script/source = "extends PathExtrude3D
@@ -25,44 +23,25 @@ func _process(delta: float) -> void:
 		print(\"yo\")
 "
 
-[sub_resource type="Curve" id="Curve_2g0eo"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.753859, 0), -0.0378524, -0.0378524, 0, 0, Vector2(0.90853137, 0.17918497), 2.600726, 2.600726, 0, 0, Vector2(1, 1), 14.9377, 0.0, 0, 0]
-point_count = 4
-
-[sub_resource type="GDScript" id="GDScript_2g0eo"]
-script/source = "@tool extends PathModifier3D
-
-func _process(delta: float) -> void:
-	uv_offset_modifier += Vector2(0.1 * delta, 0.0)
-"
-
 [sub_resource type="Curve3D" id="Curve3D_vx06t"]
 _data = {
-"points": PackedVector3Array(0.162846, -0.544799, 1.51087, -0.162846, 0.544799, -1.51087, 0.893575, 1.12331, 3.36361, 2.36698, -0.148876, 1.87897, -2.36698, 0.148876, -1.87897, 2.60477, 0.701425, -0.999865, 0.20386, 1.18696, -1.22073, -0.20386, -1.18696, 1.22073, 0.887123, 2.20234, 2.2783),
+"points": PackedVector3Array(0.162846, -0.544799, 1.51087, -0.162846, 0.544799, -1.51087, 0.893575, 1.12331, 3.36361, 2.36698, -0.148876, 1.87897, -2.36698, 0.148876, -1.87897, 2.60477, 0.701425, -0.999865, 0.20386, 1.18696, -1.22073, -0.20386, -1.18696, 1.22073, -0.027908802, 1.9651347, 2.760342),
 "tilts": PackedFloat32Array(3.01723, -1.805, 0)
 }
 point_count = 3
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=1330561999]
 
-[node name="PathExtrude3D" type="PathExtrude3D" parent="." node_paths=PackedStringArray("path_3d")]
+[node name="PathExtrude3D" type="PathExtrude3D" parent="." unique_id=2056338519 node_paths=PackedStringArray("path_3d")]
 path_3d = NodePath("../Path3D")
-profile = SubResource("PathExtrudeProfileCircle_2g0eo")
-tessellation_tolerance_degrees = 0.5
-material = SubResource("StandardMaterial3D_eywb8")
+profile = SubResource("PathExtrudeProfileCircle_5cjix")
+material = SubResource("StandardMaterial3D_64j8u")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15287, -0.660449)
 script = SubResource("GDScript_x3lis")
 
-[node name="PathModifier3D" type="PathModifier3D" parent="PathExtrude3D"]
-curve_offset_end = 11.435217
-influence = SubResource("Curve_2g0eo")
-scale_modifier = Vector3(0, 0, 0)
+[node name="PathModifier3D" type="PathModifier3D" parent="PathExtrude3D" unique_id=1401110606]
+curve_offset_end = 11.994024
 
-[node name="PathModifier3D2" type="PathModifier3D" parent="PathExtrude3D"]
-curve_offset_end = 11.435217
-uv_offset_modifier = Vector2(66.195526, 0)
-script = SubResource("GDScript_2g0eo")
-
-[node name="Path3D" type="Path3D" parent="."]
+[node name="Path3D" type="Path3D" parent="." unique_id=1479160575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.75648)
 curve = SubResource("Curve3D_vx06t")

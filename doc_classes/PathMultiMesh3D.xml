@@ -12,7 +12,7 @@
 		<method name="queue_rebuild">
 			<return type="void" />
 			<description>
-				Rebuilds the instances along the path. This method is called automatically when the path, but it can be called manually to force an update.
+				Rebuilds the instances along the path. This method is called automatically when the path or MultiMesh changes, but it can be called manually to force an update.
 			</description>
 		</method>
 	</methods>
